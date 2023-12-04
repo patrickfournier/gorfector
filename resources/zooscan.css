@@ -1,0 +1,14 @@
+.settings-content {
+    padding: 10px;
+    margin: 10px;
+}
+
+.settings-group {
+    background: #eee;
+    padding: 10px;
+    margin: 10px;
+}
+
+.advanced {
+    background: burlywood;
+}

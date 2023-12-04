@@ -1,0 +1,41 @@
+#include "Application.h"
+#include "SignalSupport.h"
+
+Zoo::Application::Application()
+        : m_GtkApp(nullptr)
+        , m_MainWindow(nullptr)
+{
+}
+
+void Zoo::Application::Initialize()
+{
+    m_GtkApp = gtk_application_new(GetApplicationId().c_str(), GetApplicationFlags());
+    ConnectGtkSignal(this, &Application::OnActivate, m_GtkApp, "activate");
+}
+
+Zoo::Application::~Application()
+{
+    g_object_unref(m_GtkApp);
+}
+
+int Zoo::Application::Run(int argc, char **argv)
+{
+    return g_application_run(G_APPLICATION(m_GtkApp), argc, argv);
+}
+
+void Zoo::Application::OnActivate(GtkApplication *app)
+{
+    m_MainWindow = GTK_WINDOW(gtk_application_window_new(app));
+    gtk_window_set_title(m_MainWindow, GetMainWindowTitle().c_str());
+    auto size = GetMainWindowSize();
+    gtk_window_set_default_size(m_MainWindow, std::get<0>(size), std::get<1>(size));
+
+    PopulateMainWindow();
+
+    gtk_window_present(m_MainWindow);
+    gtk_widget_add_tick_callback(GTK_WIDGET(m_MainWindow), [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
+        auto *app = static_cast<Application *>(data);
+        app->m_ObserverManager.NotifyObservers();
+        return G_SOURCE_CONTINUE;
+    }, this, nullptr);
+}
