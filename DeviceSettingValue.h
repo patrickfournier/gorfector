@@ -12,26 +12,35 @@ namespace ZooScan
         typedef TValueType ValueType;
 
     private:
+        ValueType *m_RequestedValue;
         ValueType *m_Value;
 
     public:
-        DeviceSettingValue(int settingIndex, SANE_Value_Type valueType, int valueCount = 1)
-                : DeviceSettingValueBase(settingIndex, valueType)
+        explicit DeviceSettingValue(SANE_Value_Type valueType, int valueCount = 1)
+                : DeviceSettingValueBase(valueType, valueCount)
         {
+            m_RequestedValue = new ValueType[valueCount];
             m_Value = new ValueType[valueCount];
         }
 
         ~DeviceSettingValue() override
         {
+            delete[] m_RequestedValue;
             delete[] m_Value;
         }
 
-        void SetValue(int valueIndex, ValueType value)
+        void SetValue(uint32_t valueIndex, const ValueType& value)
         {
+            SetValue(valueIndex, value, value);
+        }
+
+        void SetValue(uint32_t valueIndex, const ValueType& requestedValue, const ValueType& value)
+        {
+            m_RequestedValue[valueIndex] = requestedValue;
             m_Value[valueIndex] = value;
         }
 
-        [[nodiscard]] ValueType GetValue(int valueIndex = 0) const
+        [[nodiscard]] const ValueType& GetValue(uint32_t valueIndex = 0) const
         {
             return m_Value[valueIndex];
         }

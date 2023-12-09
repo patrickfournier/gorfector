@@ -2,12 +2,13 @@
 #include "DeviceSelector.h"
 #include "ZooFW/SignalSupport.h"
 #include "Commands/DeviceSelectorCommands.h"
-#include "Commands/OpenDeviceCommand.h"
+#include "Commands/SelectDeviceCommand.h"
 #include "ZooFW/ErrorDialog.h"
 
 
 ZooScan::DeviceSelector::DeviceSelector(Zoo::CommandDispatcher* parent, Zoo::Application* app)
-: m_Dispatcher(parent), m_App(app)
+: m_App(app)
+, m_Dispatcher(parent)
 {
     m_State = new DeviceSelectorState();
     m_App->GetState()->AddStateComponent(m_State);
@@ -69,25 +70,29 @@ void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget*)
     }
 
     auto device = m_State->DeviceList()[selectedIndex];
-    m_Dispatcher.Dispatch(OpenDeviceCommand(device));
+    m_Dispatcher.Dispatch(SelectDeviceCommand(device));
 }
 
-void ZooScan::DeviceSelector::Update()
+void ZooScan::DeviceSelector::Update(DeviceSelectorState *stateComponent)
 {
-    static u_int64_t lastSeenVersion = 0;
+    static uint64_t lastSeenVersion = 0;
+
+    if (stateComponent != m_State)
+    {
+        throw std::runtime_error("State component mismatch");
+    }
 
     if (m_State->Version() <= lastSeenVersion)
     {
         return;
     }
-    lastSeenVersion = m_State->Version();
 
     auto deviceList = m_State->DeviceList();
-    if (deviceList != nullptr && deviceList[0] != nullptr)
+    if (!deviceList.empty())
     {
         auto* devicesNames = new std::string[m_State->DeviceCount()];
         const char** deviceNameCStr = new const char*[m_State->DeviceCount() + 1];
-        auto deviceIndex = 0;
+        auto deviceIndex = 0U;
         while (deviceList[deviceIndex] != nullptr)
         {
             if (deviceIndex >= m_State->DeviceCount())
@@ -95,9 +100,9 @@ void ZooScan::DeviceSelector::Update()
                 throw std::runtime_error("Device count mismatch");
             }
 
-            std::string deviceName = deviceList[deviceIndex]->vendor;
+            std::string deviceName = deviceList[deviceIndex]->Vendor();
             deviceName += " ";
-            deviceName += deviceList[deviceIndex]->model;
+            deviceName += deviceList[deviceIndex]->Model();
 
             devicesNames[deviceIndex] = deviceName;
             deviceNameCStr[deviceIndex] = devicesNames[deviceIndex].c_str();
@@ -123,4 +128,6 @@ void ZooScan::DeviceSelector::Update()
         gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
         gtk_widget_set_sensitive(m_DeviceSelectorList, false);
     }
+
+    lastSeenVersion = m_State->Version();
 }

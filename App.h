@@ -23,7 +23,7 @@ namespace ZooScan
 
         DeviceSelector *m_DeviceSelector{};
 
-        GtkWidget *m_SettingsBox;
+        GtkWidget *m_SettingsBox{};
         GdkPixbuf* m_PreviewPixBuf{};
         GtkWidget* m_PreviewImage{};
 
@@ -61,7 +61,7 @@ namespace ZooScan
 
         DeviceSelector *CreateDeviceSelector();
 
-        void Update();
+        void Update(AppState* appState);
     };
 
 }

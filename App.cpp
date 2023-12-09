@@ -1,7 +1,7 @@
 #include "App.h"
 #include "ZooFW/SignalSupport.h"
 #include "DeviceSelector.h"
-#include "Commands/OpenDeviceCommand.h"
+#include "Commands/SelectDeviceCommand.h"
 #include "DeviceSettingsPanel.h"
 #include "AppState.h"
 
@@ -21,14 +21,14 @@ ZooScan::App::App()
     m_Observer = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_Observer);
 
-    m_Dispatcher.RegisterHandler<OpenDeviceCommand, AppState>(OpenDeviceCommand::Execute, m_AppState);
+    m_Dispatcher.RegisterHandler<SelectDeviceCommand, AppState>(SelectDeviceCommand::Execute, m_AppState);
 }
 
 ZooScan::App::~App()
 {
     delete m_DeviceSelector;
 
-    m_Dispatcher.UnregisterHandler<OpenDeviceCommand>();
+    m_Dispatcher.UnregisterHandler<SelectDeviceCommand>();
 
     m_ObserverManager.RemoveObserver(m_Observer);
     delete m_Observer;
@@ -60,7 +60,6 @@ void ZooScan::App::PopulateMainWindow()
     gtk_grid_set_row_spacing(GTK_GRID(grid), 0);
 
     m_DeviceSelector = CreateDeviceSelector();
-    m_DeviceSelector->Update();
     gtk_grid_attach(GTK_GRID(grid), m_DeviceSelector->RootWidget(), 0, 0, 2, 1);
 
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -76,9 +75,14 @@ void ZooScan::App::PopulateMainWindow()
     gtk_grid_attach(GTK_GRID(grid), m_PreviewImage, 1, 1, 1, 2);
 }
 
-void ZooScan::App::Update()
+void ZooScan::App::Update(AppState* appState)
 {
-    static u_int64_t lastSeenVersion = 0;
+    static uint64_t lastSeenVersion = 0;
+
+    if (appState != m_AppState)
+    {
+        throw std::runtime_error("State component mismatch");
+    }
 
     if (m_AppState->Version() <= lastSeenVersion)
     {
@@ -95,13 +99,13 @@ void ZooScan::App::Update()
 
     if (m_DeviceSettingsPanel == nullptr && m_SettingsBox != nullptr && m_AppState->CurrentDevice() != nullptr)
     {
-        m_DeviceSettingsPanel = new DeviceSettingsPanel(m_AppState->CurrentDevice(), GTK_BOX(m_SettingsBox), &m_Dispatcher, this);
+        m_DeviceSettingsPanel = new DeviceSettingsPanel(m_AppState->CurrentDevice(), &m_Dispatcher, this);
         gtk_box_append(GTK_BOX(m_SettingsBox), m_DeviceSettingsPanel->RootWidget());
     }
 }
 
 void ZooScan::App::OnScanClicked(GtkWidget *widget)
-{
+{/*
     int width = 0;
     int height = 0;
     SANE_Handle handle;
@@ -143,5 +147,5 @@ void ZooScan::App::OnScanClicked(GtkWidget *widget)
         sane_cancel(handle);
 
         free(fullImage);
-    }
+    }*/
 }

@@ -30,19 +30,19 @@ add_custom_target(
 
 add_executable(zooscan
         main.cpp
-        ZooFW/SignalSupport.h
+
         ZooFW/Application.cpp
+        ZooFW/ErrorDialog.cpp
+
         App.cpp
         DeviceSelector.cpp
-        ZooFW/StateComponent.cpp
-        ZooFW/ErrorDialog.cpp
-        ZooFW/ErrorDialog.h
         DeviceSettingsPanel.cpp
 
         ${RESOURCE_OUTPUT}
 )
 
 target_include_directories(zooscan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(zooscan PRIVATE -fexperimental-library -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result)
 
 set_source_files_properties(${RESOURCE_OUTPUT} PROPERTIES GENERATED TRUE)
 add_dependencies(zooscan resources)

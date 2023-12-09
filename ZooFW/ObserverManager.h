@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <stdexcept>
 #include "Observer.h"
 
 namespace Zoo
@@ -23,7 +24,8 @@ namespace Zoo
 
         void NotifyObservers()
         {
-            for (auto observer : m_Observers)
+            auto observersToRun(m_Observers);
+            for (auto observer : observersToRun)
             {
                 observer->Update();
             }

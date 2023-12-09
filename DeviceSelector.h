@@ -30,7 +30,7 @@ namespace ZooScan
         GtkWidget *RootWidget()
         { return m_DeviceSelectorRoot; }
 
-        void Update();
+        void Update(DeviceSelectorState *stateComponent);
     };
 
 }

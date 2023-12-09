@@ -7,10 +7,10 @@ namespace ZooScan
 {
     class AppState : public Zoo::StateComponent
     {
-        const SANE_Device *m_CurrentDevice{};
+        SaneDevice *m_CurrentDevice{};
 
     public:
-        [[nodiscard]] const SANE_Device *CurrentDevice() const
+        [[nodiscard]] const SaneDevice *CurrentDevice() const
         { return m_CurrentDevice; }
 
         class Updater : public Zoo::StateComponent::Updater<AppState>
@@ -20,9 +20,15 @@ namespace ZooScan
                     : StateComponent::Updater<AppState>(state)
             {}
 
-            void SetCurrentDevice(const SANE_Device *device)
+            void SetCurrentDevice(SaneDevice *device)
             {
+                if (m_StateComponent->m_CurrentDevice != nullptr)
+                    m_StateComponent->m_CurrentDevice->Close();
+
                 m_StateComponent->m_CurrentDevice = device;
+
+                if (m_StateComponent->m_CurrentDevice != nullptr)
+                    m_StateComponent->m_CurrentDevice->Open();
             }
         };
     };

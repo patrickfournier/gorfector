@@ -7,18 +7,17 @@ namespace Zoo
 {
     class StateComponent
     {
-        u_int32_t m_StateId{};
-        u_int64_t m_StateVersion{};
+        uint64_t m_StateVersion{};
 
     public:
         StateComponent()
         {
-            // get a random number for the state id
-            m_StateId = std::random_device()();
             m_StateVersion = 1;
         }
 
-        [[nodiscard]] u_int64_t Version() const
+        virtual ~StateComponent() = default;
+
+        [[nodiscard]] uint64_t Version() const
         {
             return m_StateVersion;
         }
@@ -37,7 +36,7 @@ namespace Zoo
                               "The type parameter of Updater<T> must derive from StateComponent");
             }
 
-            ~Updater()
+            virtual ~Updater()
             {
                 m_StateComponent->m_StateVersion++;
             }

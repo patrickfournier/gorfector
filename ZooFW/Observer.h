@@ -7,6 +7,7 @@ namespace Zoo
 {
     class Observer
     {
+    protected:
         std::vector<Zoo::StateComponent *> m_ObservedComponents{};
         std::vector<Zoo::StateComponent *> m_ModifiedComponents{};
 

@@ -1,14 +1,13 @@
 #pragma once
 
-#include <sane/sane.h>
 #include "ZooFW/StateComponent.h"
+#include "SaneDevice.h"
 
 namespace ZooScan
 {
     class DeviceSelectorState : public Zoo::StateComponent
     {
-        const SANE_Device **m_DeviceList{};
-        int m_DeviceCount{};
+        std::vector<SaneDevice*> m_DeviceList{};
         bool m_ScanNetwork{};
 
         void GetDevicesFromSANE()
@@ -17,29 +16,42 @@ namespace ZooScan
             SANE_Status status = sane_get_devices(&deviceList, ScanNetwork() ? SANE_FALSE : SANE_TRUE);
             if (status == SANE_STATUS_GOOD)
             {
-                m_DeviceList = deviceList;
-
-                m_DeviceCount = 0;
-                while (deviceList[m_DeviceCount] != nullptr)
+                auto deviceCount = 0;
+                while (deviceList[deviceCount] != nullptr)
                 {
-                    m_DeviceCount++;
+                    deviceCount++;
+                }
+
+                m_DeviceList.clear();
+                m_DeviceList.reserve(deviceCount);
+                for (int i = 0; i < deviceCount; i++)
+                {
+                    m_DeviceList.push_back(new SaneDevice(deviceList[i]));
                 }
             }
         }
 
     public:
-        [[nodiscard]] const SANE_Device **DeviceList() const
+        [[nodiscard]] const std::vector<SaneDevice*> &DeviceList() const
         { return m_DeviceList; }
 
         [[nodiscard]] bool ScanNetwork() const
         { return m_ScanNetwork; }
 
-        [[nodiscard]] int DeviceCount() const
-        { return m_DeviceCount; }
+        [[nodiscard]] uint64_t DeviceCount() const
+        { return m_DeviceList.size(); }
 
         DeviceSelectorState()
         {
             GetDevicesFromSANE();
+        }
+
+        ~DeviceSelectorState() override
+        {
+            for (auto device : m_DeviceList)
+            {
+                delete device;
+            }
         }
 
         class Updater : public Zoo::StateComponent::Updater<DeviceSelectorState>

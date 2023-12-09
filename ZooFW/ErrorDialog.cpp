@@ -2,7 +2,7 @@
 
 namespace Zoo
 {
-    static void CloseWindow(GtkWidget *widget, gpointer data)
+    static void CloseWindow(GtkWidget*, gpointer data)
     {
         gtk_window_destroy(GTK_WINDOW(data));
     }

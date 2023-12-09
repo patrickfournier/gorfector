@@ -37,6 +37,9 @@ namespace Zoo
 
         int Run(int argc = 0, char **argv = nullptr);
 
+        GtkWindow *GetMainWindow()
+        { return m_MainWindow; }
+
         State *GetState()
         { return &m_State; }
 

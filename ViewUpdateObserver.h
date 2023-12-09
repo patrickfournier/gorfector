@@ -19,7 +19,7 @@ namespace ZooScan
 
         void Update() override
         {
-            m_View->Update();
+            m_View->Update(dynamic_cast<TState *>(m_ObservedComponents[0]));
         }
     };
 }

@@ -2,6 +2,7 @@
 
 #include "StateComponent.h"
 #include <vector>
+#include <algorithm>
 
 namespace Zoo
 {
