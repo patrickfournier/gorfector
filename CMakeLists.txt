@@ -36,9 +36,12 @@ add_executable(zooscan
 
         App.cpp
         DeviceSelector.cpp
-        DeviceSettingsPanel.cpp
+        DeviceOptionsPanel.cpp
+        DeviceOptionState.cpp
 
         ${RESOURCE_OUTPUT}
+        nlohmann_json/json.hpp
+        SaneDevice.cpp
 )
 
 target_include_directories(zooscan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

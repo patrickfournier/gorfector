@@ -38,10 +38,8 @@ namespace ZooScan
         [[nodiscard]] bool ScanNetwork() const
         { return m_ScanNetwork; }
 
-        [[nodiscard]] uint64_t DeviceCount() const
-        { return m_DeviceList.size(); }
-
-        DeviceSelectorState()
+        explicit DeviceSelectorState(Zoo::State* state)
+        : StateComponent(state)
         {
             GetDevicesFromSANE();
         }

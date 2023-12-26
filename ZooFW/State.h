@@ -1,11 +1,12 @@
 #pragma once
 
-#include "StateComponent.h"
 #include <vector>
 #include <algorithm>
 
 namespace Zoo
 {
+    class StateComponent;
+
     class State
     {
         std::vector<StateComponent *> m_StateComponents;
@@ -13,6 +14,7 @@ namespace Zoo
     public:
         void AddStateComponent(StateComponent *stateComponent)
         {
+            // FIXME add once
             m_StateComponents.push_back(stateComponent);
         }
 

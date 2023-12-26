@@ -5,13 +5,18 @@
 #include <tuple>
 #include "ZooFW/Application.h"
 #include "DeviceSelector.h"
-#include "DeviceSettingsPanel.h"
 #include "AppState.h"
 
 namespace ZooScan
 {
+    class DeviceOptionsPanel;
+
     class App : public Zoo::Application
     {
+    private:
+        const int k_PreviewWidth = 750;
+        const int k_PreviewHeight = 1000;
+
         Zoo::CommandDispatcher m_Dispatcher{};
 
         Zoo::State m_State{};
@@ -27,9 +32,8 @@ namespace ZooScan
         GdkPixbuf* m_PreviewPixBuf{};
         GtkWidget* m_PreviewImage{};
 
-        DeviceSettingsPanel *m_DeviceSettingsPanel{};
+        DeviceOptionsPanel *m_DeviceOptionsPanel{};
 
-    protected:
         std::string GetApplicationId() override
         {
             return "com.patrickfournier.zooscan";
@@ -52,16 +56,31 @@ namespace ZooScan
 
         void PopulateMainWindow() override;
 
+        SANE_Parameters m_ScanParameters{};
+        uint64_t m_FullImageSize{};
+        SANE_Byte * m_FullImage{};
+        uint64_t m_Offset{};
+
+        int GetScanHeight();
+
+        bool m_IsPreviewing{};
+        void OnPreviewClicked(GtkWidget *widget);
+        void UpdatePreviewing();
+        void DrawRGBPreview();
+        void RestoreScanOptions();
+
+        bool m_IsScanning{};
         void OnScanClicked(GtkWidget *widget);
+        void UpdateScanning();
 
     public:
         App();
 
         ~App() override;
 
-        DeviceSelector *CreateDeviceSelector();
+        AppState* GetAppState()
+        { return m_AppState; }
 
         void Update(AppState* appState);
     };
-
 }

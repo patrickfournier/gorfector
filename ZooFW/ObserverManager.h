@@ -27,7 +27,10 @@ namespace Zoo
             auto observersToRun(m_Observers);
             for (auto observer : observersToRun)
             {
-                observer->Update();
+                if (std::find(m_Observers.begin(), m_Observers.end(), observer) != m_Observers.end())
+                {
+                    observer->Update();
+                }
             }
         }
     };

@@ -2,20 +2,32 @@
 
 #include <cstdlib>
 #include <random>
+#include "State.h"
 
 namespace Zoo
 {
     class StateComponent
     {
+    protected:
+        State* m_State{};
+
+    private:
         uint64_t m_StateVersion{};
 
     public:
-        StateComponent()
+        StateComponent() = delete;
+
+        explicit StateComponent(State* state)
+        : m_State(state)
+        , m_StateVersion(1)
         {
-            m_StateVersion = 1;
+            m_State->AddStateComponent(this);
         }
 
-        virtual ~StateComponent() = default;
+        virtual ~StateComponent()
+        {
+            m_State->RemoveStateComponent(this);
+        };
 
         [[nodiscard]] uint64_t Version() const
         {

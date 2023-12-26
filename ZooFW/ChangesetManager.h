@@ -63,6 +63,11 @@ namespace Zoo
                 }
             }
 
+            if (m_CurrentChangeset != nullptr)
+            {
+                aggregatedChangeset->Aggregate(*m_CurrentChangeset);
+            }
+
             return aggregatedChangeset;
         }
 

@@ -18,6 +18,8 @@ namespace ZooScan
         GtkWidget *m_DeviceSelectorRoot{};
         GtkWidget *m_DeviceSelectorList{};
 
+        gulong m_DropdownSelectedSignalId;
+
         void OnRefreshDevicesClicked(GtkWidget *);
         void OnDeviceSelected(GtkWidget *);
         void OnActivateNetwork(GtkWidget *);
