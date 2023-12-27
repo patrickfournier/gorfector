@@ -7,6 +7,7 @@
 #include "DeviceOptionValue.h"
 #include "ZooFW/ChangesetManager.h"
 #include "ZooFW/ChangesetBase.h"
+#include "nlohmann_json/json.hpp"
 
 namespace ZooScan
 {
@@ -89,7 +90,7 @@ namespace ZooScan
 
     class DeviceOptionState : public Zoo::StateComponent, public Zoo::ChangesetManager<Changeset>
     {
-        SaneDevice* m_Device{};
+        SaneDevice* m_Device;
         std::vector<DeviceOptionValueBase *> m_OptionValues;
 
         uint32_t m_PreviewIndex{};
@@ -202,6 +203,8 @@ namespace ZooScan
                 m_StateComponent->m_OptionValues.clear();
                 m_StateComponent->GetCurrentChangeset()->SetReloadOptions(true);
             }
+
+            void DeserializeAndApply(const nlohmann::json& json);
         };
 
         [[nodiscard]] size_t GetOptionCount() const
@@ -289,5 +292,7 @@ namespace ZooScan
         {
             return m_BitDepthIndex;
         }
+
+        [[nodiscard]] nlohmann::json* Serialize() const;
     };
 }

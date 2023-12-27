@@ -174,6 +174,10 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
         return;
     }
 
+    auto serializedOptions = options->Serialize();
+    g_print("Options: %s\n", serializedOptions->dump().c_str());
+    delete serializedOptions;
+
     // Set preview settings on the device
 
     SANE_Bool isPreview = SANE_TRUE;

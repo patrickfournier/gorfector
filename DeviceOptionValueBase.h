@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sane/sane.h>
+#include "nlohmann_json/json.hpp"
 
 namespace ZooScan
 {
@@ -15,6 +16,9 @@ namespace ZooScan
         }
 
         virtual ~DeviceOptionValueBase() = default;
+
+        virtual void Serialize(nlohmann::json& parent) const = 0;
+        virtual bool Deserialize(const nlohmann::json& json) = 0;
 
         [[nodiscard]] const char* Name() const
         { return m_OptionDescriptor->name; }
@@ -101,6 +105,11 @@ namespace ZooScan
             return DeviceOptionValueBase::ShouldHide(*m_OptionDescriptor);
         }
 
+        [[nodiscard]] bool IsSoftwareSettable() const
+        {
+            return DeviceOptionValueBase::IsSoftwareSettable(*m_OptionDescriptor);
+        }
+
         [[nodiscard]] bool IsAdvanced() const
         {
             return DeviceOptionValueBase::IsAdvanced(*m_OptionDescriptor);
@@ -133,6 +142,11 @@ namespace ZooScan
                                       strcasestr(optionDescriptor.desc, "preview") != nullptr);
 
             return hideBecauseOfDesc;
+        }
+
+        [[nodiscard]] static bool IsSoftwareSettable(const SANE_Option_Descriptor& optionDescriptor)
+        {
+            return (optionDescriptor.cap & SANE_CAP_SOFT_SELECT);
         }
 
         [[nodiscard]] static bool IsAdvanced(const SANE_Option_Descriptor& optionDescriptor)
