@@ -1,11 +1,11 @@
 #pragma once
 
 #include <gtk/gtk.h>
-#include "ZooFW/CommandDispatcher.h"
-#include "DeviceOptionState.h"
-#include "ViewUpdateObserver.h"
-#include "SaneDevice.h"
-#include "App.h"
+#include "ZooFW/CommandDispatcher.hpp"
+#include "DeviceOptionState.hpp"
+#include "ViewUpdateObserver.hpp"
+#include "SaneDevice.hpp"
+#include "App.hpp"
 
 namespace ZooScan
 {
@@ -53,6 +53,6 @@ namespace ZooScan
 
         ~DeviceOptionsPanel();
 
-        void Update(DeviceOptionState *stateComponent);
+        void Update(const DeviceOptionState *stateComponent);
     };
 }

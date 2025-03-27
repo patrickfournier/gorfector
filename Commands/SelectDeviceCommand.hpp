@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AppState.h"
-#include "SaneDevice.h"
-#include "ZooFW/Command.h"
+#include "AppState.hpp"
+#include "SaneDevice.hpp"
+#include "ZooFW/Command.hpp"
 
 namespace ZooScan
 {

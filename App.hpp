@@ -3,9 +3,9 @@
 #include <gtk/gtk.h>
 #include <sane/sane.h>
 #include <tuple>
-#include "ZooFW/Application.h"
-#include "DeviceSelector.h"
-#include "AppState.h"
+#include "ZooFW/Application.hpp"
+#include "DeviceSelector.hpp"
+#include "AppState.hpp"
 
 namespace ZooScan
 {

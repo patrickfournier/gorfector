@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sane/sane.h>
-#include "DeviceOptionValueBase.h"
+#include "DeviceOptionValueBase.hpp"
 
 namespace ZooScan
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DeviceSelectorState.h"
+#include "DeviceSelectorState.hpp"
 
 namespace ZooScan
 {

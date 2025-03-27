@@ -1,10 +1,10 @@
 #include <memory>
-#include "DeviceOptionsPanel.h"
-#include "ZooFW/ErrorDialog.h"
-#include "ZooFW/SignalSupport.h"
-#include "Commands/ChangeOptionCommand.h"
-#include "ViewUpdateObserver.h"
-#include "SaneException.h"
+#include "DeviceOptionsPanel.hpp"
+#include "ZooFW/ErrorDialog.hpp"
+#include "ZooFW/SignalSupport.hpp"
+#include "Commands/ChangeOptionCommand.hpp"
+#include "ViewUpdateObserver.hpp"
+#include "SaneException.hpp"
 
 
 const char* ZooScan::DeviceOptionsPanel::SaneUnitToString(SANE_Unit unit)
@@ -623,7 +623,7 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
     }
 }
 
-void ZooScan::DeviceOptionsPanel::Update(DeviceOptionState *stateComponent)
+void ZooScan::DeviceOptionsPanel::Update(const DeviceOptionState *stateComponent)
 {
     static uint64_t lastSeenVersion = 0;
 

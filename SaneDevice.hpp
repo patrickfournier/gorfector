@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sane/sane.h>
-#include "SaneException.h"
-#include "DeviceOptionState.h"
+#include "SaneException.hpp"
+#include "DeviceOptionState.hpp"
 
 namespace ZooScan
 {

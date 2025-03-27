@@ -2,11 +2,11 @@
 
 #include <cstring>
 #include <stdexcept>
-#include "ZooFW/StateComponent.h"
-#include "DeviceOptionValueBase.h"
-#include "DeviceOptionValue.h"
-#include "ZooFW/ChangesetManager.h"
-#include "ZooFW/ChangesetBase.h"
+#include "ZooFW/StateComponent.hpp"
+#include "DeviceOptionValueBase.hpp"
+#include "DeviceOptionValue.hpp"
+#include "ZooFW/ChangesetManager.hpp"
+#include "ZooFW/ChangesetBase.hpp"
 #include "nlohmann_json/json.hpp"
 
 namespace ZooScan

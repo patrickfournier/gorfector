@@ -1,5 +1,5 @@
-#include "Application.h"
-#include "SignalSupport.h"
+#include "Application.hpp"
+#include "SignalSupport.hpp"
 
 Zoo::Application::Application()
         : m_GtkApp(nullptr)
@@ -18,7 +18,7 @@ Zoo::Application::~Application()
     g_object_unref(m_GtkApp);
 }
 
-int Zoo::Application::Run(int argc, char **argv)
+int Zoo::Application::Run(int argc, char **argv) const
 {
     return g_application_run(G_APPLICATION(m_GtkApp), argc, argv);
 }
@@ -34,8 +34,9 @@ void Zoo::Application::OnActivate(GtkApplication *app)
 
     gtk_window_present(m_MainWindow);
     gtk_widget_add_tick_callback(GTK_WIDGET(m_MainWindow), [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
-        auto *app = static_cast<Application *>(data);
-        app->m_ObserverManager.NotifyObservers();
+        auto *localApp = static_cast<Application *>(data);
+        localApp->m_ObserverManager.NotifyObservers();
         return G_SOURCE_CONTINUE;
-    }, this, nullptr);
+    },
+    this, nullptr);
 }

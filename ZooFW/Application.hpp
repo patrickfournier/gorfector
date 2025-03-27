@@ -1,7 +1,7 @@
 #pragma once
 
-#include "State.h"
-#include "ObserverManager.h"
+#include "State.hpp"
+#include "ObserverManager.hpp"
 #include <string>
 #include <gtk/gtk.h>
 
@@ -35,7 +35,7 @@ namespace Zoo
 
         virtual ~Application();
 
-        int Run(int argc = 0, char **argv = nullptr);
+        int Run(int argc = 0, char **argv = nullptr) const;
 
         GtkWindow *GetMainWindow()
         { return m_MainWindow; }

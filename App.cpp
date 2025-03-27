@@ -1,10 +1,10 @@
-#include "App.h"
-#include "ZooFW/SignalSupport.h"
-#include "DeviceSelector.h"
-#include "Commands/SelectDeviceCommand.h"
-#include "DeviceOptionsPanel.h"
-#include "AppState.h"
-#include "ZooFW/ErrorDialog.h"
+#include "App.hpp"
+#include "ZooFW/SignalSupport.hpp"
+#include "DeviceSelector.hpp"
+#include "Commands/SelectDeviceCommand.hpp"
+#include "DeviceOptionsPanel.hpp"
+#include "AppState.hpp"
+#include "ZooFW/ErrorDialog.hpp"
 
 #include <sane/sane.h>
 #include <stdexcept>

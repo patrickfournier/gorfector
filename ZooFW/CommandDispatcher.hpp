@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Command.h"
+#include "Command.hpp"
 #include <typeindex>
 #include <unordered_map>
 #include <functional>

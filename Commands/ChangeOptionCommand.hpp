@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DeviceOptionState.h"
+#include "DeviceOptionState.hpp"
 
 namespace ZooScan
 {
@@ -8,9 +8,9 @@ namespace ZooScan
     class ChangeOptionCommand : public Zoo::Command
     {
     public:
-        uint32_t SettingIndex;
-        uint32_t ValueIndex;
-        TValueType Value;
+        const uint32_t SettingIndex;
+        const uint32_t ValueIndex;
+        const TValueType Value;
 
         ChangeOptionCommand(uint32_t settingIndex, uint32_t valueIndex, TValueType value)
                 : SettingIndex(settingIndex), ValueIndex(valueIndex), Value(value)
@@ -35,4 +35,5 @@ namespace ZooScan
             updater.SetOption(command.SettingIndex, command.ValueIndex, command.Value);
         }
     };
+
 }

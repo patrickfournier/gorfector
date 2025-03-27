@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include "Observer.h"
+#include "Observer.hpp"
 
 namespace Zoo
 {

@@ -1,1 +1,1 @@
-#include "SaneDevice.h"
+#include "SaneDevice.hpp"

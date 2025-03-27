@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZooFW/Observer.h"
+#include "ZooFW/Observer.hpp"
 
 namespace ZooScan
 {
@@ -11,7 +11,7 @@ namespace ZooScan
 
     public:
         ViewUpdateObserver(TView *view,
-                           TState *observedStateComponent)
+                           const TState *observedStateComponent)
         : Observer({observedStateComponent}, {})
         {
             m_View = view;
@@ -19,7 +19,7 @@ namespace ZooScan
 
         void Update() override
         {
-            m_View->Update(dynamic_cast<TState *>(m_ObservedComponents[0]));
+            m_View->Update(dynamic_cast<const TState *>(m_ObservedComponents[0]));
         }
     };
 }

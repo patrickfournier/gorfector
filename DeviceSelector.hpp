@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DeviceSelectorState.h"
-#include "ZooFW/Application.h"
-#include "ZooFW/CommandDispatcher.h"
-#include "ViewUpdateObserver.h"
+#include "DeviceSelectorState.hpp"
+#include "ZooFW/Application.hpp"
+#include "ZooFW/CommandDispatcher.hpp"
+#include "ViewUpdateObserver.hpp"
 
 namespace ZooScan
 {
@@ -32,7 +32,7 @@ namespace ZooScan
         GtkWidget *RootWidget()
         { return m_DeviceSelectorRoot; }
 
-        void Update(DeviceSelectorState *stateComponent);
+        void Update(const DeviceSelectorState *stateComponent);
     };
 
 }

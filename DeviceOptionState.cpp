@@ -1,6 +1,6 @@
-#include "DeviceOptionState.h"
-#include "SaneException.h"
-#include "SaneDevice.h"
+#include "DeviceOptionState.hpp"
+#include "SaneException.hpp"
+#include "SaneDevice.hpp"
 
 #include <cstring>
 #include <memory>

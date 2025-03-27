@@ -1,10 +1,10 @@
 #include <stdexcept>
 #include <c++/11/memory>
-#include "DeviceSelector.h"
-#include "ZooFW/SignalSupport.h"
-#include "Commands/DeviceSelectorCommands.h"
-#include "Commands/SelectDeviceCommand.h"
-#include "ZooFW/ErrorDialog.h"
+#include "DeviceSelector.hpp"
+#include "ZooFW/SignalSupport.hpp"
+#include "Commands/DeviceSelectorCommands.hpp"
+#include "Commands/SelectDeviceCommand.hpp"
+#include "ZooFW/ErrorDialog.hpp"
 
 
 ZooScan::DeviceSelector::DeviceSelector(Zoo::CommandDispatcher* parent, Zoo::Application* app)
@@ -77,7 +77,7 @@ void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget*)
     m_Dispatcher.Dispatch(SelectDeviceCommand(device));
 }
 
-void ZooScan::DeviceSelector::Update(DeviceSelectorState *stateComponent)
+void ZooScan::DeviceSelector::Update(const DeviceSelectorState *stateComponent)
 {
     static uint64_t lastSeenVersion = 0;
 

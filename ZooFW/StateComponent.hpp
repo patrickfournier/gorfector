@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 #include <random>
-#include "State.h"
+#include "State.hpp"
 
 namespace Zoo
 {

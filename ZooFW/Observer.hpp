@@ -1,18 +1,18 @@
 #pragma once
 
 #include <vector>
-#include "StateComponent.h"
+#include "StateComponent.hpp"
 
 namespace Zoo
 {
     class Observer
     {
     protected:
-        std::vector<Zoo::StateComponent *> m_ObservedComponents{};
+        std::vector<const Zoo::StateComponent *> m_ObservedComponents{};
         std::vector<Zoo::StateComponent *> m_ModifiedComponents{};
 
     public:
-        Observer(std::vector<Zoo::StateComponent *> observedComponents,
+        Observer(std::vector<const Zoo::StateComponent *> observedComponents,
                  std::vector<Zoo::StateComponent *> modifiedComponents)
         {
             m_ObservedComponents = std::move(observedComponents);

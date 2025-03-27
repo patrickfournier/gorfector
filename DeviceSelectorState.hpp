@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ZooFW/StateComponent.h"
-#include "SaneDevice.h"
+#include "ZooFW/StateComponent.hpp"
+#include "SaneDevice.hpp"
 
 namespace ZooScan
 {
