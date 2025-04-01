@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sane/sane.h>
+
 #include "SaneException.hpp"
-#include "DeviceOptionState.hpp"
 
 namespace ZooScan
 {
@@ -13,8 +13,8 @@ namespace ZooScan
 
     public:
         explicit SaneDevice(const SANE_Device *device)
-                : m_Device(device)
-                , m_Handle(nullptr)
+            : m_Device(device)
+            , m_Handle(nullptr)
         {
         }
 
@@ -28,7 +28,8 @@ namespace ZooScan
         SaneDevice &operator=(const SaneDevice &) = delete;
 
         SaneDevice(SaneDevice &&other) noexcept
-        : m_Device(other.m_Device), m_Handle(other.m_Handle)
+            : m_Device(other.m_Device)
+            , m_Handle(other.m_Handle)
         {
             other.m_Device = nullptr;
             other.m_Handle = nullptr;
@@ -67,25 +68,34 @@ namespace ZooScan
         }
 
         [[nodiscard]] const char *Name() const
-        { return m_Device->name; }
+        {
+            return m_Device->name;
+        }
 
         [[nodiscard]] const char *Vendor() const
-        { return m_Device->vendor; }
+        {
+            return m_Device->vendor;
+        }
 
         [[nodiscard]] const char *Model() const
-        { return m_Device->model; }
+        {
+            return m_Device->model;
+        }
 
         [[nodiscard]] const char *Type() const
-        { return m_Device->type; }
+        {
+            return m_Device->type;
+        }
 
-        [[nodiscard]] const SANE_Option_Descriptor* GetOptionDescriptor(uint32_t optionIndex) const
+        [[nodiscard]] const SANE_Option_Descriptor *GetOptionDescriptor(uint32_t optionIndex) const
         {
             if (m_Handle == nullptr)
             {
                 throw std::runtime_error("Failed to get option descriptor (device not open).");
             }
 
-            const SANE_Option_Descriptor *optionDescriptor = sane_get_option_descriptor(m_Handle, int(optionIndex));
+            const SANE_Option_Descriptor *optionDescriptor =
+                    sane_get_option_descriptor(m_Handle, static_cast<int>(optionIndex));
             return optionDescriptor;
         }
 
@@ -96,7 +106,8 @@ namespace ZooScan
                 throw std::runtime_error("Failed to get option (device not open).");
             }
 
-            if (sane_control_option(m_Handle, int(optionIndex), SANE_ACTION_GET_VALUE, value, nullptr) != SANE_STATUS_GOOD)
+            if (sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_GET_VALUE, value, nullptr) !=
+                SANE_STATUS_GOOD)
             {
                 throw SaneException("Failed to get option.");
             }
@@ -109,7 +120,9 @@ namespace ZooScan
                 throw std::runtime_error("Failed to set option (device not open).");
             }
 
-            if (sane_control_option(m_Handle, int(optionIndex), SANE_ACTION_SET_VALUE, value, optionInfo) != SANE_STATUS_GOOD)
+            if (sane_control_option(
+                        m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_VALUE, value, optionInfo) !=
+                SANE_STATUS_GOOD)
             {
                 throw SaneException("Failed to set option.");
             }
@@ -122,7 +135,8 @@ namespace ZooScan
                 throw std::runtime_error("Failed to set option to default (device not open).");
             }
 
-            if (sane_control_option(m_Handle, int(optionIndex), SANE_ACTION_SET_AUTO, nullptr, nullptr) != SANE_STATUS_GOOD)
+            if (sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_AUTO, nullptr, nullptr) !=
+                SANE_STATUS_GOOD)
             {
                 throw SaneException("Failed to set option to default.");
             }
@@ -148,9 +162,7 @@ namespace ZooScan
                 throw std::runtime_error("Failed to read (device not open).");
             }
 
-            auto status = sane_read(m_Handle, buffer, max_length, length);
-
-            switch (status)
+            switch (sane_read(m_Handle, buffer, max_length, length))
             {
                 case SANE_STATUS_GOOD:
                 case SANE_STATUS_DEVICE_BUSY:

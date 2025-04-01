@@ -1,13 +1,13 @@
-#include <memory>
 #include "DeviceOptionsPanel.hpp"
-#include "ZooFW/ErrorDialog.hpp"
-#include "ZooFW/SignalSupport.hpp"
+#include <memory>
 #include "Commands/ChangeOptionCommand.hpp"
+#include "SaneDevice.hpp"
 #include "ViewUpdateObserver.hpp"
-#include "SaneException.hpp"
+#include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/SignalSupport.hpp"
 
 
-const char* ZooScan::DeviceOptionsPanel::SaneUnitToString(SANE_Unit unit)
+const char *ZooScan::DeviceOptionsPanel::SaneUnitToString(SANE_Unit unit)
 {
     switch (unit)
     {
@@ -30,11 +30,11 @@ const char* ZooScan::DeviceOptionsPanel::SaneUnitToString(SANE_Unit unit)
     }
 }
 
-std::string ZooScan::DeviceOptionsPanel::SaneIntOrFixedToString(int value, const DeviceOptionValueBase* option)
+std::string ZooScan::DeviceOptionsPanel::SaneIntOrFixedToString(int value, const DeviceOptionValueBase *option)
 {
-    if (option->ValueType() == SANE_TYPE_FIXED)
+    if (option->GetValueType() == SANE_TYPE_FIXED)
     {
-        if (option->Unit() == SANE_UNIT_MM)
+        if (option->GetUnit() == SANE_UNIT_MM)
         {
             char strBuffer[32];
             std::sprintf(strBuffer, "%.2f", SANE_UNFIX(value));
@@ -51,7 +51,7 @@ std::string ZooScan::DeviceOptionsPanel::SaneIntOrFixedToString(int value, const
     }
 }
 
-GtkWidget* ZooScan::DeviceOptionsPanel::AddSettingBox(GtkBox *parent, const SANE_Option_Descriptor *option)
+GtkWidget *ZooScan::DeviceOptionsPanel::AddSettingBox(GtkBox *parent, const SANE_Option_Descriptor *option)
 {
     auto settingBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_append(GTK_BOX(parent), settingBox);
@@ -69,18 +69,19 @@ GtkWidget* ZooScan::DeviceOptionsPanel::AddSettingBox(GtkBox *parent, const SANE
     return settingBox;
 }
 
-void ZooScan::DeviceOptionsPanel::AddCheckButton(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
+void ZooScan::DeviceOptionsPanel::AddCheckButton(
+        GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
 {
-    auto boolOption = dynamic_cast<const DeviceOptionValue<bool>*>(option);
+    auto boolOption = dynamic_cast<const DeviceOptionValue<bool> *>(option);
     if (boolOption == nullptr)
         return;
 
     if (option->IsDisplayOnly())
     {
-        auto *label = gtk_label_new(option->Title());
+        auto *label = gtk_label_new(option->GetTitle());
         gtk_box_append(GTK_BOX(parent), label);
-        if (option->Description() != nullptr && strlen(option->Description()) > 0)
-            gtk_widget_set_tooltip_text(label, option->Description());
+        if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
+            gtk_widget_set_tooltip_text(label, option->GetDescription());
 
         label = gtk_label_new(boolOption->GetValue() ? "Yes" : "No");
         gtk_box_append(GTK_BOX(parent), label);
@@ -88,33 +89,34 @@ void ZooScan::DeviceOptionsPanel::AddCheckButton(GtkBox *parent, const DeviceOpt
         return;
     }
 
-    auto *checkButton = gtk_check_button_new_with_label(option->Title());
+    auto *checkButton = gtk_check_button_new_with_label(option->GetTitle());
     gtk_box_append(GTK_BOX(parent), checkButton);
     gtk_check_button_set_active(GTK_CHECK_BUTTON(checkButton), boolOption->GetValue() != 0);
 
-    if (option->Description() != nullptr && strlen(option->Description()) > 0)
-        gtk_widget_set_tooltip_text(checkButton, option->Description());
+    if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
+        gtk_widget_set_tooltip_text(checkButton, option->GetDescription());
 
     auto index = WidgetIndex(settingIndex, 0);
     g_object_set_data(G_OBJECT(checkButton), "OptionIndex", GINT_TO_POINTER(index.Hash()));
     m_Widgets[index.Hash()] = checkButton;
 
-    Zoo::ConnectGtkSignal(this, &DeviceOptionsPanel::OnCheckBoxChanged, checkButton, "toggled");
+    ZooLib::ConnectGtkSignal(this, &DeviceOptionsPanel::OnCheckBoxChanged, checkButton, "toggled");
 }
 
-void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex, uint32_t valueIndex)
+void ZooScan::DeviceOptionsPanel::AddVectorRow(
+        GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex, uint32_t valueIndex)
 {
-    auto intOption = dynamic_cast<const DeviceOptionValue<int>*>(option);
+    auto intOption = dynamic_cast<const DeviceOptionValue<int> *>(option);
     if (intOption == nullptr)
         return;
 
     if (valueIndex == 0)
     {
-        auto *label = gtk_label_new(option->Title());
+        auto *label = gtk_label_new(option->GetTitle());
         gtk_box_append(GTK_BOX(parent), label);
 
-        if (option->Description() != nullptr && strlen(option->Description()) > 0)
-            gtk_widget_set_tooltip_text(label, option->Description());
+        if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
+            gtk_widget_set_tooltip_text(label, option->GetDescription());
     }
 
     int value = intOption->GetValue(valueIndex);
@@ -130,24 +132,24 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptio
         auto label = gtk_label_new(valueStr.c_str());
         gtk_box_append(GTK_BOX(elementBox), label);
     }
-    else if (auto range = option->GetRange(); range != nullptr)
+    else if (auto range = option->GetRange(); range != nullptr && range->quant != 0)
     {
-        valueWidget = gtk_spin_button_new_with_range(range->min, range->max,range->quant);
+        valueWidget = gtk_spin_button_new_with_range(range->min, range->max, range->quant);
         gtk_box_append(GTK_BOX(elementBox), valueWidget);
 
         double fieldValue = value;
-        if (option->ValueType() == SANE_TYPE_FIXED)
+        if (option->GetValueType() == SANE_TYPE_FIXED)
         {
             fieldValue = SANE_UNFIX(fieldValue);
         }
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(valueWidget), fieldValue);
 
-        Zoo::ConnectGtkSignal(this, &DeviceOptionsPanel::OnSpinButtonChanged, valueWidget, "value-changed");
+        ZooLib::ConnectGtkSignal(this, &DeviceOptionsPanel::OnSpinButtonChanged, valueWidget, "value-changed");
     }
     else if (auto wordList = option->GetNumberList(); wordList != nullptr)
     {
-        std::unique_ptr<std::string[]> optionsStr(new std::string[wordList[0]]);
-        std::unique_ptr<const char*[]> options(new const char *[wordList[0] + 1]);
+        std::unique_ptr<std::string[]> optionsStr(new std::string[wordList[0]]); // storage for option strings
+        std::unique_ptr<const char *[]> options(new const char *[wordList[0] + 1]); // list of char* for drop down
 
         auto activeIndex = 0;
         for (auto wordIndex = 1; wordIndex < wordList[0] + 1; wordIndex++)
@@ -159,9 +161,9 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptio
                 activeIndex = wordIndex - 1;
             }
 
-            optionsStr[wordIndex - 1] = option->ValueType() == SANE_TYPE_FIXED ?
-                                        std::to_string(SANE_UNFIX(optionValue)) :
-                                        std::to_string(optionValue);
+            optionsStr[wordIndex - 1] = option->GetValueType() == SANE_TYPE_FIXED
+                                                ? std::to_string(SANE_UNFIX(optionValue))
+                                                : std::to_string(optionValue);
             options[wordIndex - 1] = optionsStr[wordIndex - 1].c_str();
         }
         options[wordList[0]] = nullptr;
@@ -170,8 +172,8 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptio
         gtk_box_append(GTK_BOX(elementBox), valueWidget);
         gtk_drop_down_set_selected(GTK_DROP_DOWN(valueWidget), activeIndex);
 
-        Zoo::ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget,
-                                            "notify::selected");
+        ZooLib::ConnectGtkSignalWithParamSpecs(
+                this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
     }
     else // no constraint
     {
@@ -182,9 +184,9 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptio
 
         std::string text = SaneIntOrFixedToString(value, option);
         auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(valueWidget));
-        gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(entryBuffer), text.c_str(), int(text.length()));
+        gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(entryBuffer), text.c_str(), static_cast<int>(text.length()));
 
-        Zoo::ConnectGtkSignal(this, &DeviceOptionsPanel::OnNumericTextFieldChanged, focusController, "leave");
+        ZooLib::ConnectGtkSignal(this, &DeviceOptionsPanel::OnNumericTextFieldChanged, focusController, "leave");
     }
 
     if (valueWidget != nullptr)
@@ -195,24 +197,25 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(GtkBox *parent, const DeviceOptio
     }
 
     // Add unit label
-    if (auto unitStr = SaneUnitToString(option->Unit()); unitStr != nullptr && strlen(unitStr) > 0)
+    if (auto unitStr = SaneUnitToString(option->GetUnit()); unitStr != nullptr && strlen(unitStr) > 0)
     {
         auto *unitLabel = gtk_label_new(unitStr);
         gtk_box_append(GTK_BOX(elementBox), unitLabel);
     }
 }
 
-void ZooScan::DeviceOptionsPanel::AddStringRow(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
+void ZooScan::DeviceOptionsPanel::AddStringRow(
+        GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
 {
-    auto strOption = dynamic_cast<const DeviceOptionValue<std::string>*>(option);
+    auto strOption = dynamic_cast<const DeviceOptionValue<std::string> *>(option);
     if (strOption == nullptr)
         return;
 
-    auto *label = gtk_label_new(option->Title());
+    auto *label = gtk_label_new(option->GetTitle());
     gtk_box_append(GTK_BOX(parent), label);
 
-    if (option->Description() != nullptr && strlen(option->Description()) > 0)
-        gtk_widget_set_tooltip_text(label, option->Description());
+    if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
+        gtk_widget_set_tooltip_text(label, option->GetDescription());
 
     auto value = strOption->GetValue();
     GtkWidget *valueWidget = nullptr;
@@ -241,8 +244,8 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(GtkBox *parent, const DeviceOptio
         gtk_box_append(GTK_BOX(parent), valueWidget);
         gtk_drop_down_set_selected(GTK_DROP_DOWN(valueWidget), activeIndex);
 
-        Zoo::ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget,
-                                            "notify::selected");
+        ZooLib::ConnectGtkSignalWithParamSpecs(
+                this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
     }
     else // no constraint
     {
@@ -252,9 +255,9 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(GtkBox *parent, const DeviceOptio
         gtk_box_append(GTK_BOX(parent), valueWidget);
 
         auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(valueWidget));
-        gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(entryBuffer), value.c_str(), int(value.length()));
+        gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(entryBuffer), value.c_str(), static_cast<int>(value.length()));
 
-        Zoo::ConnectGtkSignal(this, &DeviceOptionsPanel::OnStringTextFieldChanged, focusController, "leave");
+        ZooLib::ConnectGtkSignal(this, &DeviceOptionsPanel::OnStringTextFieldChanged, focusController, "leave");
     }
 
     if (valueWidget != nullptr)
@@ -265,17 +268,19 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(GtkBox *parent, const DeviceOptio
     }
 }
 
-ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(const SaneDevice *saneDevice, Zoo::CommandDispatcher *parentDispatcher, App *app)
-        : m_App(app)
-        , m_Device(saneDevice)
-        , m_Dispatcher(parentDispatcher)
+ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(
+        int saneInitId, const std::string &deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app)
+    : m_App(app)
+    , m_SaneInitId(saneInitId)
+    , m_DeviceName(deviceName)
+    , m_Dispatcher(parentDispatcher)
 {
-    if (m_Device == nullptr)
+    if (m_DeviceName.empty())
         return;
 
-    m_DeviceOptions = m_App->GetAppState()->DeviceOptions();
+    m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
 
-    m_OptionUpdateObserver = new ViewUpdateObserver<DeviceOptionsPanel, DeviceOptionState>(this, m_DeviceOptions);
+    m_OptionUpdateObserver = new ViewUpdateObserver(this, m_DeviceOptions);
     m_App->GetObserverManager()->AddObserver(m_OptionUpdateObserver);
 
     m_RootWidget = gtk_scrolled_window_new();
@@ -287,9 +292,12 @@ ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(const SaneDevice *saneDevice, Zo
 
     BuildUI();
 
-    m_Dispatcher.RegisterHandler<ChangeOptionCommand<bool>, DeviceOptionState>(ChangeOptionCommand<bool>::Execute, m_DeviceOptions);
-    m_Dispatcher.RegisterHandler<ChangeOptionCommand<int>, DeviceOptionState>(ChangeOptionCommand<int>::Execute, m_DeviceOptions);
-    m_Dispatcher.RegisterHandler<ChangeOptionCommand<std::string>, DeviceOptionState>(ChangeOptionCommand<std::string>::Execute, m_DeviceOptions);
+    m_Dispatcher.RegisterHandler<ChangeOptionCommand<bool>, DeviceOptionsState>(
+            ChangeOptionCommand<bool>::Execute, m_DeviceOptions);
+    m_Dispatcher.RegisterHandler<ChangeOptionCommand<int>, DeviceOptionsState>(
+            ChangeOptionCommand<int>::Execute, m_DeviceOptions);
+    m_Dispatcher.RegisterHandler<ChangeOptionCommand<std::string>, DeviceOptionsState>(
+            ChangeOptionCommand<std::string>::Execute, m_DeviceOptions);
 }
 
 ZooScan::DeviceOptionsPanel::~DeviceOptionsPanel()
@@ -300,6 +308,8 @@ ZooScan::DeviceOptionsPanel::~DeviceOptionsPanel()
 
     m_App->GetObserverManager()->RemoveObserver(m_OptionUpdateObserver);
     delete m_OptionUpdateObserver;
+
+    delete m_DeviceOptions;
 }
 
 void ZooScan::DeviceOptionsPanel::BuildUI()
@@ -315,13 +325,10 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
 
     for (auto optionIndex = 0UL; optionIndex < m_DeviceOptions->GetOptionCount(); optionIndex++)
     {
-        auto optionDescriptor = m_Device->GetOptionDescriptor(optionIndex);
+        auto device = m_App->GetDeviceByName(m_DeviceName);
+        auto optionDescriptor = device->GetOptionDescriptor(optionIndex);
         const auto *optionValue = m_DeviceOptions->GetOption(optionIndex);
         if (optionDescriptor == nullptr)
-        {
-            continue;
-        }
-        if (optionValue == nullptr && optionDescriptor->type != SANE_TYPE_BUTTON && optionDescriptor->type != SANE_TYPE_GROUP)
         {
             continue;
         }
@@ -332,6 +339,9 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
         {
             case SANE_TYPE_BOOL:
             {
+                if (optionValue == nullptr)
+                    continue;
+
                 auto *settingBox = AddSettingBox(GTK_BOX(currentParent), optionDescriptor);
                 AddCheckButton(GTK_BOX(settingBox), optionValue, optionIndex);
                 break;
@@ -340,7 +350,10 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
             case SANE_TYPE_INT:
             case SANE_TYPE_FIXED:
             {
-                auto numberOfElements = optionValue->ValueCount();
+                if (optionValue == nullptr)
+                    continue;
+
+                auto numberOfElements = optionValue->GetValueCount();
                 if (numberOfElements > 4)
                     break;
 
@@ -367,6 +380,9 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
 
             case SANE_TYPE_STRING:
             {
+                if (optionValue == nullptr)
+                    continue;
+
                 auto *settingBox = AddSettingBox(GTK_BOX(currentParent), optionDescriptor);
                 AddStringRow(GTK_BOX(settingBox), optionValue, optionIndex);
                 break;
@@ -382,7 +398,7 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
                 gtk_widget_add_css_class(frame, "settings-group");
                 if (DeviceOptionValueBase::IsAdvanced(*optionDescriptor))
                 {
-                    //gtk_widget_add_css_class(frame, "advanced");
+                    // gtk_widget_add_css_class(frame, "advanced");
                 }
 
                 if (optionDescriptor->desc != nullptr && strlen(optionDescriptor->desc) > 0)
@@ -420,13 +436,13 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
     }
 }
 
-void ZooScan::DeviceOptionsPanel::OnCheckBoxChanged(GtkWidget* widget)
+void ZooScan::DeviceOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex((uint64_t)(gObjectData));
+    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
@@ -439,7 +455,7 @@ void ZooScan::DeviceOptionsPanel::OnCheckBoxChanged(GtkWidget* widget)
     }
     catch (std::runtime_error &e)
     {
-        Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+        ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
     }
 }
 
@@ -449,12 +465,12 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex((uint64_t)(gObjectData));
+    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
-    auto saneType = option->ValueType();
+    auto saneType = option->GetValueType();
 
     auto *dropDown = GTK_DROP_DOWN(widget);
     auto selectedItem = G_OBJECT(gtk_drop_down_get_selected_item(dropDown));
@@ -470,7 +486,7 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
     else if (saneType == SANE_TYPE_INT)
@@ -484,7 +500,7 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
     else if (saneType == SANE_TYPE_STRING)
@@ -496,7 +512,7 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
 }
@@ -508,12 +524,12 @@ void ZooScan::DeviceOptionsPanel::OnNumericTextFieldChanged(GtkEventControllerFo
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex((uint64_t)(gObjectData));
+    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
-    auto saneType = option->ValueType();
+    auto saneType = option->GetValueType();
 
     if ((saneType == SANE_TYPE_FIXED) || (saneType == SANE_TYPE_INT))
     {
@@ -534,11 +550,11 @@ void ZooScan::DeviceOptionsPanel::OnNumericTextFieldChanged(GtkEventControllerFo
                 value = std::stoi(text);
             }
         }
-        catch (std::invalid_argument &e)
+        catch (std::invalid_argument)
         {
             value = 0;
         }
-        catch (std::out_of_range &e)
+        catch (std::out_of_range)
         {
             value = 0;
         }
@@ -549,7 +565,7 @@ void ZooScan::DeviceOptionsPanel::OnNumericTextFieldChanged(GtkEventControllerFo
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
 }
@@ -561,12 +577,12 @@ void ZooScan::DeviceOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFoc
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex((uint64_t)(gObjectData));
+    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
-    auto saneType = option->ValueType();
+    auto saneType = option->GetValueType();
 
     if (saneType == SANE_TYPE_STRING)
     {
@@ -580,7 +596,7 @@ void ZooScan::DeviceOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFoc
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
 }
@@ -591,12 +607,12 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex((uint64_t)(gObjectData));
+    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
-    auto saneType = option->ValueType();
+    auto saneType = option->GetValueType();
 
     if ((saneType == SANE_TYPE_FIXED) || (saneType == SANE_TYPE_INT))
     {
@@ -609,7 +625,7 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
         }
         else
         {
-            value = int(fieldValue);
+            value = static_cast<int>(fieldValue);
         }
 
         try
@@ -618,136 +634,113 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
         }
         catch (std::runtime_error &e)
         {
-            Zoo::ShowUserError(m_App->GetMainWindow(), e.what());
+            ZooLib::ShowUserError(m_App->GetMainWindow(), e.what());
         }
     }
 }
 
-void ZooScan::DeviceOptionsPanel::Update(const DeviceOptionState *stateComponent)
+void ZooScan::DeviceOptionsPanel::Update(u_int64_t lastSeenVersion)
 {
-    static uint64_t lastSeenVersion = 0;
-
-    if (stateComponent != m_DeviceOptions)
-    {
-        throw std::runtime_error("State component mismatch");
-    }
-
-    if (m_DeviceOptions->Version() <= lastSeenVersion)
-    {
-        return;
-    }
-
     auto firstChangesetVersion = m_DeviceOptions->FirstChangesetVersion();
     auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersion);
 
-    try
+    if (firstChangesetVersion > lastSeenVersion || changeset->RebuildAll())
     {
-        if (firstChangesetVersion > lastSeenVersion || changeset->RebuildAll())
+        BuildUI();
+    }
+    else
+    {
+        for (auto changedIndex: changeset->ChangedIndices())
         {
-            BuildUI();
-        }
-        else
-        {
-            for (auto changedIndex : changeset->ChangedIndices())
+            auto option = m_DeviceOptions->GetOption(changedIndex.m_OptionIndex);
+            auto settingValueType = option->GetValueType();
+            auto widget = m_Widgets[changedIndex.Hash()];
+
+            switch (settingValueType)
             {
-                auto option = m_DeviceOptions->GetOption(changedIndex.m_OptionIndex);
-                auto settingValueType = option->ValueType();
-                auto widget = m_Widgets[changedIndex.Hash()];
-
-                switch (settingValueType)
+                case SANE_TYPE_BOOL:
                 {
-                    case SANE_TYPE_BOOL:
-                    {
-                        auto boolOption = dynamic_cast<const DeviceOptionValue<bool>*>(option);
-                        gtk_check_button_set_active(GTK_CHECK_BUTTON(widget), boolOption->GetValue() != 0);
-                        break;
-                    }
-
-                    case SANE_TYPE_INT:
-                    case SANE_TYPE_FIXED:
-                    {
-                        auto intOption = dynamic_cast<const DeviceOptionValue<int>*>(option);
-                        auto value = intOption->GetValue(changedIndex.m_ValueIndex);
-
-                        if (GTK_IS_DROP_DOWN(widget))
-                        {
-                            auto valueStr = settingValueType == SANE_TYPE_FIXED ?
-                                            std::to_string(SANE_UNFIX(value)) :
-                                            std::to_string(value);
-                            auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
-                            uint32_t valuePosition = 0;
-                            for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
-                            {
-                                auto *item = G_OBJECT(g_list_model_get_item(items, i));
-                                auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(item));
-                                if (strcmp(itemName, valueStr.c_str()) == 0)
-                                {
-                                    valuePosition = i;
-                                    break;
-                                }
-                            }
-
-                            gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
-                        }
-                        else if (GTK_IS_SPIN_BUTTON(widget))
-                        {
-                            double fieldValue = value;
-                            if (settingValueType == SANE_TYPE_FIXED)
-                            {
-                                fieldValue = SANE_UNFIX(fieldValue);
-                            }
-                            gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), fieldValue);
-                        }
-                        else if (GTK_IS_ENTRY(widget))
-                        {
-                            auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
-                            auto text = SaneIntOrFixedToString(value, option);
-                            gtk_entry_buffer_set_text(entryBuffer, text.c_str(), int(text.length()));
-                        }
-                        break;
-                    }
-
-                    case SANE_TYPE_STRING:
-                    {
-                        auto strOption = dynamic_cast<const DeviceOptionValue<std::string>*>(option);
-                        auto value = strOption->GetValue();
-
-                        if (GTK_IS_DROP_DOWN(widget))
-                        {
-                            auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
-                            uint32_t valuePosition = 0;
-                            for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
-                            {
-                                auto *item = G_OBJECT(g_list_model_get_item(items, i));
-                                auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(item));
-                                if (strcmp(itemName, value.c_str()) == 0)
-                                {
-                                    valuePosition = i;
-                                    break;
-                                }
-                            }
-
-                            gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
-                        }
-                        else if (GTK_IS_ENTRY(widget))
-                        {
-                            auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
-                            gtk_entry_buffer_set_text(entryBuffer, value.c_str(), int(value.length()));
-                        }
-                        break;
-                    }
-
-                    default:
-                        break;
+                    auto boolOption = dynamic_cast<const DeviceOptionValue<bool> *>(option);
+                    gtk_check_button_set_active(GTK_CHECK_BUTTON(widget), boolOption->GetValue() != 0);
+                    break;
                 }
+
+                case SANE_TYPE_INT:
+                case SANE_TYPE_FIXED:
+                {
+                    auto intOption = dynamic_cast<const DeviceOptionValue<int> *>(option);
+                    auto value = intOption->GetValue(changedIndex.m_ValueIndex);
+
+                    if (GTK_IS_DROP_DOWN(widget))
+                    {
+                        auto valueStr = settingValueType == SANE_TYPE_FIXED ? std::to_string(SANE_UNFIX(value))
+                                                                            : std::to_string(value);
+                        auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
+                        uint32_t valuePosition = 0;
+                        for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
+                        {
+                            auto *item = G_OBJECT(g_list_model_get_item(items, i));
+                            auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(item));
+                            if (strcmp(itemName, valueStr.c_str()) == 0)
+                            {
+                                valuePosition = i;
+                                break;
+                            }
+                        }
+
+                        gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
+                    }
+                    else if (GTK_IS_SPIN_BUTTON(widget))
+                    {
+                        double fieldValue = value;
+                        if (settingValueType == SANE_TYPE_FIXED)
+                        {
+                            fieldValue = SANE_UNFIX(fieldValue);
+                        }
+                        gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), fieldValue);
+                    }
+                    else if (GTK_IS_ENTRY(widget))
+                    {
+                        auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
+                        auto text = SaneIntOrFixedToString(value, option);
+                        gtk_entry_buffer_set_text(entryBuffer, text.c_str(), static_cast<int>(text.length()));
+                    }
+                    break;
+                }
+
+                case SANE_TYPE_STRING:
+                {
+                    auto strOption = dynamic_cast<const DeviceOptionValue<std::string> *>(option);
+                    auto value = strOption->GetValue();
+
+                    if (GTK_IS_DROP_DOWN(widget))
+                    {
+                        auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
+                        uint32_t valuePosition = 0;
+                        for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
+                        {
+                            auto *item = G_OBJECT(g_list_model_get_item(items, i));
+                            auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(item));
+                            if (strcmp(itemName, value.c_str()) == 0)
+                            {
+                                valuePosition = i;
+                                break;
+                            }
+                        }
+
+                        gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
+                    }
+                    else if (GTK_IS_ENTRY(widget))
+                    {
+                        auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
+                        gtk_entry_buffer_set_text(entryBuffer, value.c_str(), static_cast<int>(value.length()));
+                    }
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
     }
-    catch (...)
-    {
-        lastSeenVersion = m_DeviceOptions->Version();
-        throw;
-    }
-
-    lastSeenVersion = m_DeviceOptions->Version();
 }

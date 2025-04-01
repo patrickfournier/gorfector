@@ -20,7 +20,7 @@ namespace ZooScan
         explicit DeviceOptionValue(const SANE_Option_Descriptor* optionDescriptor)
                 : DeviceOptionValueBase(optionDescriptor)
         {
-            m_Size = ValueCount();
+            m_Size = GetValueCount();
             m_RequestedValue = new ValueType[m_Size];
             m_Value = new ValueType[m_Size];
         }
@@ -39,15 +39,15 @@ namespace ZooScan
             {
                 values.push_back(m_RequestedValue[i]);
             }
-            parentObject[Name()] = values;
+            parentObject[GetName()] = values;
         }
 
         bool Deserialize(const nlohmann::json& parentObject) override
         {
             bool updated = false;
-            if (parentObject.contains(Name()))
+            if (parentObject.contains(GetName()))
             {
-                auto values = parentObject[Name()];
+                auto values = parentObject[GetName()];
                 if (values.is_array())
                 {
                     std::unique_ptr<ValueType[]> newValues(new ValueType[values.size()]);

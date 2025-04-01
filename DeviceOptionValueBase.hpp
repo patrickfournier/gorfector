@@ -20,26 +20,35 @@ namespace ZooScan
         virtual void Serialize(nlohmann::json& parent) const = 0;
         virtual bool Deserialize(const nlohmann::json& json) = 0;
 
-        [[nodiscard]] const char* Name() const
-        { return m_OptionDescriptor->name; }
+        [[nodiscard]] const char* GetName() const
+        {
+            return m_OptionDescriptor->name;
+        }
 
-        [[nodiscard]] const char* Title() const
-        { return m_OptionDescriptor->title; }
+        [[nodiscard]] const char* GetTitle() const
+        {
+            return m_OptionDescriptor->title;
+        }
 
-        [[nodiscard]] const char* Description() const
-        { return m_OptionDescriptor->desc; }
+        [[nodiscard]] const char* GetDescription() const
+        {
+            return m_OptionDescriptor->desc;
+        }
 
-        [[nodiscard]] SANE_Unit Unit() const
-        { return m_OptionDescriptor->unit; }
+        [[nodiscard]] SANE_Unit GetUnit() const
+        {
+            return m_OptionDescriptor->unit;
+        }
 
-        [[nodiscard]] SANE_Value_Type ValueType() const
-        { return m_OptionDescriptor->type; }
+        [[nodiscard]] SANE_Value_Type GetValueType() const
+        {
+            return m_OptionDescriptor->type;
+        }
 
         [[nodiscard]] bool IsRange() const
         {
             return m_OptionDescriptor->constraint_type == SANE_CONSTRAINT_RANGE &&
-                    m_OptionDescriptor->constraint.range != nullptr &&
-                    m_OptionDescriptor->constraint.range->quant > 0;
+                    m_OptionDescriptor->constraint.range != nullptr;
         }
 
         [[nodiscard]] const SANE_Range* GetRange() const
@@ -79,7 +88,7 @@ namespace ZooScan
             return nullptr;
         }
 
-        [[nodiscard]] unsigned long ValueCount() const
+        [[nodiscard]] unsigned long GetValueCount() const
         {
             auto type = m_OptionDescriptor->type;
             if (type == SANE_TYPE_BOOL || type == SANE_TYPE_INT || type == SANE_TYPE_FIXED)
@@ -90,7 +99,7 @@ namespace ZooScan
             return 1;
         }
 
-        [[nodiscard]] unsigned long ValueSize() const
+        [[nodiscard]] unsigned long GetValueSize() const
         {
             return m_OptionDescriptor->size;
         }

@@ -12,3 +12,9 @@
 .advanced {
     background: burlywood;
 }
+
+.preview-overlay {
+    border-width: 1px;
+    border-color: #c0c;
+    border-style: solid;
+}

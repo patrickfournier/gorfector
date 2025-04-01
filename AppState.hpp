@@ -1,58 +1,39 @@
 #pragma once
 
-#include "ZooFW/StateComponent.hpp"
+#include "ZooLib/StateComponent.hpp"
 
 namespace ZooScan
 {
-    class AppState : public Zoo::StateComponent
+    class AppState final : public ZooLib::StateComponent
     {
-        SaneDevice *m_CurrentDevice{};
-        DeviceOptionState *m_CurrentDeviceOptions{};
+        std::string m_OptionPanelDeviceName{};
 
     public:
-        explicit AppState(Zoo::State* state)
-                : StateComponent(state)
-        {}
+        explicit AppState(ZooLib::State *state)
+            : StateComponent(state)
+        {
+        }
 
         ~AppState() override
         {
-            if (m_CurrentDevice != nullptr)
-                m_CurrentDevice->Close();
         }
 
-        [[nodiscard]] const SaneDevice *CurrentDevice() const
-        { return m_CurrentDevice; }
+        [[nodiscard]] const std::string &GetOptionPanelDeviceName() const
+        {
+            return m_OptionPanelDeviceName;
+        }
 
-        [[nodiscard]] DeviceOptionState *DeviceOptions()
-        { return m_CurrentDeviceOptions; }
-
-        class Updater : public Zoo::StateComponent::Updater<AppState>
+        class Updater final : public StateComponent::Updater<AppState>
         {
         public:
             explicit Updater(AppState *state)
-                    : StateComponent::Updater<AppState>(state)
-            {}
-
-            void SetCurrentDevice(SaneDevice *device)
+                : StateComponent::Updater<AppState>(state)
             {
-                if (m_StateComponent->m_CurrentDevice == device)
-                    return;
+            }
 
-                delete m_StateComponent->m_CurrentDeviceOptions;
-
-                if (m_StateComponent->m_CurrentDevice != nullptr)
-                    m_StateComponent->m_CurrentDevice->Close();
-
-                m_StateComponent->m_CurrentDevice = device;
-
-                if (m_StateComponent->m_CurrentDevice != nullptr)
-                {
-                    m_StateComponent->m_CurrentDevice->Open();
-
-                    m_StateComponent->m_CurrentDeviceOptions = new DeviceOptionState(m_StateComponent->m_State, m_StateComponent->m_CurrentDevice);
-                    auto optionUpdater = DeviceOptionState::Updater(m_StateComponent->m_CurrentDeviceOptions);
-                    optionUpdater.BuildOptions();
-                }
+            void UpdateOptionPanelDeviceName(const std::string &deviceName) const
+            {
+                m_StateComponent->m_OptionPanelDeviceName = deviceName;
             }
         };
     };

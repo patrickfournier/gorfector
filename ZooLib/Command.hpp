@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Zoo
+namespace ZooLib
 {
     struct Command
     {

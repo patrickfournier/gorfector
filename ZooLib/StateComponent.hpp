@@ -1,15 +1,15 @@
 #pragma once
 
-#include <cstdlib>
 #include <random>
+
 #include "State.hpp"
 
-namespace Zoo
+namespace ZooLib
 {
     class StateComponent
     {
     protected:
-        State* m_State{};
+        State *m_State{};
 
     private:
         uint64_t m_StateVersion{};
@@ -17,9 +17,9 @@ namespace Zoo
     public:
         StateComponent() = delete;
 
-        explicit StateComponent(State* state)
-        : m_State(state)
-        , m_StateVersion(1)
+        explicit StateComponent(State *state)
+            : m_State(state)
+            , m_StateVersion(1)
         {
             m_State->AddStateComponent(this);
         }
@@ -42,15 +42,16 @@ namespace Zoo
 
         public:
             explicit Updater(TState *stateComponent)
-                    : m_StateComponent(stateComponent)
+                : m_StateComponent(stateComponent)
             {
-                static_assert(std::is_base_of<StateComponent, TState>::value,
-                              "The type parameter of Updater<T> must derive from StateComponent");
+                static_assert(
+                        std::is_base_of_v<StateComponent, TState>,
+                        "The type parameter of Updater<T> must derive from StateComponent");
             }
 
             virtual ~Updater()
             {
-                m_StateComponent->m_StateVersion++;
+                ++m_StateComponent->m_StateVersion;
             }
         };
     };

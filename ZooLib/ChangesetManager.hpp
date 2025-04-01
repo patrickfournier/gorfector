@@ -3,14 +3,13 @@
 #include <vector>
 #include <cstdint>
 
-namespace Zoo
+namespace ZooLib
 {
     class ChangesetBase;
 
     template<typename TChangeset>
     class ChangesetManager
     {
-    private:
         TChangeset *m_CurrentChangeset{};
         std::vector<TChangeset *> m_Changesets;
 
@@ -27,7 +26,7 @@ namespace Zoo
 
         [[nodiscard]] TChangeset *GetCurrentChangeset(uint64_t stateComponentVersion)
         {
-            static_assert(std::is_base_of<ChangesetBase, TChangeset>::value,
+            static_assert(std::is_base_of_v<ChangesetBase, TChangeset>,
                           "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
 
             if (m_CurrentChangeset == nullptr)
@@ -50,7 +49,7 @@ namespace Zoo
     public:
         [[nodiscard]] TChangeset *GetAggregatedChangeset(uint64_t sinceVersion) const
         {
-            static_assert(std::is_base_of<ChangesetBase, TChangeset>::value,
+            static_assert(std::is_base_of_v<ChangesetBase, TChangeset>,
                           "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
 
             auto *aggregatedChangeset = new TChangeset(sinceVersion);

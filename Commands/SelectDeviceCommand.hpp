@@ -1,27 +1,29 @@
 #pragma once
 
-#include "AppState.hpp"
 #include "SaneDevice.hpp"
-#include "ZooFW/Command.hpp"
+#include "ZooLib/Command.hpp"
 
 namespace ZooScan
 {
-    struct SelectDeviceCommand : public Zoo::Command
+    struct SelectDeviceCommand : public ZooLib::Command
     {
-        SaneDevice *m_Device{};
+    private:
+        std::string m_DeviceName{};
 
     public:
-        explicit SelectDeviceCommand(SaneDevice *device)
-                : m_Device(device)
+        explicit SelectDeviceCommand(const std::string& deviceName)
+                : m_DeviceName(deviceName)
         {}
 
-        [[nodiscard]] SaneDevice *Device() const
-        { return m_Device; }
-
-        static void Execute(const SelectDeviceCommand &command, AppState *appState)
+        [[nodiscard]] const std::string &DeviceName() const
         {
-            AppState::Updater updater(appState);
-            updater.SetCurrentDevice(command.Device());
+            return m_DeviceName;
+        }
+
+        static void Execute(const SelectDeviceCommand &command, DeviceSelectorState *deviceSelectorState)
+        {
+            const DeviceSelectorState::Updater updater(deviceSelectorState);
+            updater.SelectDevice(command.DeviceName());
         }
     };
 }

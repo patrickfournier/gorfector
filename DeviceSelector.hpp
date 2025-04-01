@@ -1,8 +1,8 @@
 #pragma once
 
 #include "DeviceSelectorState.hpp"
-#include "ZooFW/Application.hpp"
-#include "ZooFW/CommandDispatcher.hpp"
+#include "ZooLib/Application.hpp"
+#include "ZooLib/CommandDispatcher.hpp"
 #include "ViewUpdateObserver.hpp"
 
 namespace ZooScan
@@ -12,8 +12,8 @@ namespace ZooScan
         DeviceSelectorState *m_State;
         ViewUpdateObserver<DeviceSelector, DeviceSelectorState> *m_Observer;
 
-        Zoo::Application *m_App;
-        Zoo::CommandDispatcher m_Dispatcher{};
+        ZooLib::Application *m_App;
+        ZooLib::CommandDispatcher m_Dispatcher{};
 
         GtkWidget *m_DeviceSelectorRoot{};
         GtkWidget *m_DeviceSelectorList{};
@@ -24,15 +24,28 @@ namespace ZooScan
         void OnDeviceSelected(GtkWidget *);
         void OnActivateNetwork(GtkWidget *);
 
+        void SelectDevice(int deviceIndex);
+
     public:
-        DeviceSelector(Zoo::CommandDispatcher* parent, Zoo::Application* app);
+        DeviceSelector(ZooLib::CommandDispatcher* parent, ZooLib::Application* app);
 
         ~DeviceSelector();
 
-        GtkWidget *RootWidget()
-        { return m_DeviceSelectorRoot; }
+        DeviceSelectorState* GetState() const
+        {
+            return m_State;
+        }
 
-        void Update(const DeviceSelectorState *stateComponent);
+        GtkWidget *RootWidget() const
+        {
+            return m_DeviceSelectorRoot;
+        }
+
+        void Update(u_int64_t lastSeenVersion) const;
+
+        void SelectDefaultDevice()
+        {
+            SelectDevice(0);
+        }
     };
-
 }

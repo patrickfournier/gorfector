@@ -1,18 +1,24 @@
-#include "App.hpp"
-#include "ZooFW/SignalSupport.hpp"
-#include "DeviceSelector.hpp"
-#include "Commands/SelectDeviceCommand.hpp"
-#include "DeviceOptionsPanel.hpp"
-#include "AppState.hpp"
-#include "ZooFW/ErrorDialog.hpp"
-
+#include <memory>
 #include <sane/sane.h>
 #include <stdexcept>
-#include <memory>
+
+#include <tiffio.h>
+
+#include "App.hpp"
+#include "AppState.hpp"
+#include "Commands/SetScanAreaCommand.hpp"
+#include "DeviceOptionsObserver.hpp"
+#include "DeviceOptionsPanel.hpp"
+#include "DeviceSelector.hpp"
+#include "DeviceSelectorObserver.hpp"
+#include "PreviewPanel.hpp"
+#include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/SignalSupport.hpp"
 
 ZooScan::App::App()
 {
-    if (SANE_STATUS_GOOD != sane_init(&m_SaneVersion, nullptr))
+    SANE_Int saneVersion;
+    if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
     {
         sane_exit();
         throw std::runtime_error("Failed to initialize SANE");
@@ -20,21 +26,23 @@ ZooScan::App::App()
 
     m_AppState = new AppState(&m_State);
 
-    m_Observer = new ViewUpdateObserver(this, m_AppState);
-    m_ObserverManager.AddObserver(m_Observer);
-
-    m_Dispatcher.RegisterHandler<SelectDeviceCommand, AppState>(SelectDeviceCommand::Execute, m_AppState);
+    m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
+    m_ObserverManager.AddObserver(m_ViewUpdateObserver);
 }
 
 ZooScan::App::~App()
 {
+    m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
+
+    m_ObserverManager.RemoveObserver(m_DeviceSelectorObserver);
+    delete m_DeviceSelectorObserver;
+
     delete m_DeviceSelector;
     delete m_DeviceOptionsPanel;
+    delete m_PreviewPanel;
 
-    m_Dispatcher.UnregisterHandler<SelectDeviceCommand>();
-
-    m_ObserverManager.RemoveObserver(m_Observer);
-    delete m_Observer;
+    m_ObserverManager.RemoveObserver(m_ViewUpdateObserver);
+    delete m_ViewUpdateObserver;
 
     delete m_AppState;
 
@@ -49,7 +57,8 @@ void ZooScan::App::PopulateMainWindow()
     auto *cssProvider = gtk_css_provider_new();
     std::string cssPath = std::string("/com/patrickfournier/zooscan/resources/zooscan.css");
     gtk_css_provider_load_from_resource(cssProvider, cssPath.c_str());
-    gtk_style_context_add_provider_for_display(display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
+    gtk_style_context_add_provider_for_display(
+            display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
     g_object_unref(cssProvider);
 
     auto *grid = gtk_grid_new();
@@ -61,65 +70,100 @@ void ZooScan::App::PopulateMainWindow()
     m_DeviceSelector = new DeviceSelector(&m_Dispatcher, this);
     gtk_grid_attach(GTK_GRID(grid), m_DeviceSelector->RootWidget(), 0, 0, 2, 1);
 
+    m_DeviceSelectorObserver = new DeviceSelectorObserver(m_DeviceSelector->GetState(), m_AppState);
+    m_ObserverManager.AddObserver(m_DeviceSelectorObserver);
+
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_grid_attach(GTK_GRID(grid), m_SettingsBox, 0, 1, 1, 1);
 
     auto button = gtk_button_new_with_label("Preview");
-    Zoo::ConnectGtkSignal(this, &App::OnPreviewClicked, button, "clicked");
+    ConnectGtkSignal(this, &App::OnPreviewClicked, button, "clicked");
     gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
 
     button = gtk_button_new_with_label("Scan");
-    Zoo::ConnectGtkSignal(this, &App::OnScanClicked, button, "clicked");
+    ConnectGtkSignal(this, &App::OnScanClicked, button, "clicked");
     gtk_grid_attach(GTK_GRID(grid), button, 0, 3, 1, 1);
 
-    m_PreviewPixBuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, k_PreviewWidth, k_PreviewHeight);
-    m_PreviewImage = gtk_image_new_from_pixbuf(m_PreviewPixBuf);
-    gtk_widget_set_size_request(m_PreviewImage, k_PreviewWidth, k_PreviewHeight);
-    gtk_grid_attach(GTK_GRID(grid), m_PreviewImage, 1, 1, 1, 2);
+    m_PreviewPanel = new PreviewPanel(&m_Dispatcher, this);
+    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 1, 1, 3);
 }
 
-void ZooScan::App::Update(AppState* appState)
+const std::string &ZooScan::App::GetSelectorDeviceName() const
 {
-    static uint64_t lastSeenVersion = 0;
-
-    if (appState != m_AppState)
+    if (m_DeviceSelector == nullptr)
     {
-        throw std::runtime_error("State component mismatch");
+        return DeviceSelectorState::k_NullDeviceName;
     }
 
+    return m_DeviceSelector->GetState()->GetSelectedDeviceName();
+}
+
+int ZooScan::App::GetSelectorSaneInitId() const
+{
+    if (m_DeviceSelector == nullptr)
+    {
+        return 0;
+    }
+
+    return m_DeviceSelector->GetState()->GetSelectorSaneInitId();
+}
+
+void ZooScan::App::Update(u_int64_t lastSeenVersion)
+{
     if (m_IsScanning)
     {
         UpdateScanning();
     }
-    else if (m_IsPreviewing)
-    {
-        UpdatePreviewing();
-    }
 
-    if (m_AppState->Version() <= lastSeenVersion)
+    if (m_DeviceOptionsPanel != nullptr && (m_DeviceOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
+                                            m_DeviceOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
     {
-        return;
-    }
-    lastSeenVersion = m_AppState->Version();
+        if (m_DeviceOptionsObserver != nullptr)
+        {
+            m_ObserverManager.RemoveObserver(m_DeviceOptionsObserver);
+            delete m_DeviceOptionsObserver;
+        }
 
-    if (m_DeviceOptionsPanel != nullptr && m_DeviceOptionsPanel->Device() != m_AppState->CurrentDevice())
-    {
-        gtk_box_remove(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->RootWidget());
+        gtk_box_remove(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
         delete m_DeviceOptionsPanel;
         m_DeviceOptionsPanel = nullptr;
+        m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
     }
 
-    if (m_DeviceOptionsPanel == nullptr && m_SettingsBox != nullptr && m_AppState->CurrentDevice() != nullptr)
+    if (m_DeviceOptionsPanel == nullptr && m_SettingsBox != nullptr && !GetSelectorDeviceName().empty())
     {
-        m_DeviceOptionsPanel = new DeviceOptionsPanel(m_AppState->CurrentDevice(), &m_Dispatcher, this);
-        gtk_box_append(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->RootWidget());
+        m_DeviceOptionsPanel =
+                new DeviceOptionsPanel(GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
+        gtk_box_append(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
+        m_Dispatcher.RegisterHandler<SetScanAreaCommand, DeviceOptionsState>(
+                SetScanAreaCommand::Execute, m_DeviceOptionsPanel->GetState());
+
+        if (m_PreviewPanel != nullptr)
+        {
+            m_DeviceOptionsObserver =
+                    new DeviceOptionsObserver(m_DeviceOptionsPanel->GetState(), m_PreviewPanel->GetState());
+            m_ObserverManager.AddObserver(m_DeviceOptionsObserver);
+        }
     }
 }
 
-void ZooScan::App::RestoreScanOptions()
+const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
 {
-    auto device = m_AppState->CurrentDevice();
-    auto options = m_AppState->DeviceOptions();
+    if (m_DeviceOptionsPanel == nullptr)
+        return nullptr;
+
+    return m_DeviceOptionsPanel->GetState();
+}
+
+void ZooScan::App::RestoreScanOptions() const
+{
+    if (m_DeviceSelector == nullptr)
+    {
+        return;
+    }
+
+    auto device = GetDevice();
+    const auto options = GetDeviceOptions();
     if (device == nullptr || options == nullptr)
     {
         return;
@@ -132,7 +176,7 @@ void ZooScan::App::RestoreScanOptions()
     {
         auto option = options->GetOption<std::string>(options->ModeIndex());
         std::string value = option->GetValue();
-        std::unique_ptr<char[]> valueCString(new char[option->ValueSize() + 1]);
+        std::unique_ptr<char[]> valueCString(new char[option->GetValueSize() + 1]);
         strcpy(valueCString.get(), value.c_str());
         device->SetOptionValue(options->ModeIndex(), valueCString.get(), nullptr);
     }
@@ -152,14 +196,21 @@ void ZooScan::App::RestoreScanOptions()
     }
 }
 
-int ZooScan::App::GetScanHeight()
+int ZooScan::App::GetScanHeight() const
 {
     auto height = m_ScanParameters.lines;
 
     if (height == -1)
     {
-        auto options = m_AppState->DeviceOptions();
-        height = std::ceil(options->GetScanAreaHeight() * options->GetYResolution() / 25.4);
+        auto options = GetDeviceOptions();
+        if (options != nullptr)
+        {
+            height = std::ceil(options->GetScanArea().height * options->GetYResolution() / 25.4);
+        }
+        else
+        {
+            height = 0;
+        }
     }
 
     return height;
@@ -167,16 +218,12 @@ int ZooScan::App::GetScanHeight()
 
 void ZooScan::App::OnPreviewClicked(GtkWidget *)
 {
-    auto device = m_AppState->CurrentDevice();
-    auto options = m_AppState->DeviceOptions();
+    auto device = GetDevice();
+    auto options = GetDeviceOptions();
     if (device == nullptr || options == nullptr)
     {
         return;
     }
-
-    auto serializedOptions = options->Serialize();
-    g_print("Options: %s\n", serializedOptions->dump().c_str());
-    delete serializedOptions;
 
     // Set preview settings on the device
 
@@ -211,30 +258,67 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
         device->SetOptionValue(options->BitDepthIndex(), &bitDepth, nullptr);
     }
 
-    auto resolutionDescription = device->GetOptionDescriptor(options->ResolutionIndex());
-    SANE_Int resolution;
-    if (resolutionDescription->constraint_type == SANE_CONSTRAINT_RANGE)
+    if (options->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
-        resolution = resolutionDescription->constraint.range->min;
+        auto resolutionDescription = device->GetOptionDescriptor(options->ResolutionIndex());
+        SANE_Int resolution;
+        if (resolutionDescription->constraint_type == SANE_CONSTRAINT_RANGE)
+        {
+            resolution = resolutionDescription->constraint.range->min;
+        }
+        else if (resolutionDescription->constraint_type == SANE_CONSTRAINT_WORD_LIST)
+        {
+            auto count = resolutionDescription->constraint.word_list[0];
+            resolution = std::numeric_limits<int>::max();
+            for (auto i = 0; i < count; i++)
+            {
+                resolution = std::min(resolution, resolutionDescription->constraint.word_list[i]);
+            }
+        }
+        else
+        {
+            resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
+        }
+        device->SetOptionValue(options->ResolutionIndex(), &resolution, nullptr);
     }
-    else if (resolutionDescription->constraint_type == SANE_CONSTRAINT_WORD_LIST)
+
+    auto maxScanArea = options->GetMaxScanArea();
+    if (options->TLXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        resolution = resolutionDescription->constraint.word_list[0];
+        auto description = device->GetOptionDescriptor(options->TLXIndex());
+        double value = maxScanArea.x;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        device->SetOptionValue(options->TLXIndex(), &fValue, nullptr);
     }
-    else
+    if (options->TLYIndex() != std::numeric_limits<uint32_t>::max())
     {
-        resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
+        auto description = device->GetOptionDescriptor(options->TLYIndex());
+        double value = maxScanArea.y;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        device->SetOptionValue(options->TLYIndex(), &fValue, nullptr);
     }
-    device->SetOptionValue(options->ResolutionIndex(), &resolution, nullptr);
+    if (options->BRXIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto description = device->GetOptionDescriptor(options->BRXIndex());
+        double value = maxScanArea.x + maxScanArea.width;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        device->SetOptionValue(options->BRXIndex(), &fValue, nullptr);
+    }
+    if (options->BRYIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto description = device->GetOptionDescriptor(options->BRYIndex());
+        double value = maxScanArea.y + maxScanArea.height;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        device->SetOptionValue(options->BRYIndex(), &fValue, nullptr);
+    }
 
     try
     {
         device->StartScan();
-        m_IsPreviewing = true;
     }
     catch (const std::runtime_error &e)
     {
-        Zoo::ShowUserError(m_MainWindow, e.what());
+        ZooLib::ShowUserError(m_MainWindow, e.what());
         return;
     }
 
@@ -243,7 +327,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     {
         device->CancelScan();
         RestoreScanOptions();
-        Zoo::ShowUserError(m_MainWindow, "Unsupported format");
+        ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
         return;
     }
 
@@ -251,68 +335,69 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     {
         device->CancelScan();
         RestoreScanOptions();
-        Zoo::ShowUserError(m_MainWindow, "Unsupported depth");
+        ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
         return;
     }
 
     auto height = GetScanHeight();
     g_print("Image size: %d (%d) x %d\n", m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
 
-    m_FullImageSize = m_ScanParameters.bytes_per_line * height;
-    m_FullImage = static_cast<SANE_Byte *>(calloc(m_FullImageSize, 1));
-
-    m_Offset = 0;
-}
-
-void ZooScan::App::DrawRGBPreview()
-{
-    auto width = m_ScanParameters.pixels_per_line;
-    auto height = GetScanHeight();
-    auto scaleW = double(k_PreviewWidth)/width;
-    auto scaleH = double(k_PreviewHeight)/height;
-    auto scale = std::min(scaleW, scaleH);
-    auto previewWidth = k_PreviewWidth * scale / scaleW;
-    auto previewHeight = k_PreviewHeight * scale / scaleH;
-
-    auto *pixbuf = gdk_pixbuf_new_from_data(m_FullImage, GDK_COLORSPACE_RGB, false, 8,
-                                            width, height,m_ScanParameters.bytes_per_line,nullptr, nullptr);
-    gdk_pixbuf_fill(m_PreviewPixBuf, 0);
-    gdk_pixbuf_scale(pixbuf, m_PreviewPixBuf, 0, 0, int(previewWidth), int(previewHeight), 0., 0., scale, scale,
-                     GDK_INTERP_NEAREST);
-    g_object_unref(pixbuf);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(m_PreviewImage), m_PreviewPixBuf);
-    gtk_widget_queue_draw(m_PreviewImage);
-}
-
-void ZooScan::App::UpdatePreviewing()
-{
-    auto device = m_AppState->CurrentDevice();
-    SANE_Int readLength = 0;
-    auto requestedLength = int(std::min(1024UL*1024UL, m_FullImageSize - m_Offset));
-    if (requestedLength == 0 || !device->Read(m_FullImage + m_Offset, requestedLength, &readLength))
+    if (m_PreviewPanel != nullptr)
     {
-        g_print("Done reading data\n");
-        m_IsPreviewing = false;
-        device->CancelScan();
-        RestoreScanOptions();
+        auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
+        previewPanelUpdater.PrepareForScan(m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
 
-        DrawRGBPreview();
+        m_UpdatePreviewCallbackId = gtk_widget_add_tick_callback(
+                GTK_WIDGET(m_MainWindow),
+                [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
+                    auto *localApp = static_cast<App *>(data);
+                    localApp->UpdatePreview();
+                    return G_SOURCE_CONTINUE;
+                },
+                this, nullptr);
+    }
+}
 
-        free (m_FullImage);
-        m_FullImage = nullptr;
-        m_FullImageSize = 0;
-
+void ZooScan::App::UpdatePreview() const
+{
+    if (m_PreviewPanel == nullptr)
+    {
         return;
     }
 
-    g_print("Read data %d\n", readLength);
-    m_Offset += readLength;
-    DrawRGBPreview();
+    auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
+
+    SANE_Int readLength = 0;
+    SANE_Byte *readBuffer = nullptr;
+    int maxReadLength = 0;
+    auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
+    previewPanelUpdater.GetReadBuffer(readBuffer, maxReadLength);
+
+    if (maxReadLength == 0 || !device->Read(readBuffer, maxReadLength, &readLength))
+    {
+        device->CancelScan();
+        RestoreScanOptions();
+
+        previewPanelUpdater.ResetReadBuffer();
+
+        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_UpdatePreviewCallbackId);
+        return;
+    }
+
+    previewPanelUpdater.CommitReadBuffer(readLength);
 }
 
 void ZooScan::App::OnScanClicked(GtkWidget *)
 {
-    auto device = m_AppState->CurrentDevice();
+    const auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
 
     try
     {
@@ -321,7 +406,7 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     }
     catch (const std::runtime_error &e)
     {
-        Zoo::ShowUserError(m_MainWindow, e.what());
+        ZooLib::ShowUserError(m_MainWindow, e.what());
         return;
     }
 
@@ -329,14 +414,14 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
         device->CancelScan();
-        Zoo::ShowUserError(m_MainWindow, "Unsupported format");
+        ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
         return;
     }
 
     if (m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
     {
         device->CancelScan();
-        Zoo::ShowUserError(m_MainWindow, "Unsupported depth");
+        ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
         return;
     }
 
@@ -351,19 +436,53 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
 
 void ZooScan::App::UpdateScanning()
 {
-    auto device = m_AppState->CurrentDevice();
+    auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
 
     SANE_Int readLength = 0;
-    auto requestedLength = int(std::min(1024UL*1024UL, m_FullImageSize - m_Offset));
+    auto requestedLength = static_cast<int>(std::min(1024UL * 1024UL, m_FullImageSize - m_Offset));
     if (requestedLength == 0 || !device->Read(m_FullImage + m_Offset, requestedLength, &readLength))
     {
         g_print("Done reading data\n");
         m_IsScanning = false;
         device->CancelScan();
 
-        // TODO Save image
+        auto options = GetDeviceOptions();
+        int xResolution = options == nullptr               ? 0
+                          : options->GetXResolution() == 0 ? options->GetResolution()
+                                                           : options->GetXResolution();
+        int yResolution = options == nullptr               ? 0
+                          : options->GetYResolution() == 0 ? options->GetResolution()
+                                                           : options->GetYResolution();
 
-        free (m_FullImage);
+        TIFF *tifFile = TIFFOpen("test.tiff", "w");
+
+        TIFFSetField(tifFile, TIFFTAG_IMAGEWIDTH, m_ScanParameters.pixels_per_line);
+        TIFFSetField(tifFile, TIFFTAG_IMAGELENGTH, m_ScanParameters.lines);
+        TIFFSetField(tifFile, TIFFTAG_SAMPLESPERPIXEL, m_ScanParameters.format == SANE_FRAME_RGB ? 3 : 1);
+        TIFFSetField(tifFile, TIFFTAG_BITSPERSAMPLE, m_ScanParameters.depth);
+        TIFFSetField(tifFile, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+        TIFFSetField(tifFile, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+        TIFFSetField(
+                tifFile, TIFFTAG_PHOTOMETRIC,
+                m_ScanParameters.format == SANE_FRAME_RGB ? PHOTOMETRIC_RGB : PHOTOMETRIC_MINISBLACK);
+        TIFFSetField(tifFile, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS);
+        TIFFSetField(tifFile, TIFFTAG_ROWSPERSTRIP, 1);
+        TIFFSetField(tifFile, TIFFTAG_XRESOLUTION, xResolution);
+        TIFFSetField(tifFile, TIFFTAG_YRESOLUTION, yResolution);
+        TIFFSetField(tifFile, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
+
+        for (auto i = 0; i < m_ScanParameters.lines; i++)
+        {
+            TIFFWriteScanline(tifFile, m_FullImage + i * m_ScanParameters.bytes_per_line, i, 0);
+        }
+
+        TIFFClose(tifFile);
+
+        free(m_FullImage);
         m_FullImage = nullptr;
         m_FullImageSize = 0;
 

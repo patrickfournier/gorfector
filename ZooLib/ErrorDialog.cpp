@@ -1,6 +1,6 @@
 #include <gtk/gtk.h>
 
-namespace Zoo
+namespace ZooLib
 {
     static void CloseWindow(GtkWidget*, gpointer data)
     {

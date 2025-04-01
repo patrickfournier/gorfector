@@ -2,7 +2,7 @@
 
 #include <gtk/gtktypes.h>
 
-namespace Zoo
+namespace ZooLib
 {
     void ShowUserError(GtkWindow *parent, const char *message, ...);
 }

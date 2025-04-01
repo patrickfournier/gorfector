@@ -1,15 +1,16 @@
-#include <stdexcept>
 #include <c++/11/memory>
-#include "DeviceSelector.hpp"
-#include "ZooFW/SignalSupport.hpp"
+#include <stdexcept>
+
 #include "Commands/DeviceSelectorCommands.hpp"
 #include "Commands/SelectDeviceCommand.hpp"
-#include "ZooFW/ErrorDialog.hpp"
+#include "DeviceSelector.hpp"
+#include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/SignalSupport.hpp"
 
 
-ZooScan::DeviceSelector::DeviceSelector(Zoo::CommandDispatcher* parent, Zoo::Application* app)
-: m_App(app)
-, m_Dispatcher(parent)
+ZooScan::DeviceSelector::DeviceSelector(ZooLib::CommandDispatcher *parent, ZooLib::Application *app)
+    : m_App(app)
+    , m_Dispatcher(parent)
 {
     m_State = new DeviceSelectorState(m_App->GetState());
     m_Observer = new ViewUpdateObserver(this, m_State);
@@ -20,28 +21,32 @@ ZooScan::DeviceSelector::DeviceSelector(Zoo::CommandDispatcher* parent, Zoo::App
     GtkWidget *deviceLabel = gtk_label_new("Device:");
     gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), deviceLabel);
 
-    const char* deviceList[] = {"No Devices Found", nullptr};
+    const char *deviceList[] = {"No Devices Found", nullptr};
     m_DeviceSelectorList = gtk_drop_down_new_from_strings(deviceList);
     gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), m_DeviceSelectorList);
     gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
     gtk_widget_set_sensitive(m_DeviceSelectorList, false);
-    m_DropdownSelectedSignalId = Zoo::ConnectGtkSignalWithParamSpecs(this, &DeviceSelector::OnDeviceSelected, m_DeviceSelectorList, "notify::selected");
+    m_DropdownSelectedSignalId = ZooLib::ConnectGtkSignalWithParamSpecs(
+            this, &DeviceSelector::OnDeviceSelected, m_DeviceSelectorList, "notify::selected");
 
     GtkWidget *refreshButton = gtk_button_new_with_label("Find Scanners");
-    Zoo::ConnectGtkSignal(this, &DeviceSelector::OnRefreshDevicesClicked, refreshButton, "clicked");
+    ZooLib::ConnectGtkSignal(this, &DeviceSelector::OnRefreshDevicesClicked, refreshButton, "clicked");
     gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), refreshButton);
 
     auto *networkScan = gtk_check_button_new_with_label("Network Scan");
     gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), networkScan);
-    Zoo::ConnectGtkSignal(this, &DeviceSelector::OnActivateNetwork, networkScan, "toggled");
+    ZooLib::ConnectGtkSignal(this, &DeviceSelector::OnActivateNetwork, networkScan, "toggled");
 
+    m_Dispatcher.RegisterHandler<SelectDeviceCommand, DeviceSelectorState>(SelectDeviceCommand::Execute, m_State);
     m_Dispatcher.RegisterHandler<RefreshDeviceList, DeviceSelectorState>(RefreshDeviceList::Execute, m_State);
     m_Dispatcher.RegisterHandler<ActivateNetworkScan, DeviceSelectorState>(ActivateNetworkScan::Execute, m_State);
 }
 
 ZooScan::DeviceSelector::~DeviceSelector()
 {
+    m_Dispatcher.UnregisterHandler<SelectDeviceCommand>();
     m_Dispatcher.UnregisterHandler<RefreshDeviceList>();
+    m_Dispatcher.UnregisterHandler<ActivateNetworkScan>();
 
     gtk_widget_unparent(m_DeviceSelectorRoot);
 
@@ -51,98 +56,103 @@ ZooScan::DeviceSelector::~DeviceSelector()
     delete m_State;
 }
 
-void ZooScan::DeviceSelector::OnRefreshDevicesClicked(GtkWidget*)
+void ZooScan::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
 {
     m_Dispatcher.Dispatch(RefreshDeviceList());
 }
 
-void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget* checkButton)
+void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *checkButton)
 {
-    bool value = gtk_check_button_get_active(GTK_CHECK_BUTTON(checkButton));
-    auto command = ActivateNetworkScan();
-    command.ScanNetwork = value;
+    const bool value = gtk_check_button_get_active(GTK_CHECK_BUTTON(checkButton));
+    auto command = ActivateNetworkScan(value);
     m_Dispatcher.Dispatch(command);
 }
 
-void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget*)
+void ZooScan::DeviceSelector::SelectDevice(const int deviceIndex)
 {
-    auto selectedIndex = int(gtk_drop_down_get_selected(GTK_DROP_DOWN(m_DeviceSelectorList))) - 1;
-
-    SaneDevice* device = nullptr;
-    if (selectedIndex < int(m_State->DeviceList().size()))
+    SaneDevice *device = nullptr;
+    if (deviceIndex >= 0 && deviceIndex < static_cast<int>(m_State->GetDeviceList().size()))
     {
-        device = m_State->DeviceList()[selectedIndex];
+        device = m_State->GetDeviceList()[deviceIndex];
     }
 
-    m_Dispatcher.Dispatch(SelectDeviceCommand(device));
+    m_Dispatcher.Dispatch(
+            SelectDeviceCommand(device == nullptr ? DeviceSelectorState::k_NullDeviceName : device->Name()));
 }
 
-void ZooScan::DeviceSelector::Update(const DeviceSelectorState *stateComponent)
+void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget *)
 {
-    static uint64_t lastSeenVersion = 0;
+    const auto selectedIndex = static_cast<int>(gtk_drop_down_get_selected(GTK_DROP_DOWN(m_DeviceSelectorList))) - 1;
+    SelectDevice(selectedIndex);
+}
 
-    if (stateComponent != m_State)
-    {
-        throw std::runtime_error("State component mismatch");
-    }
-
-    if (m_State->Version() <= lastSeenVersion)
-    {
-        return;
-    }
-
+void ZooScan::DeviceSelector::Update(u_int64_t lastSeenVersion) const
+{
     g_signal_handler_block(m_DeviceSelectorList, m_DropdownSelectedSignalId);
 
-    auto deviceList = m_State->DeviceList();
-    if (!deviceList.empty())
+    if (const auto deviceList = m_State->GetDeviceList(); !deviceList.empty())
     {
-        auto deviceCount = m_State->DeviceList().size();
+        const auto deviceCount = m_State->GetDeviceList().size();
         std::unique_ptr<std::string[]> devicesNames(new std::string[deviceCount + 1]);
-        std::unique_ptr<const char*[]> deviceNamesCStr(new const char*[deviceCount + 2]);
+        std::unique_ptr<const char *[]> deviceNamesCStr(new const char *[deviceCount + 2]);
         auto deviceIndex = 0U;
+        auto dropDownItemIndex = 0U;
+        auto selectedItemIndex = 0U;
 
-        devicesNames[deviceIndex] = "Select Device";
-        deviceNamesCStr[deviceIndex] = devicesNames[deviceIndex].c_str();
-        deviceIndex++;
+        devicesNames[dropDownItemIndex] = "Select Device";
+        deviceNamesCStr[dropDownItemIndex] = devicesNames[dropDownItemIndex].c_str();
+        dropDownItemIndex++;
 
-        while (deviceIndex - 1 < deviceCount)
+        while (deviceIndex < deviceCount)
         {
-            std::string deviceName = deviceList[deviceIndex - 1]->Vendor();
-            deviceName += " ";
-            deviceName += deviceList[deviceIndex - 1]->Model();
+            const auto device = deviceList[deviceIndex];
 
-            devicesNames[deviceIndex] = deviceName;
-            deviceNamesCStr[deviceIndex] = devicesNames[deviceIndex].c_str();
+            if (device == nullptr)
+            {
+                deviceIndex++;
+                continue;
+            }
+
+            if (device->Name() == m_State->GetSelectedDeviceName())
+            {
+                selectedItemIndex = deviceIndex + 1;
+            }
+
+            std::string deviceName = device->Vendor();
+            deviceName += " ";
+            deviceName += device->Model();
+
+            devicesNames[dropDownItemIndex] = deviceName;
+            deviceNamesCStr[dropDownItemIndex] = devicesNames[dropDownItemIndex].c_str();
 
             deviceIndex++;
+            dropDownItemIndex++;
         }
 
-        deviceNamesCStr[deviceIndex] = nullptr;
+        deviceNamesCStr[dropDownItemIndex] = nullptr;
         try
         {
-            gtk_drop_down_set_model(GTK_DROP_DOWN(m_DeviceSelectorList),
-                                    G_LIST_MODEL(gtk_string_list_new(deviceNamesCStr.get())));
-            gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
+            gtk_drop_down_set_model(
+                    GTK_DROP_DOWN(m_DeviceSelectorList), G_LIST_MODEL(gtk_string_list_new(deviceNamesCStr.get())));
+            gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), selectedItemIndex);
             gtk_widget_set_sensitive(m_DeviceSelectorList, true);
         }
-        catch (const SaneException& e)
+        catch (const SaneException &)
         {
-            auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
-            Zoo::ShowUserError(GTK_WINDOW(parentWindow), "Cannot open device %s.", deviceNamesCStr[0]);
+            const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
+            ZooLib::ShowUserError(GTK_WINDOW(parentWindow), "Cannot open device %s.", deviceNamesCStr[0]);
         }
     }
     else
     {
-        auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
-        Zoo::ShowUserError(GTK_WINDOW(parentWindow), "No devices found.");
+        const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
+        ZooLib::ShowUserError(GTK_WINDOW(parentWindow), "No devices found.");
 
-        const char* deviceListStr[] = {"No Devices Found", nullptr};
+        const char *deviceListStr[] = {"No Devices Found", nullptr};
         gtk_drop_down_set_model(GTK_DROP_DOWN(m_DeviceSelectorList), G_LIST_MODEL(gtk_string_list_new(deviceListStr)));
         gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
         gtk_widget_set_sensitive(m_DeviceSelectorList, false);
     }
 
     g_signal_handler_unblock(m_DeviceSelectorList, m_DropdownSelectedSignalId);
-
-    lastSeenVersion = m_State->Version();
 }

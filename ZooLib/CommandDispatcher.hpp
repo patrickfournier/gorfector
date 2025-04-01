@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <functional>
 
-namespace Zoo
+namespace ZooLib
 {
     class CommandDispatcher
     {
@@ -62,7 +62,7 @@ namespace Zoo
         template<typename TCommand, typename ...TStateArgs>
         void RegisterHandler(void (*handler)(const TCommand &, TStateArgs *...), TStateArgs* ...args)
         {
-            static_assert(std::is_base_of<Command, TCommand>::value,
+            static_assert(std::is_base_of_v<Command, TCommand>,
                           "The TCommand type parameter of RegisterHandler<T> must derive from Command");
 
             auto key = std::type_index(typeid(TCommand)).hash_code();
@@ -80,7 +80,7 @@ namespace Zoo
         template<typename TCommand>
         void UnregisterHandler()
         {
-            static_assert(std::is_base_of<Command, TCommand>::value,
+            static_assert(std::is_base_of_v<Command, TCommand>,
                           "The TCommand type parameter of RegisterHandler<T> must derive from Command");
 
             auto key = std::type_index(typeid(TCommand)).hash_code();

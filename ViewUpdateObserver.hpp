@@ -1,25 +1,25 @@
 #pragma once
 
-#include "ZooFW/Observer.hpp"
+#include "ZooLib/Observer.hpp"
 
 namespace ZooScan
 {
     template<typename TView, typename TState>
-    class ViewUpdateObserver : public Zoo::Observer
+    class ViewUpdateObserver : public ZooLib::Observer
     {
         TView *m_View{};
 
-    public:
-        ViewUpdateObserver(TView *view,
-                           const TState *observedStateComponent)
-        : Observer({observedStateComponent}, {})
+    protected:
+        void UpdateImplementation() override
         {
-            m_View = view;
+            m_View->Update(m_ObservedComponentVersions[0]);
         }
 
-        void Update() override
+    public:
+        ViewUpdateObserver(TView *view, const TState *observedStateComponent)
+            : Observer({observedStateComponent}, {})
         {
-            m_View->Update(dynamic_cast<const TState *>(m_ObservedComponents[0]));
+            m_View = view;
         }
     };
 }

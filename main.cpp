@@ -9,7 +9,7 @@ void SignalHandler(int signal)
     delete app;
 }
 
-int main()
+int main(int argc, char **argv)
 {
     signal(SIGINT, SignalHandler);
     signal(SIGILL, SignalHandler);

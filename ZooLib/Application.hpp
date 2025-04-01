@@ -1,11 +1,11 @@
 #pragma once
 
-#include "State.hpp"
-#include "ObserverManager.hpp"
-#include <string>
 #include <gtk/gtk.h>
+#include <string>
+#include "ObserverManager.hpp"
+#include "State.hpp"
 
-namespace Zoo
+namespace ZooLib
 {
     class Application
     {
@@ -37,13 +37,19 @@ namespace Zoo
 
         int Run(int argc = 0, char **argv = nullptr) const;
 
-        GtkWindow *GetMainWindow()
-        { return m_MainWindow; }
+        GtkWindow *GetMainWindow() const
+        {
+            return m_MainWindow;
+        }
 
         State *GetState()
-        { return &m_State; }
+        {
+            return &m_State;
+        }
 
         ObserverManager *GetObserverManager()
-        { return &m_ObserverManager; }
+        {
+            return &m_ObserverManager;
+        }
     };
 }

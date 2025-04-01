@@ -3,36 +3,39 @@
 #include <gtk/gtk.h>
 #include <sane/sane.h>
 #include <tuple>
-#include "ZooFW/Application.hpp"
-#include "DeviceSelector.hpp"
+
 #include "AppState.hpp"
+#include "DeviceOptionsState.hpp"
+#include "DeviceSelector.hpp"
+#include "ZooLib/Application.hpp"
 
 namespace ZooScan
 {
+    class DeviceOptionsObserver;
     class DeviceOptionsPanel;
+    class DeviceSelectorObserver;
+    class PreviewPanel;
 
-    class App : public Zoo::Application
+    class App : public ZooLib::Application
     {
     private:
-        const int k_PreviewWidth = 750;
-        const int k_PreviewHeight = 1000;
+        ZooLib::CommandDispatcher m_Dispatcher{};
 
-        Zoo::CommandDispatcher m_Dispatcher{};
-
-        Zoo::State m_State{};
+        ZooLib::State m_State{};
         AppState *m_AppState{};
 
-        ViewUpdateObserver<App, AppState> *m_Observer;
-
-        SANE_Int m_SaneVersion{};
+        ViewUpdateObserver<App, AppState> *m_ViewUpdateObserver{};
+        DeviceSelectorObserver *m_DeviceSelectorObserver{};
+        DeviceOptionsObserver *m_DeviceOptionsObserver{};
 
         DeviceSelector *m_DeviceSelector{};
+        DeviceOptionsPanel *m_DeviceOptionsPanel{};
+        PreviewPanel *m_PreviewPanel{};
 
         GtkWidget *m_SettingsBox{};
-        GdkPixbuf* m_PreviewPixBuf{};
-        GtkWidget* m_PreviewImage{};
 
-        DeviceOptionsPanel *m_DeviceOptionsPanel{};
+        bool m_IsScanning{};
+        guint m_UpdatePreviewCallbackId;
 
         std::string GetApplicationId() override
         {
@@ -51,36 +54,65 @@ namespace ZooScan
 
         std::tuple<int, int> GetMainWindowSize() override
         {
-            return std::make_tuple(640, 480);
+            return std::make_tuple(-1, -1);
         }
 
         void PopulateMainWindow() override;
 
+        SaneDevice *GetDevice() const
+        {
+            if (m_DeviceSelector == nullptr)
+            {
+                return nullptr;
+            }
+            return m_DeviceSelector->GetState()->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
+        }
+
         SANE_Parameters m_ScanParameters{};
         uint64_t m_FullImageSize{};
-        SANE_Byte * m_FullImage{};
+        SANE_Byte *m_FullImage{};
         uint64_t m_Offset{};
 
-        int GetScanHeight();
+        int GetScanHeight() const;
 
-        bool m_IsPreviewing{};
         void OnPreviewClicked(GtkWidget *widget);
-        void UpdatePreviewing();
-        void DrawRGBPreview();
-        void RestoreScanOptions();
+        void UpdatePreview() const;
+        void RestoreScanOptions() const;
 
-        bool m_IsScanning{};
         void OnScanClicked(GtkWidget *widget);
         void UpdateScanning();
+
+        const std::string &GetSelectorDeviceName() const;
+
+        int GetSelectorSaneInitId() const;
 
     public:
         App();
 
         ~App() override;
 
-        AppState* GetAppState()
-        { return m_AppState; }
+        const AppState *GetAppState() const
+        {
+            return m_AppState;
+        }
 
-        void Update(AppState* appState);
+        AppState *GetAppState()
+        {
+            return m_AppState;
+        }
+
+        void Update(u_int64_t lastSeenVersion);
+
+        SaneDevice *GetDeviceByName(const std::string &deviceName) const
+        {
+            if (m_DeviceSelector == nullptr)
+            {
+                return nullptr;
+            }
+
+            return m_DeviceSelector->GetState()->GetDeviceByName(deviceName);
+        }
+
+        const DeviceOptionsState *GetDeviceOptions() const;
     };
 }

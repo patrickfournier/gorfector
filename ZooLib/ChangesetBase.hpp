@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <algorithm>
 
-namespace Zoo
+namespace ZooLib
 {
     class ChangesetBase
     {

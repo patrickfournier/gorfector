@@ -1,38 +1,39 @@
 #pragma once
 
-#include "DeviceOptionState.hpp"
+#include "DeviceOptionsState.hpp"
 
 namespace ZooScan
 {
     template<typename TValueType>
-    class ChangeOptionCommand : public Zoo::Command
+    struct ChangeOptionCommand : public ZooLib::Command
     {
+    private:
+        const uint32_t m_SettingIndex;
+        const uint32_t m_ValueIndex;
+        const TValueType m_Value;
+
     public:
-        const uint32_t SettingIndex;
-        const uint32_t ValueIndex;
-        const TValueType Value;
-
         ChangeOptionCommand(uint32_t settingIndex, uint32_t valueIndex, TValueType value)
-                : SettingIndex(settingIndex), ValueIndex(valueIndex), Value(value)
+                : m_SettingIndex(settingIndex), m_ValueIndex(valueIndex), m_Value(value)
         {
         }
 
-        static void Execute(const ChangeOptionCommand<bool>& command, DeviceOptionState *state)
+        static void Execute(const ChangeOptionCommand<bool>& command, DeviceOptionsState *state)
         {
-            auto updater = DeviceOptionState::Updater(state);
-            updater.SetOption(command.SettingIndex, command.ValueIndex, command.Value);
+            auto updater = DeviceOptionsState::Updater(state);
+            updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
         }
 
-        static void Execute(const ChangeOptionCommand<int>& command, DeviceOptionState *state)
+        static void Execute(const ChangeOptionCommand<int>& command, DeviceOptionsState *state)
         {
-            auto updater = DeviceOptionState::Updater(state);
-            updater.SetOption(command.SettingIndex, command.ValueIndex, command.Value);
+            auto updater = DeviceOptionsState::Updater(state);
+            updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
         }
 
-        static void Execute(const ChangeOptionCommand<std::string>& command, DeviceOptionState *state)
+        static void Execute(const ChangeOptionCommand<std::string>& command, DeviceOptionsState *state)
         {
-            auto updater = DeviceOptionState::Updater(state);
-            updater.SetOption(command.SettingIndex, command.ValueIndex, command.Value);
+            auto updater = DeviceOptionsState::Updater(state);
+            updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
         }
     };
 
