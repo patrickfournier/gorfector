@@ -28,10 +28,10 @@ namespace ZooLib
             }
         }
 
-        template <typename TStateComponent>
-        TStateComponent* GetStateComponentByType() const
+        template<typename TStateComponent>
+        TStateComponent *GetStateComponentByType() const
         {
-            for (const auto &stateComponent : m_StateComponents)
+            for (const auto &stateComponent: m_StateComponents)
             {
                 auto sc = dynamic_cast<TStateComponent *>(stateComponent);
                 if (sc != nullptr)

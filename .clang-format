@@ -36,6 +36,7 @@ BreakConstructorInitializersBeforeComma: false
 ColumnLimit: 120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ContinuationIndentWidth: 8
+FixNamespaceComments: false
 IncludeCategories:
   - Regex: '^<.*'
     Priority: 1

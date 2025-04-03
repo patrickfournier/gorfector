@@ -8,7 +8,7 @@ namespace ZooScan
     {
     public:
         explicit SaneException(const std::string &arg)
-                : runtime_error(arg)
+            : runtime_error(arg)
         {
         }
     };

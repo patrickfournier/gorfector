@@ -17,8 +17,8 @@ namespace ZooScan
         ValueType *m_Value;
 
     public:
-        explicit DeviceOptionValue(const SANE_Option_Descriptor* optionDescriptor)
-                : DeviceOptionValueBase(optionDescriptor)
+        explicit DeviceOptionValue(const SANE_Option_Descriptor *optionDescriptor)
+            : DeviceOptionValueBase(optionDescriptor)
         {
             m_Size = GetValueCount();
             m_RequestedValue = new ValueType[m_Size];
@@ -32,7 +32,7 @@ namespace ZooScan
             m_Size = 0;
         }
 
-        void Serialize(nlohmann::json& parentObject) const override
+        void Serialize(nlohmann::json &parentObject) const override
         {
             auto values = nlohmann::json::array();
             for (auto i = 0U; i < m_Size; i++)
@@ -42,7 +42,7 @@ namespace ZooScan
             parentObject[GetName()] = values;
         }
 
-        bool Deserialize(const nlohmann::json& parentObject) override
+        bool Deserialize(const nlohmann::json &parentObject) override
         {
             bool updated = false;
             if (parentObject.contains(GetName()))
@@ -78,9 +78,10 @@ namespace ZooScan
             }
 
             return updated;
+            ;
         }
 
-        void SetRequestedValue(uint32_t valueIndex, const ValueType& value)
+        void SetRequestedValue(uint32_t valueIndex, const ValueType &value)
         {
             if (valueIndex >= m_Size)
                 throw std::out_of_range("valueIndex");
@@ -88,7 +89,7 @@ namespace ZooScan
             m_RequestedValue[valueIndex] = value;
         }
 
-        void SetDeviceValue(uint32_t valueIndex, const ValueType& value)
+        void SetDeviceValue(uint32_t valueIndex, const ValueType &value)
         {
             if (valueIndex >= m_Size)
                 throw std::out_of_range("valueIndex");
@@ -96,16 +97,7 @@ namespace ZooScan
             m_Value[valueIndex] = value;
         }
 
-        void SetValues(uint32_t valueIndex, const ValueType& requestedValue, const ValueType& value)
-        {
-            if (valueIndex >= m_Size)
-                throw std::out_of_range("valueIndex");
-
-            m_RequestedValue[valueIndex] = requestedValue;
-            m_Value[valueIndex] = value;
-        }
-
-        void SetValues(uint32_t valueIndex, const ValueType& requestedValue, ValueType&& value)
+        void SetValues(uint32_t valueIndex, const ValueType &requestedValue, const ValueType &value)
         {
             if (valueIndex >= m_Size)
                 throw std::out_of_range("valueIndex");
@@ -114,7 +106,16 @@ namespace ZooScan
             m_Value[valueIndex] = value;
         }
 
-        [[nodiscard]] const ValueType& GetRequestedValue(uint32_t valueIndex = 0) const
+        void SetValues(uint32_t valueIndex, const ValueType &requestedValue, ValueType &&value)
+        {
+            if (valueIndex >= m_Size)
+                throw std::out_of_range("valueIndex");
+
+            m_RequestedValue[valueIndex] = requestedValue;
+            m_Value[valueIndex] = value;
+        }
+
+        [[nodiscard]] const ValueType &GetRequestedValue(uint32_t valueIndex = 0) const
         {
             if (valueIndex >= m_Size)
                 throw std::out_of_range("valueIndex");
@@ -122,7 +123,7 @@ namespace ZooScan
             return m_RequestedValue[valueIndex];
         }
 
-        [[nodiscard]] const ValueType& GetValue(uint32_t valueIndex = 0) const
+        [[nodiscard]] const ValueType &GetValue(uint32_t valueIndex = 0) const
         {
             if (valueIndex >= m_Size)
                 throw std::out_of_range("valueIndex");

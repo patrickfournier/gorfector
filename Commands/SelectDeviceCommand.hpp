@@ -11,9 +11,10 @@ namespace ZooScan
         std::string m_DeviceName{};
 
     public:
-        explicit SelectDeviceCommand(const std::string& deviceName)
-                : m_DeviceName(deviceName)
-        {}
+        explicit SelectDeviceCommand(const std::string &deviceName)
+            : m_DeviceName(deviceName)
+        {
+        }
 
         [[nodiscard]] const std::string &DeviceName() const
         {

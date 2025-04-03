@@ -42,10 +42,10 @@ namespace ZooLib
             // See https://en.wikipedia.org/wiki/Topological_sorting.
             m_SortedObservers.clear();
             std::vector observersToSort(m_Observers);
-            std::vector<const StateComponent*> modifiedComponents;
-            for (const Observer *observer : observersToSort)
+            std::vector<const StateComponent *> modifiedComponents;
+            for (const Observer *observer: observersToSort)
             {
-                for (auto modifiedSC : observer->ModifiedComponents())
+                for (auto modifiedSC: observer->ModifiedComponents())
                 {
                     modifiedComponents.push_back(modifiedSC);
                 }
@@ -55,19 +55,20 @@ namespace ZooLib
             while (!observersToSort.empty() && nextObserverFound)
             {
                 nextObserverFound = false;
-                for (Observer *observer : observersToSort)
+                for (Observer *observer: observersToSort)
                 {
-                    if (std::ranges::all_of(observer->ObservedComponents(),
-                                 [&modifiedComponents](const StateComponent *observedSC)
-                                 {
-                                     return std::ranges::find(modifiedComponents, observedSC) == modifiedComponents.end();
-                                 }))
+                    if (std::ranges::all_of(
+                                observer->ObservedComponents(),
+                                [&modifiedComponents](const StateComponent *observedSC) {
+                                    return std::ranges::find(modifiedComponents, observedSC) ==
+                                           modifiedComponents.end();
+                                }))
                     {
                         nextObserverFound = true;
 
                         m_SortedObservers.push_back(observer);
                         SwapRemove(observersToSort, observer);
-                        for (const StateComponent* modifiedSC : observer->ModifiedComponents())
+                        for (const StateComponent *modifiedSC: observer->ModifiedComponents())
                         {
                             SwapRemove(modifiedComponents, modifiedSC);
                         }
@@ -103,7 +104,7 @@ namespace ZooLib
                 m_NeedsSorting = false;
             }
 
-            for (auto observer : m_SortedObservers)
+            for (auto observer: m_SortedObservers)
             {
                 observer->Update();
             }

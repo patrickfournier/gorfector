@@ -12,7 +12,7 @@ namespace ZooScan
 
     public:
         explicit SetScanAreaCommand(const Rect<double> &scanArea)
-                : m_ScanArea(scanArea)
+            : m_ScanArea(scanArea)
         {
         }
 

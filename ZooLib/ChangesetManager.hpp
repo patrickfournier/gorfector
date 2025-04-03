@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace ZooLib
 {
@@ -26,8 +26,9 @@ namespace ZooLib
 
         [[nodiscard]] TChangeset *GetCurrentChangeset(uint64_t stateComponentVersion)
         {
-            static_assert(std::is_base_of_v<ChangesetBase, TChangeset>,
-                          "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
+            static_assert(
+                    std::is_base_of_v<ChangesetBase, TChangeset>,
+                    "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
 
             if (m_CurrentChangeset == nullptr)
             {
@@ -49,8 +50,9 @@ namespace ZooLib
     public:
         [[nodiscard]] TChangeset *GetAggregatedChangeset(uint64_t sinceVersion) const
         {
-            static_assert(std::is_base_of_v<ChangesetBase, TChangeset>,
-                          "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
+            static_assert(
+                    std::is_base_of_v<ChangesetBase, TChangeset>,
+                    "The type parameter of ChangesetManager<T> must derive from ChangesetBase");
 
             auto *aggregatedChangeset = new TChangeset(sinceVersion);
 

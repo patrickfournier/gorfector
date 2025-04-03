@@ -1,9 +1,9 @@
 #pragma once
 
 #include "DeviceSelectorState.hpp"
+#include "ViewUpdateObserver.hpp"
 #include "ZooLib/Application.hpp"
 #include "ZooLib/CommandDispatcher.hpp"
-#include "ViewUpdateObserver.hpp"
 
 namespace ZooScan
 {
@@ -27,11 +27,11 @@ namespace ZooScan
         void SelectDevice(int deviceIndex);
 
     public:
-        DeviceSelector(ZooLib::CommandDispatcher* parent, ZooLib::Application* app);
+        DeviceSelector(ZooLib::CommandDispatcher *parent, ZooLib::Application *app);
 
         ~DeviceSelector();
 
-        DeviceSelectorState* GetState() const
+        DeviceSelectorState *GetState() const
         {
             return m_State;
         }

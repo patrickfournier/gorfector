@@ -22,7 +22,7 @@ namespace ZooScan
 
     public:
         explicit ActivateNetworkScan(bool activate)
-        : m_ScanNetwork(activate)
+            : m_ScanNetwork(activate)
         {
         }
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Command.hpp"
+#include <functional>
 #include <typeindex>
 #include <unordered_map>
-#include <functional>
+#include "Command.hpp"
 
 namespace ZooLib
 {
@@ -24,8 +24,9 @@ namespace ZooLib
 
         public:
             explicit CommandHandlerFunc(std::function<void(const TCommand &)> handler)
-                    : m_Handler(handler)
-            {}
+                : m_Handler(handler)
+            {
+            }
 
             void Invoke(const Command &command) override
             {
@@ -38,8 +39,9 @@ namespace ZooLib
 
     public:
         explicit CommandDispatcher(CommandDispatcher *parent = nullptr)
-                : m_Parent(parent)
-        {}
+            : m_Parent(parent)
+        {
+        }
 
         template<typename TCommand>
         void Dispatch(const TCommand &command) // NOLINT(misc-no-recursion)
@@ -59,11 +61,12 @@ namespace ZooLib
             }
         }
 
-        template<typename TCommand, typename ...TStateArgs>
-        void RegisterHandler(void (*handler)(const TCommand &, TStateArgs *...), TStateArgs* ...args)
+        template<typename TCommand, typename... TStateArgs>
+        void RegisterHandler(void (*handler)(const TCommand &, TStateArgs *...), TStateArgs *...args)
         {
-            static_assert(std::is_base_of_v<Command, TCommand>,
-                          "The TCommand type parameter of RegisterHandler<T> must derive from Command");
+            static_assert(
+                    std::is_base_of_v<Command, TCommand>,
+                    "The TCommand type parameter of RegisterHandler<T> must derive from Command");
 
             auto key = std::type_index(typeid(TCommand)).hash_code();
 
@@ -80,8 +83,9 @@ namespace ZooLib
         template<typename TCommand>
         void UnregisterHandler()
         {
-            static_assert(std::is_base_of_v<Command, TCommand>,
-                          "The TCommand type parameter of RegisterHandler<T> must derive from Command");
+            static_assert(
+                    std::is_base_of_v<Command, TCommand>,
+                    "The TCommand type parameter of RegisterHandler<T> must derive from Command");
 
             auto key = std::type_index(typeid(TCommand)).hash_code();
 

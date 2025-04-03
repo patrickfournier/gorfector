@@ -13,7 +13,7 @@ namespace ZooScan
         static const std::string k_NullDeviceName;
 
     private:
-        std::vector<SaneDevice*> m_DeviceList{};
+        std::vector<SaneDevice *> m_DeviceList{};
         std::string m_SelectedDeviceName{};
         bool m_ScanNetwork{};
         int m_SANEInitId{};
@@ -92,17 +92,17 @@ namespace ZooScan
             return m_SANEInitId;
         }
 
-        [[nodiscard]] const std::vector<SaneDevice*> &GetDeviceList() const
+        [[nodiscard]] const std::vector<SaneDevice *> &GetDeviceList() const
         {
             return m_DeviceList;
         }
 
-        [[nodiscard]] SaneDevice* GetDeviceByName(const std::string &deviceName) const
+        [[nodiscard]] SaneDevice *GetDeviceByName(const std::string &deviceName) const
         {
             if (deviceName.empty())
                 return nullptr;
 
-            for (const auto device : m_DeviceList)
+            for (const auto device: m_DeviceList)
             {
                 if (device->Name() == deviceName)
                 {
@@ -122,8 +122,8 @@ namespace ZooScan
             return m_ScanNetwork;
         }
 
-        explicit DeviceSelectorState(ZooLib::State* state)
-        : StateComponent(state)
+        explicit DeviceSelectorState(ZooLib::State *state)
+            : StateComponent(state)
         {
             GetDevicesFromSANE();
             if (!m_DeviceList.empty())
@@ -134,7 +134,7 @@ namespace ZooScan
 
         ~DeviceSelectorState() override
         {
-            for (const auto device : m_DeviceList)
+            for (const auto device: m_DeviceList)
             {
                 delete device;
             }
@@ -144,8 +144,9 @@ namespace ZooScan
         {
         public:
             explicit Updater(DeviceSelectorState *state)
-                    : StateComponent::Updater<DeviceSelectorState>(state)
-            {}
+                : StateComponent::Updater<DeviceSelectorState>(state)
+            {
+            }
 
             void UpdateDeviceList() const
             {
@@ -157,7 +158,7 @@ namespace ZooScan
                 m_StateComponent->m_ScanNetwork = scanNetwork;
             }
 
-            void SelectDevice(const std::string& deviceName) const
+            void SelectDevice(const std::string &deviceName) const
             {
                 m_StateComponent->SelectDevice(deviceName);
             }

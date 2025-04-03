@@ -15,8 +15,9 @@ namespace ZooLib
         virtual void UpdateImplementation() = 0;
 
     public:
-        Observer(std::vector<const StateComponent *> observedComponents,
-                 std::vector<StateComponent *> modifiedComponents)
+        Observer(
+                std::vector<const StateComponent *> observedComponents,
+                std::vector<StateComponent *> modifiedComponents)
         {
             m_ObservedComponents = std::move(observedComponents);
             m_ModifiedComponents = std::move(modifiedComponents);
@@ -25,12 +26,12 @@ namespace ZooLib
 
         virtual ~Observer() = default;
 
-        const std::vector<const StateComponent *>& ObservedComponents() const
+        const std::vector<const StateComponent *> &ObservedComponents() const
         {
             return m_ObservedComponents;
         }
 
-        const std::vector<StateComponent *>& ModifiedComponents() const
+        const std::vector<StateComponent *> &ModifiedComponents() const
         {
             return m_ModifiedComponents;
         }

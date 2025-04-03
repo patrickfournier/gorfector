@@ -14,26 +14,29 @@ namespace ZooScan
 
     public:
         ChangeOptionCommand(uint32_t settingIndex, uint32_t valueIndex, TValueType value)
-                : m_SettingIndex(settingIndex), m_ValueIndex(valueIndex), m_Value(value)
+            : m_SettingIndex(settingIndex)
+            , m_ValueIndex(valueIndex)
+            , m_Value(value)
         {
         }
 
-        static void Execute(const ChangeOptionCommand<bool>& command, DeviceOptionsState *state)
+        static void Execute(const ChangeOptionCommand<bool> &command, DeviceOptionsState *state)
         {
             auto updater = DeviceOptionsState::Updater(state);
             updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
         }
 
-        static void Execute(const ChangeOptionCommand<int>& command, DeviceOptionsState *state)
+        static void Execute(const ChangeOptionCommand<int> &command, DeviceOptionsState *state)
         {
             auto updater = DeviceOptionsState::Updater(state);
             updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
         }
 
-        static void Execute(const ChangeOptionCommand<std::string>& command, DeviceOptionsState *state)
+        static void Execute(const ChangeOptionCommand<std::string> &command, DeviceOptionsState *state)
         {
             auto updater = DeviceOptionsState::Updater(state);
             updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
+            ;
         }
     };
 
