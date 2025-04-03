@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <nlohmann/json.hpp>
 
 #include "DeviceOptionValue.hpp"
 #include "DeviceOptionValueBase.hpp"
@@ -9,7 +10,6 @@
 #include "ZooLib/ChangesetBase.hpp"
 #include "ZooLib/ChangesetManager.hpp"
 #include "ZooLib/StateComponent.hpp"
-#include "nlohmann_json/json.hpp"
 
 namespace ZooScan
 {

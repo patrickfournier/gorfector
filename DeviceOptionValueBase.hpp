@@ -1,7 +1,7 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <sane/sane.h>
-#include "nlohmann_json/json.hpp"
 
 namespace ZooScan
 {

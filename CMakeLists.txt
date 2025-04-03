@@ -30,6 +30,9 @@ add_custom_target(
         DEPENDS ${RESOURCE_OUTPUT}
 )
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(json)
+
 set(SOURCE_FILES
         main.cpp
 
@@ -41,7 +44,6 @@ set(SOURCE_FILES
         DeviceOptionsPanel.cpp
         DeviceOptionsState.cpp
 
-        nlohmann_json/json.hpp
         SaneDevice.cpp
         DeviceSelectorState.cpp
         PreviewPanel.cpp
@@ -59,5 +61,6 @@ add_dependencies(zooscan resources)
 target_link_libraries(zooscan PRIVATE PkgConfig::GTK4)
 target_link_libraries(zooscan PRIVATE libsane.so)
 target_link_libraries(zooscan PRIVATE TIFF::TIFF)
+target_link_libraries(zooscan PRIVATE nlohmann_json::nlohmann_json)
 
 add_subdirectory(Tests)
