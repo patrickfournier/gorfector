@@ -1,6 +1,7 @@
 #include "PreviewPanel.hpp"
 
 #include "App.hpp"
+#include "Commands/SetPanAndZoomCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
@@ -22,31 +23,56 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     : m_App(app)
     , m_Dispatcher(parentDispatcher)
 {
-    m_PreviewPixBuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, k_PreviewWidth, k_PreviewHeight);
+    m_RootWidget = gtk_grid_new();
+    gtk_grid_set_column_spacing(GTK_GRID(m_RootWidget), 0);
+    gtk_grid_set_row_spacing(GTK_GRID(m_RootWidget), 5);
+
+    auto box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 0, 1, 1);
+    auto label = gtk_label_new("Zoom:");
+    gtk_box_append(GTK_BOX(box), label);
+
+    m_ZoomDropDown = gtk_drop_down_new_from_strings(PreviewState::k_ZoomValueStrings);
+    gtk_widget_set_size_request(m_ZoomDropDown, 100, -1);
+    gtk_box_append(GTK_BOX(box), m_ZoomDropDown);
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
+
+    m_PreviewPixBuf = nullptr;
     m_PreviewImage = gtk_drawing_area_new();
-    gtk_widget_set_size_request(m_PreviewImage, k_PreviewWidth, k_PreviewHeight);
-    gtk_widget_add_css_class(m_PreviewImage, "preview-overlay");
+    gtk_widget_add_css_class(GTK_WIDGET(m_PreviewImage), "preview-panel");
+    gtk_widget_set_hexpand(m_PreviewImage, true);
+    gtk_widget_set_vexpand(m_PreviewImage, true);
+    gtk_box_append(GTK_BOX(box), m_PreviewImage);
 
     auto dragHandler = gtk_gesture_drag_new();
     gtk_widget_add_controller(m_PreviewImage, GTK_EVENT_CONTROLLER(dragHandler));
     auto mouseHandler = gtk_event_controller_motion_new();
     gtk_widget_add_controller(m_PreviewImage, GTK_EVENT_CONTROLLER(mouseHandler));
+    auto scrollHandler = gtk_event_controller_scroll_new(GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
+    gtk_widget_add_controller(m_PreviewImage, GTK_EVENT_CONTROLLER(scrollHandler));
     gtk_drawing_area_set_draw_func(
             GTK_DRAWING_AREA(m_PreviewImage),
             [](GtkDrawingArea *widget, cairo_t *cr, int width, int height, gpointer data) {
                 auto previewPanel = static_cast<PreviewPanel *>(data);
-                previewPanel->OnPreviewDraw(widget, cr, width, height);
+                previewPanel->OnPreviewDraw(cr);
             },
             this, nullptr);
 
+    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnResized, m_PreviewImage, "resize");
+    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnZoomDropDownChanged, m_ZoomDropDown, "notify::selected");
     ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragBegin, dragHandler, "drag-begin");
     ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragUpdate, dragHandler, "drag-update");
     ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragEnd, dragHandler, "drag-end");
     ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnMouseMove, mouseHandler, "motion");
+    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnMouseScroll, scrollHandler, "scroll");
 
     m_PreviewState = new PreviewState(m_App->GetState());
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_PreviewState);
     m_App->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
+
+    m_Dispatcher.RegisterHandler<SetPanAndZoomCommand, PreviewState>(SetPanAndZoomCommand::Execute, m_PreviewState);
 }
 
 ZooScan::PreviewPanel::~PreviewPanel()
@@ -56,130 +82,172 @@ ZooScan::PreviewPanel::~PreviewPanel()
     delete m_PreviewState;
 }
 
-void ZooScan::PreviewPanel::ComputeScanArea(GtkWidget *widget, double w, double h, Rect<double> &outScanArea) const
+void ZooScan::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)
+{
+    if (widget != m_PreviewImage)
+        return;
+
+    auto width = gtk_widget_get_size(widget, GTK_ORIENTATION_HORIZONTAL);
+    auto height = gtk_widget_get_size(widget, GTK_ORIENTATION_VERTICAL);
+
+    auto currentWidth = m_PreviewPixBuf != nullptr ? gdk_pixbuf_get_width(m_PreviewPixBuf) : 0;
+    auto currentHeight = m_PreviewPixBuf != nullptr ? gdk_pixbuf_get_height(m_PreviewPixBuf) : 0;
+
+    if (width == currentWidth && height == currentHeight)
+    {
+        return;
+    }
+
+    if (m_PreviewPixBuf != nullptr)
+    {
+        g_object_unref(m_PreviewPixBuf);
+        m_PreviewPixBuf = nullptr;
+    }
+
+    Redraw();
+}
+
+void ZooScan::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void *data)
 {
     if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
+    {
+        return;
+    }
+
+    auto zoomValue = gtk_drop_down_get_selected(dropDown);
+    double zoomFactor = PreviewState::k_ZoomValues[zoomValue];
+    m_Dispatcher.Dispatch(SetPanAndZoomCommand(m_PreviewState->GetPreviewPanOffset(), zoomFactor));
+}
+
+/**
+ * Applies a change on the current scan area m_OriginalScanArea.
+ * @param deltaX The change in X direction, in pixels.
+ * @param deltaY The change in Y direction, in pixels.
+ * @param outScanArea The new scan area in SA units.
+ */
+void ZooScan::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const
+{
+    auto width = m_PreviewState->GetScannedPixelsPerLine();
+    auto height = m_PreviewState->GetScannedImageHeight();
+
+    if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr || width == 0 || height == 0 || m_ZoomFactor == 0.0)
     {
         outScanArea = Rect<double>{0, 0, 0, 0};
         return;
     }
 
-    // Assuming widget top-left is always (0, 0)
-    const int widgetWidth = gtk_widget_get_width(widget);
-    const int widgetHeight = gtk_widget_get_height(widget);
-
     // Assuming GetMaxScanArea() top-left is always (0, 0)
     auto maxScanArea = m_App->GetDeviceOptions()->GetMaxScanArea();
-    double scaleW = maxScanArea.width / static_cast<double>(widgetWidth);
-    double scaleH = maxScanArea.height / static_cast<double>(widgetHeight);
+    double scaleW = maxScanArea.width / (static_cast<double>(width) * m_ZoomFactor); // SA units per pixel
+    double scaleH = maxScanArea.height / (static_cast<double>(height) * m_ZoomFactor); // SA units per pixel
 
     switch (m_DragMode)
     {
         case ScanAreaDragMode::Top:
         {
-            h = std::min(h, m_OriginalScanArea.height);
-            h = std::max(h, -m_OriginalScanArea.y);
+            deltaY = std::min(deltaY, m_OriginalScanArea.height);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.y);
 
             outScanArea.x = m_OriginalScanArea.x * scaleW;
-            outScanArea.y = (m_OriginalScanArea.y + h) * scaleH;
+            outScanArea.y = (m_OriginalScanArea.y + deltaY) * scaleH;
             outScanArea.width = m_OriginalScanArea.width * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height - h) * scaleH;
+            outScanArea.height = (m_OriginalScanArea.height - deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::Bottom:
         {
-            h = std::max(h, -m_OriginalScanArea.height);
-            h = std::min(h, widgetHeight - m_OriginalScanArea.y - m_OriginalScanArea.height);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.height);
+            deltaY = std::min(deltaY, height - m_OriginalScanArea.y - m_OriginalScanArea.height);
 
             outScanArea.x = m_OriginalScanArea.x * scaleW;
             outScanArea.y = m_OriginalScanArea.y * scaleH;
             outScanArea.width = m_OriginalScanArea.width * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height + h) * scaleH;
+            outScanArea.height = (m_OriginalScanArea.height + deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::Left:
         {
-            w = std::min(w, m_OriginalScanArea.width);
-            w = std::max(w, -m_OriginalScanArea.x);
+            deltaX = std::min(deltaX, m_OriginalScanArea.width);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.x);
 
-            outScanArea.x = (m_OriginalScanArea.x + w) * scaleW;
+            outScanArea.x = (m_OriginalScanArea.x + deltaX) * scaleW;
             outScanArea.y = m_OriginalScanArea.y * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width - w) * scaleW;
+            outScanArea.width = (m_OriginalScanArea.width - deltaX) * scaleW;
             outScanArea.height = m_OriginalScanArea.height * scaleH;
             break;
         }
         case ScanAreaDragMode::Right:
         {
-            w = std::max(w, -m_OriginalScanArea.width);
-            w = std::min(w, widgetWidth - m_OriginalScanArea.x - m_OriginalScanArea.width);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.width);
+            deltaX = std::min(deltaX, width - m_OriginalScanArea.x - m_OriginalScanArea.width);
 
             outScanArea.x = m_OriginalScanArea.x * scaleW;
             outScanArea.y = m_OriginalScanArea.y * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width + w) * scaleW;
+            outScanArea.width = (m_OriginalScanArea.width + deltaX) * scaleW;
             outScanArea.height = m_OriginalScanArea.height * scaleH;
             break;
         }
         case ScanAreaDragMode::TopLeft:
         {
-            w = std::min(w, m_OriginalScanArea.width);
-            w = std::max(w, -m_OriginalScanArea.x);
-            h = std::min(h, m_OriginalScanArea.height);
-            h = std::max(h, -m_OriginalScanArea.y);
+            deltaX = std::min(deltaX, m_OriginalScanArea.width);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.x);
+            deltaY = std::min(deltaY, m_OriginalScanArea.height);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.y);
 
-            outScanArea.x = (m_OriginalScanArea.x + w) * scaleW;
-            outScanArea.y = (m_OriginalScanArea.y + h) * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width - w) * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height - h) * scaleH;
+            outScanArea.x = (m_OriginalScanArea.x + deltaX) * scaleW;
+            outScanArea.y = (m_OriginalScanArea.y + deltaY) * scaleH;
+            outScanArea.width = (m_OriginalScanArea.width - deltaX) * scaleW;
+            outScanArea.height = (m_OriginalScanArea.height - deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::TopRight:
         {
-            w = std::max(w, -m_OriginalScanArea.width);
-            w = std::min(w, widgetWidth - m_OriginalScanArea.x - m_OriginalScanArea.width);
-            h = std::min(h, m_OriginalScanArea.height);
-            h = std::max(h, -m_OriginalScanArea.y);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.width);
+            deltaX = std::min(deltaX, width - m_OriginalScanArea.x - m_OriginalScanArea.width);
+            deltaY = std::min(deltaY, m_OriginalScanArea.height);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.y);
 
             outScanArea.x = m_OriginalScanArea.x * scaleW;
-            outScanArea.y = (m_OriginalScanArea.y + h) * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width + w) * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height - h) * scaleH;
+            outScanArea.y = (m_OriginalScanArea.y + deltaY) * scaleH;
+            outScanArea.width = (m_OriginalScanArea.width + deltaX) * scaleW;
+            outScanArea.height = (m_OriginalScanArea.height - deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::BottomLeft:
         {
-            w = std::min(w, m_OriginalScanArea.width);
-            w = std::max(w, -m_OriginalScanArea.x);
-            h = std::max(h, -m_OriginalScanArea.height);
-            h = std::min(h, widgetHeight - m_OriginalScanArea.y - m_OriginalScanArea.height);
+            deltaX = std::min(deltaX, m_OriginalScanArea.width);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.x);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.height);
+            deltaY = std::min(deltaY, height - m_OriginalScanArea.y - m_OriginalScanArea.height);
 
-            outScanArea.x = (m_OriginalScanArea.x + w) * scaleW;
+            outScanArea.x = (m_OriginalScanArea.x + deltaX) * scaleW;
             outScanArea.y = m_OriginalScanArea.y * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width - w) * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height + h) * scaleH;
+            outScanArea.width = (m_OriginalScanArea.width - deltaX) * scaleW;
+            outScanArea.height = (m_OriginalScanArea.height + deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::BottomRight:
         {
-            w = std::max(w, -m_OriginalScanArea.width);
-            w = std::min(w, widgetWidth - m_OriginalScanArea.x - m_OriginalScanArea.width);
-            h = std::max(h, -m_OriginalScanArea.height);
-            h = std::min(h, widgetHeight - m_OriginalScanArea.y - m_OriginalScanArea.height);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.width);
+            deltaX = std::min(deltaX, width - m_OriginalScanArea.x - m_OriginalScanArea.width);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.height);
+            deltaY = std::min(deltaY, height - m_OriginalScanArea.y - m_OriginalScanArea.height);
 
             outScanArea.x = m_OriginalScanArea.x * scaleW;
             outScanArea.y = m_OriginalScanArea.y * scaleH;
-            outScanArea.width = (m_OriginalScanArea.width + w) * scaleW;
-            outScanArea.height = (m_OriginalScanArea.height + h) * scaleH;
+            outScanArea.width = (m_OriginalScanArea.width + deltaX) * scaleW;
+            outScanArea.height = (m_OriginalScanArea.height + deltaY) * scaleH;
             break;
         }
         case ScanAreaDragMode::Move:
         {
-            w = std::max(w, -m_OriginalScanArea.x);
-            w = std::min(w, widgetWidth - m_OriginalScanArea.x - m_OriginalScanArea.width);
-            h = std::max(h, -m_OriginalScanArea.y);
-            h = std::min(h, widgetHeight - m_OriginalScanArea.y - m_OriginalScanArea.height);
+            deltaX = std::max(deltaX, -m_OriginalScanArea.x);
+            deltaX = std::min(deltaX, width - m_OriginalScanArea.x - m_OriginalScanArea.width);
+            deltaY = std::max(deltaY, -m_OriginalScanArea.y);
+            deltaY = std::min(deltaY, height - m_OriginalScanArea.y - m_OriginalScanArea.height);
 
-            outScanArea.x = (m_OriginalScanArea.x + w) * scaleW;
-            outScanArea.y = (m_OriginalScanArea.y + h) * scaleH;
+            outScanArea.x = (m_OriginalScanArea.x + deltaX) * scaleW;
+            outScanArea.y = (m_OriginalScanArea.y + deltaY) * scaleH;
             outScanArea.width = m_OriginalScanArea.width * scaleW;
             outScanArea.height = m_OriginalScanArea.height * scaleH;
             break;
@@ -187,15 +255,15 @@ void ZooScan::PreviewPanel::ComputeScanArea(GtkWidget *widget, double w, double 
         case ScanAreaDragMode::Rect:
         default:
         {
-            w = std::min(w, widgetWidth - m_SelectionStartX);
-            w = std::max(w, -m_SelectionStartX);
-            h = std::min(h, widgetHeight - m_SelectionStartY);
-            h = std::max(h, -m_SelectionStartY);
+            deltaX = std::min(deltaX, width - m_DragStartX);
+            deltaX = std::max(deltaX, -m_DragStartX);
+            deltaY = std::min(deltaY, height - m_DragStartY);
+            deltaY = std::max(deltaY, -m_DragStartY);
 
-            outScanArea.x = std::min(m_SelectionStartX, m_SelectionStartX + w) * scaleW;
-            outScanArea.y = std::min(m_SelectionStartY, m_SelectionStartY + h) * scaleH;
-            outScanArea.width = std::max(m_SelectionStartX, m_SelectionStartX + w) * scaleW - outScanArea.x;
-            outScanArea.height = std::max(m_SelectionStartY, m_SelectionStartY + h) * scaleH - outScanArea.y;
+            outScanArea.x = std::min(m_DragStartX, m_DragStartX + deltaX) * scaleW;
+            outScanArea.y = std::min(m_DragStartY, m_DragStartY + deltaY) * scaleH;
+            outScanArea.width = std::max(m_DragStartX, m_DragStartX + deltaX) * scaleW - outScanArea.x;
+            outScanArea.height = std::max(m_DragStartY, m_DragStartY + deltaY) * scaleH - outScanArea.y;
             break;
         }
     }
@@ -231,32 +299,32 @@ void ZooScan::PreviewPanel::ComputeScanArea(GtkWidget *widget, double w, double 
     }
 }
 
-void ZooScan::PreviewPanel::ScanAreaToPixels(
-        GtkWidget *widget, const Rect<double> &scanArea, Rect<double> &outPixelArea) const
+/**
+ * Maps a scan area to pixel coordinates.
+ * @param scanArea The scan area to be mapped, in SA units.
+ * @param outPixelArea The output pixel area.
+ * @returns True if the mapping was successful, false otherwise.
+ */
+bool ZooScan::PreviewPanel::ScanAreaToPixels(const Rect<double> &scanArea, Rect<double> &outPixelArea) const
 {
-    int widgetWidth = gtk_widget_get_width(widget);
-    int widgetHeight = gtk_widget_get_height(widget);
+    const auto width = m_PreviewState->GetScannedPixelsPerLine();
+    const auto height = m_PreviewState->GetScannedImageHeight();
 
-    double scaleW;
-    double scaleH;
-
-    if (m_App != nullptr && m_App->GetDeviceOptions() != nullptr)
+    if (m_App != nullptr && m_App->GetDeviceOptions() != nullptr && width != 0 && height != 0 && m_ZoomFactor != 0.0)
     {
-        // Assuming GetMaxScanArea() top-left is always (0, 0)
         auto maxScanArea = m_App->GetDeviceOptions()->GetMaxScanArea();
-        scaleW = static_cast<double>(widgetWidth) / maxScanArea.width;
-        scaleH = static_cast<double>(widgetHeight) / maxScanArea.height;
-    }
-    else
-    {
-        scaleW = 1.0;
-        scaleH = 1.0;
+        double scaleW = (static_cast<double>(width) * m_ZoomFactor) / maxScanArea.width; // pixels per SA unit
+        double scaleH = (static_cast<double>(height) * m_ZoomFactor) / maxScanArea.height; // pixels per SA unit
+
+        outPixelArea.x = scanArea.x * scaleW;
+        outPixelArea.y = scanArea.y * scaleH;
+        outPixelArea.width = scanArea.width * scaleW;
+        outPixelArea.height = scanArea.height * scaleH;
+
+        return true;
     }
 
-    outPixelArea.x = scanArea.x * scaleW;
-    outPixelArea.y = scanArea.y * scaleH;
-    outPixelArea.width = scanArea.width * scaleW;
-    outPixelArea.height = scanArea.height * scaleH;
+    return false;
 }
 
 ScanAreaCursorRegions GetScanAreaCursorRegion(const ZooScan::Rect<double> &pixelArea, double x, double y)
@@ -324,18 +392,18 @@ ScanAreaCursorRegions GetScanAreaCursorRegion(const ZooScan::Rect<double> &pixel
 
 void ZooScan::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
 {
+    if (m_PreviewState->GetScannedPixelsPerLine() == 0 || m_PreviewState->GetScannedImageHeight() == 0)
+        return;
+
     m_IsDragging = true;
 
-    auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(dragController));
+    double x, y;
+    gtk_gesture_drag_get_start_point(dragController, &m_DragStartX, &m_DragStartY);
 
-    double w, h;
-    gtk_gesture_drag_get_start_point(dragController, &m_SelectionStartX, &m_SelectionStartY);
-
-    if (auto deviceOptions = m_App->GetDeviceOptions(); deviceOptions != nullptr)
+    if (auto deviceOptions = m_App->GetDeviceOptions();
+        deviceOptions != nullptr && ScanAreaToPixels(deviceOptions->GetScanArea(), m_OriginalScanArea))
     {
-        ScanAreaToPixels(widget, deviceOptions->GetScanArea(), m_OriginalScanArea);
-
-        auto cursorRegion = GetScanAreaCursorRegion(m_OriginalScanArea, m_SelectionStartX, m_SelectionStartY);
+        auto cursorRegion = GetScanAreaCursorRegion(m_OriginalScanArea, m_DragStartX, m_DragStartY);
         auto modifiers = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(dragController));
 
         switch (cursorRegion)
@@ -365,7 +433,7 @@ void ZooScan::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
                 m_DragMode = ScanAreaDragMode::BottomRight;
                 break;
             case ScanAreaCursorRegions::Inside:
-                if (modifiers & GDK_ALT_MASK)
+                if ((modifiers & GDK_ALT_MASK) == GDK_ALT_MASK)
                 {
                     m_DragMode = ScanAreaDragMode::Move;
                 }
@@ -385,45 +453,42 @@ void ZooScan::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
         m_DragMode = ScanAreaDragMode::Rect;
     }
 
-    gtk_gesture_drag_get_offset(dragController, &w, &h);
+    gtk_gesture_drag_get_offset(dragController, &x, &y);
 
     Rect<double> scanArea;
-    ComputeScanArea(widget, w, h, scanArea);
+    ComputeScanArea(x, y, scanArea);
     m_Dispatcher.Dispatch(SetScanAreaCommand(scanArea));
-
-    gtk_widget_queue_draw(widget);
 }
 
 void ZooScan::PreviewPanel::OnPreviewDragUpdate(GtkGestureDrag *dragController)
 {
-    auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(dragController));
+    if (m_PreviewState->GetScannedPixelsPerLine() == 0 || m_PreviewState->GetScannedImageHeight() == 0)
+        return;
 
-    double w, h;
-    gtk_gesture_drag_get_offset(dragController, &w, &h);
+    double x, y;
+    gtk_gesture_drag_get_offset(dragController, &x, &y);
 
     Rect<double> scanArea;
-    ComputeScanArea(widget, w, h, scanArea);
+    ComputeScanArea(x, y, scanArea);
     m_Dispatcher.Dispatch(SetScanAreaCommand(scanArea));
-
-    gtk_widget_queue_draw(widget);
 }
 
 void ZooScan::PreviewPanel::OnPreviewDragEnd(GtkGestureDrag *dragController)
 {
-    auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(dragController));
+    if (m_PreviewState->GetScannedPixelsPerLine() == 0 || m_PreviewState->GetScannedImageHeight() == 0)
+        return;
 
-    double w, h;
-    gtk_gesture_drag_get_offset(dragController, &w, &h);
+    double x, y;
+    gtk_gesture_drag_get_offset(dragController, &x, &y);
 
     Rect<double> scanArea;
-    ComputeScanArea(widget, w, h, scanArea);
+    ComputeScanArea(x, y, scanArea);
     m_Dispatcher.Dispatch(SetScanAreaCommand(scanArea));
-
-    gtk_widget_queue_draw(widget);
 
     m_IsDragging = false;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionController, gdouble x, gdouble y)
 {
     if (m_IsDragging)
@@ -441,7 +506,11 @@ void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionControll
 
     Rect<double> scanArea = m_App->GetDeviceOptions()->GetScanArea();
     Rect<double> pixelArea;
-    ScanAreaToPixels(GTK_WIDGET(widget), scanArea, pixelArea);
+    if (!ScanAreaToPixels(scanArea, pixelArea))
+    {
+        gtk_widget_set_cursor_from_name(widget, "default");
+        return;
+    }
 
     switch (GetScanAreaCursorRegion(pixelArea, x, y))
     {
@@ -470,7 +539,7 @@ void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionControll
             gtk_widget_set_cursor_from_name(widget, "se-resize");
             break;
         case ScanAreaCursorRegions::Inside:
-            if (modifiers & GDK_ALT_MASK)
+            if ((modifiers & GDK_ALT_MASK) == GDK_ALT_MASK)
             {
                 gtk_widget_set_cursor_from_name(widget, "move");
             }
@@ -485,47 +554,209 @@ void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionControll
     }
 }
 
-void ZooScan::PreviewPanel::OnPreviewDraw(GtkDrawingArea *widget, cairo_t *cr, int width, int height) const
+void ZooScan::PreviewPanel::OnMouseScroll(GtkEventControllerScroll *scrollController, gdouble deltaX, gdouble deltaY)
 {
     if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
     {
         return;
     }
 
-    Rect<double> scanArea = m_App->GetDeviceOptions()->GetScanArea();
-    Rect<double> pixelArea;
-    ScanAreaToPixels(GTK_WIDGET(widget), scanArea, pixelArea);
+    auto modifiers = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(scrollController));
+
+    if ((modifiers & GDK_CONTROL_MASK) == GDK_CONTROL_MASK)
+    {
+        auto currentZoomIndex = gtk_drop_down_get_selected(GTK_DROP_DOWN(m_ZoomDropDown));
+        if (deltaY < 0)
+        {
+            if (currentZoomIndex < std::size(PreviewState::k_ZoomValues) - 1)
+            {
+                m_Dispatcher.Dispatch(SetPanAndZoomCommand(
+                        m_PreviewState->GetPreviewPanOffset(), PreviewState::k_ZoomValues[currentZoomIndex + 1]));
+            }
+        }
+        else
+        {
+            if (currentZoomIndex > 0)
+            {
+                m_Dispatcher.Dispatch(SetPanAndZoomCommand(
+                        m_PreviewState->GetPreviewPanOffset(), PreviewState::k_ZoomValues[currentZoomIndex - 1]));
+            }
+        }
+    }
+    else if ((modifiers & GDK_SHIFT_MASK) == GDK_SHIFT_MASK)
+    {
+        // TODO: Implement horizontal scroll
+    }
+    else if (modifiers == 0)
+    {
+        // TODO: Implement vertical scroll
+    }
+}
+
+void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
+{
+    if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
+    {
+        return;
+    }
 
     gdk_cairo_set_source_pixbuf(cr, m_PreviewPixBuf, 0, 0);
     cairo_paint(cr);
 
+    Rect<double> scanArea = m_App->GetDeviceOptions()->GetScanArea();
+    Rect<double> pixelArea;
+    if (!ScanAreaToPixels(scanArea, pixelArea))
+    {
+        return;
+    }
+
     cairo_set_operator(cr, CAIRO_OPERATOR_EXCLUSION);
     cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+    cairo_set_line_width(cr, .50);
     cairo_rectangle(cr, pixelArea.x, pixelArea.y, pixelArea.width, pixelArea.height);
     cairo_stroke(cr);
 }
 
-void ZooScan::PreviewPanel::Update(u_int64_t lastSeenVersion) const
+void ZooScan::PreviewPanel::Update(u_int64_t lastSeenVersion)
 {
-    if (const auto image = m_PreviewState->GetFullImage(); image != nullptr)
+    auto changeset = m_PreviewState->GetAggregatedChangeset(lastSeenVersion);
+    if (changeset == nullptr || !changeset->HasAnyChange())
     {
-        auto width = m_PreviewState->GetPixelsPerLine();
-        auto height = m_PreviewState->GetImageHeight();
-        auto scaleW = static_cast<double>(k_PreviewWidth) / width;
-        auto scaleH = static_cast<double>(k_PreviewHeight) / height;
-        auto scale = std::min(scaleW, scaleH);
-        auto previewWidth = k_PreviewWidth * scale / scaleW;
-        auto previewHeight = k_PreviewHeight * scale / scaleH;
+        return;
+    }
 
-        auto *pixbuf = gdk_pixbuf_new_from_data(
-                m_PreviewState->GetFullImage(), GDK_COLORSPACE_RGB, false, 8, width, height,
-                m_PreviewState->GetBytesPerLine(), nullptr, nullptr);
-        gdk_pixbuf_fill(m_PreviewPixBuf, 0);
-        gdk_pixbuf_scale(
-                pixbuf, m_PreviewPixBuf, 0, 0, static_cast<int>(previewWidth), static_cast<int>(previewHeight), 0., 0.,
-                scale, scale, GDK_INTERP_NEAREST);
-        g_object_unref(pixbuf);
+    if (changeset->IsChanged(PreviewStateChangeset::TypeFlag::Image))
+    {
+        if (const auto image = m_PreviewState->GetScannedImage(); image != nullptr)
+        {
+            auto width = m_PreviewState->GetScannedPixelsPerLine();
+            auto height = m_PreviewState->GetScannedImageHeight();
+            if (m_ScannedImage != nullptr)
+            {
+                g_object_unref(m_ScannedImage);
+                m_ScannedImage = nullptr;
+            }
+            m_ScannedImage = gdk_pixbuf_new_from_data(
+                    m_PreviewState->GetScannedImage(), GDK_COLORSPACE_RGB, false, 8, width, height,
+                    m_PreviewState->GetScannedBytesPerLine(), nullptr, nullptr);
+        }
+    }
+
+    bool updateZoomDropDown = false;
+    if (changeset->IsChanged(PreviewStateChangeset::TypeFlag::ZoomFactor))
+    {
+        m_ZoomFactor = m_PreviewState->GetPreviewZoomFactor();
+        updateZoomDropDown = true;
+    }
+
+    // If zoom factor is 0, it will be computed in Redraw().
+    updateZoomDropDown |= (m_ZoomFactor == 0.0);
+
+    Redraw();
+
+    if (updateZoomDropDown)
+    {
+        for (auto i = 0UZ; i < std::size(PreviewState::k_ZoomValues); ++i)
+        {
+            auto zoomValue = PreviewState::k_ZoomValues[i];
+            if (std::abs(m_ZoomFactor - zoomValue) < 0.0001)
+            {
+                gtk_drop_down_set_selected(GTK_DROP_DOWN(m_ZoomDropDown), i);
+                break;
+            }
+        }
     }
 
     gtk_widget_queue_draw(m_PreviewImage);
+}
+
+void ZooScan::PreviewPanel::Redraw()
+{
+    if (m_PreviewPixBuf == nullptr)
+    {
+        auto width = gtk_widget_get_size(m_PreviewImage, GTK_ORIENTATION_HORIZONTAL);
+        auto height = gtk_widget_get_size(m_PreviewImage, GTK_ORIENTATION_VERTICAL);
+        if (width == 0 || height == 0)
+        {
+            return;
+        }
+
+        m_PreviewPixBuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, width, height);
+    }
+
+    if (m_ScannedImage != nullptr)
+    {
+        auto displayWidth = m_PreviewPixBuf != nullptr ? gdk_pixbuf_get_width(m_PreviewPixBuf) : 0.0;
+        auto displayHeight = m_PreviewPixBuf != nullptr ? gdk_pixbuf_get_height(m_PreviewPixBuf) : 0.0;
+        auto scannedWidth = gdk_pixbuf_get_width(m_ScannedImage);
+        auto scannedHeight = gdk_pixbuf_get_height(m_ScannedImage);
+
+        if (m_ZoomFactor == 0.0)
+        {
+            auto scaleW = displayWidth / scannedWidth;
+            auto scaleH = displayHeight / scannedHeight;
+
+            m_ZoomFactor = PreviewState::FloorZoomFactor(std::min(scaleW, scaleH));
+        }
+
+        auto previewWidth = std::min(scannedWidth * m_ZoomFactor, displayWidth);
+        auto previewHeight = std::min(scannedHeight * m_ZoomFactor, displayHeight);
+
+        FillWithEmptyPattern();
+        gdk_pixbuf_scale(
+                m_ScannedImage, m_PreviewPixBuf, 0, 0, static_cast<int>(previewWidth), static_cast<int>(previewHeight),
+                0., 0., m_ZoomFactor, m_ZoomFactor, GDK_INTERP_NEAREST);
+    }
+    else
+    {
+        FillWithEmptyPattern();
+    }
+}
+
+void ZooScan::PreviewPanel::FillWithEmptyPattern()
+{
+    g_assert(gdk_pixbuf_get_colorspace(m_PreviewPixBuf) == GDK_COLORSPACE_RGB);
+    g_assert(gdk_pixbuf_get_bits_per_sample(m_PreviewPixBuf) == 8);
+    g_assert(gdk_pixbuf_get_has_alpha(m_PreviewPixBuf) == false);
+    g_assert(gdk_pixbuf_get_n_channels(m_PreviewPixBuf) == 3);
+
+    auto *pixbuf = gdk_pixbuf_get_pixels(m_PreviewPixBuf);
+    int height = gdk_pixbuf_get_height(m_PreviewPixBuf);
+    int width = gdk_pixbuf_get_width(m_PreviewPixBuf);
+    int rowStride = gdk_pixbuf_get_rowstride(m_PreviewPixBuf);
+
+    constexpr guchar k_Light = 0xFF;
+    constexpr guchar k_Dark = 0xEE;
+
+    for (int y = 0; y < height; ++y)
+    {
+        auto *ptr = pixbuf + y * rowStride;
+        for (int x = 0; x < width; ++x)
+        {
+            if ((x & 0x40) && (y & 0x40))
+            {
+                *ptr++ = k_Light;
+                *ptr++ = k_Light;
+                *ptr++ = k_Light;
+            }
+            else if ((x & 0x40) && !(y & 0x40))
+            {
+                *ptr++ = k_Dark;
+                *ptr++ = k_Dark;
+                *ptr++ = k_Dark;
+            }
+            else if (!(x & 0x40) && (y & 0x40))
+            {
+                *ptr++ = k_Dark;
+                *ptr++ = k_Dark;
+                *ptr++ = k_Dark;
+            }
+            else
+            {
+                *ptr++ = k_Light;
+                *ptr++ = k_Light;
+                *ptr++ = k_Light;
+            }
+        }
+    }
 }

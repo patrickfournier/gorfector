@@ -16,15 +16,10 @@ namespace ZooScan
         {
         }
 
-        [[nodiscard]] const std::string &DeviceName() const
-        {
-            return m_DeviceName;
-        }
-
         static void Execute(const SelectDeviceCommand &command, DeviceSelectorState *deviceSelectorState)
         {
             const DeviceSelectorState::Updater updater(deviceSelectorState);
-            updater.SelectDevice(command.DeviceName());
+            updater.SelectDevice(command.m_DeviceName);
         }
     };
 }

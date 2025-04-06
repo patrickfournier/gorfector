@@ -64,8 +64,8 @@ void ZooScan::App::PopulateMainWindow()
     auto *grid = gtk_grid_new();
     gtk_window_set_child(m_MainWindow, grid);
 
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 0);
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 0);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
 
     m_DeviceSelector = new DeviceSelector(&m_Dispatcher, this);
     gtk_grid_attach(GTK_GRID(grid), m_DeviceSelector->RootWidget(), 0, 0, 2, 1);
@@ -381,8 +381,6 @@ void ZooScan::App::UpdatePreview() const
     {
         device->CancelScan();
         RestoreScanOptions();
-
-        previewPanelUpdater.ResetReadBuffer();
 
         gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_UpdatePreviewCallbackId);
         return;

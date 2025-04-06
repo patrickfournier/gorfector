@@ -26,11 +26,6 @@ namespace ZooScan
         {
         }
 
-        [[nodiscard]] bool ScanNetwork() const
-        {
-            return m_ScanNetwork;
-        }
-
         static void Execute(const ActivateNetworkScan &command, DeviceSelectorState *deviceSelectorState)
         {
             DeviceSelectorState::Updater updater(deviceSelectorState);

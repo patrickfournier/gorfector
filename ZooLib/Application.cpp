@@ -15,6 +15,7 @@ void ZooLib::Application::Initialize()
 ZooLib::Application::~Application()
 {
     g_object_unref(m_GtkApp);
+    m_GtkApp = nullptr;
 }
 
 int ZooLib::Application::Run(int argc, char **argv) const

@@ -155,14 +155,14 @@ namespace ZooScan
             }
         }
 
-        bool Read(SANE_Byte *buffer, SANE_Int max_length, SANE_Int *length) const
+        bool Read(SANE_Byte *buffer, SANE_Int maxLength, SANE_Int *length) const
         {
             if (m_Handle == nullptr)
             {
                 throw std::runtime_error("Failed to read (device not open).");
             }
 
-            switch (sane_read(m_Handle, buffer, max_length, length))
+            switch (sane_read(m_Handle, buffer, maxLength, length))
             {
                 case SANE_STATUS_GOOD:
                 case SANE_STATUS_DEVICE_BUSY:

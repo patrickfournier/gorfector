@@ -333,8 +333,6 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
             continue;
         }
 
-        g_print("%s %d\n", optionDescriptor->name, optionDescriptor->type);
-
         switch (optionDescriptor->type)
         {
             case SANE_TYPE_BOOL:

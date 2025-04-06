@@ -13,8 +13,8 @@
     background: burlywood;
 }
 
-.preview-overlay {
+.preview-panel {
     border-width: 1px;
-    border-color: #c0c;
+    border-color: #000;
     border-style: solid;
 }
