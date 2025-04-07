@@ -14,10 +14,15 @@ namespace ZooScan
     class PreviewPanel
     {
     private:
-        enum class ScanAreaDragMode
+        constexpr static auto gdkModifiers = GDK_SHIFT_MASK | GDK_LOCK_MASK | GDK_CONTROL_MASK | GDK_ALT_MASK |
+                                             GDK_SUPER_MASK | GDK_HYPER_MASK | GDK_META_MASK;
+
+        enum class DragMode
         {
+            None,
+            Pan,
             Move,
-            Rect,
+            Draw,
             Top,
             Bottom,
             Left,
@@ -32,7 +37,7 @@ namespace ZooScan
         ZooLib::CommandDispatcher m_Dispatcher{};
 
         PreviewState *m_PreviewState{};
-        ViewUpdateObserver<PreviewPanel, PreviewState> *m_ViewUpdateObserver;
+        ViewUpdateObserver<PreviewPanel, PreviewState> *m_ViewUpdateObserver{};
 
         double m_ZoomFactor{};
 
@@ -45,8 +50,10 @@ namespace ZooScan
         bool m_IsDragging{};
         double m_DragStartX{};
         double m_DragStartY{};
-        Rect<double> m_OriginalScanArea;
-        ScanAreaDragMode m_DragMode{};
+        DragMode m_DragMode{};
+        Point<double> m_OriginalPan{};
+        Rect<double> m_OriginalScanArea{};
+        Point<double> m_LastMousePosition{};
 
         void OnPreviewDragBegin(GtkGestureDrag *dragController);
         void OnPreviewDragUpdate(GtkGestureDrag *dragController);
@@ -63,7 +70,7 @@ namespace ZooScan
         void ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const;
         bool ScanAreaToPixels(const Rect<double> &scanArea, Rect<double> &outPixelArea) const;
 
-        void FillWithEmptyPattern();
+        void FillWithEmptyPattern() const;
         void Redraw();
 
     public:

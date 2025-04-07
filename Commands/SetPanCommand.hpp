@@ -5,24 +5,21 @@
 
 namespace ZooScan
 {
-    struct SetPanAndZoomCommand : public ZooLib::Command
+    struct SetPanCommand : public ZooLib::Command
     {
     private:
         const Point<double> m_PanOffset{};
-        const double m_ZoomFactor{};
 
     public:
-        explicit SetPanAndZoomCommand(const Point<double> panOffset, double zoomFactor)
+        explicit SetPanCommand(const Point<double> panOffset)
             : m_PanOffset(panOffset)
-            , m_ZoomFactor(zoomFactor)
         {
         }
 
-        static void Execute(const SetPanAndZoomCommand &command, PreviewState *previewState)
+        static void Execute(const SetPanCommand &command, PreviewState *previewState)
         {
             auto updater = PreviewState::Updater(previewState);
             updater.SetPanOffset(command.m_PanOffset);
-            updater.SetZoomFactor(command.m_ZoomFactor);
         }
     };
 }

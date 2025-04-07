@@ -62,11 +62,14 @@ namespace ZooScan
     class PreviewState final : public ZooLib::StateComponent, public ZooLib::ChangesetManager<PreviewStateChangeset>
     {
     public:
-        static constexpr const char *k_ZoomValueStrings[] = {"-",    "12.5%", "25%",  "33%",  "50%",   "66%",
-                                                             "100%", "200%",  "400%", "800%", "1600%", nullptr};
-        static constexpr double k_ZoomValues[] = {0., .125, .25, .33, .5, .66, 1.0, 2.0, 4.0, 8.0, 16.0};
+        static constexpr const char *k_ZoomValueStrings[] = {"-",  "1/16", "1/8", "1/4", "1/2",  "x1",
+                                                             "x2", "x4",   "x8",  "x16", nullptr};
+        static constexpr double k_ZoomValues[] = {0., .0625, .125, .25, .5, 1.0, 2.0, 4.0, 8.0, 16.0};
 
     private:
+        int m_PreviewWindowWidth{};
+        int m_PreviewWindowHeight{};
+
         Point<double> m_PanOffset{};
         double m_ZoomFactor{};
 
@@ -78,6 +81,41 @@ namespace ZooScan
         int m_PixelsPerLine{};
         int m_BytesPerLine{};
         int m_ImageHeight{};
+
+        void ApplyPanConstraints()
+        {
+            if (m_PreviewWindowWidth >= m_PixelsPerLine * m_ZoomFactor)
+            {
+                m_PanOffset.x = 0;
+            }
+            else
+            {
+                if (m_PanOffset.x > 0)
+                {
+                    m_PanOffset.x = 0;
+                }
+                else if (m_PanOffset.x < m_PreviewWindowWidth - m_PixelsPerLine * m_ZoomFactor)
+                {
+                    m_PanOffset.x = m_PreviewWindowWidth - m_PixelsPerLine * m_ZoomFactor;
+                }
+            }
+
+            if (m_PreviewWindowHeight >= m_ImageHeight * m_ZoomFactor)
+            {
+                m_PanOffset.y = 0;
+            }
+            else
+            {
+                if (m_PanOffset.y > 0)
+                {
+                    m_PanOffset.y = 0;
+                }
+                else if (m_PanOffset.y < m_PreviewWindowHeight - m_ImageHeight * m_ZoomFactor)
+                {
+                    m_PanOffset.y = m_PreviewWindowHeight - m_ImageHeight * m_ZoomFactor;
+                }
+            }
+        }
 
     public:
         explicit PreviewState(ZooLib::State *state)
@@ -173,19 +211,45 @@ namespace ZooScan
             {
             }
 
-            void SetPanOffset(Point<double> panOffset) const
+            void SetPreviewWindowSize(int width, int height)
             {
-                if (m_StateComponent->m_PanOffset == panOffset)
+                if (m_StateComponent->m_PreviewWindowWidth == width &&
+                    m_StateComponent->m_PreviewWindowHeight == height)
                 {
                     return;
                 }
 
-                m_StateComponent->m_PanOffset = panOffset;
+                m_StateComponent->m_PreviewWindowWidth = width;
+                m_StateComponent->m_PreviewWindowHeight = height;
+
+                m_StateComponent->ApplyPanConstraints();
+
                 auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
             }
 
-            void SetZoomFactor(double zoomFactor) const
+            void SetPanOffset(Point<double> panOffsetDelta)
+            {
+                if (m_StateComponent->m_PanOffset == panOffsetDelta)
+                {
+                    return;
+                }
+
+                m_StateComponent->m_PanOffset = panOffsetDelta;
+                m_StateComponent->ApplyPanConstraints();
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
+            }
+
+            void SetZoomFactor(double zoomFactor)
+            {
+                SetZoomFactor(
+                        zoomFactor, Point{m_StateComponent->m_PreviewWindowWidth / 2.,
+                                          m_StateComponent->m_PreviewWindowHeight / 2.});
+            }
+
+            void SetZoomFactor(double zoomFactor, Point<double> zoomCenter)
             {
                 zoomFactor = ClampToNearestZoomFactor(zoomFactor);
 
@@ -194,12 +258,22 @@ namespace ZooScan
                     return;
                 }
 
+                // Adjust pan offset to zoom around the center of the preview window.
+                auto centerX = (m_StateComponent->m_PanOffset.x - zoomCenter.x) / m_StateComponent->m_ZoomFactor;
+                auto centerY = (m_StateComponent->m_PanOffset.y - zoomCenter.y) / m_StateComponent->m_ZoomFactor;
+
+                m_StateComponent->m_PanOffset.x = zoomFactor * centerX + zoomCenter.x;
+                m_StateComponent->m_PanOffset.y = zoomFactor * centerY + zoomCenter.y;
+
                 m_StateComponent->m_ZoomFactor = zoomFactor;
+
                 auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                m_StateComponent->ApplyPanConstraints();
+                changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
                 changeset->Set(PreviewStateChangeset::TypeFlag::ZoomFactor);
             }
 
-            void UpdatePreviewRectangle(const Rect<double> &scanArea) const
+            void UpdatePreviewRectangle(const Rect<double> &scanArea)
             {
                 if (m_StateComponent->m_ScanArea == scanArea)
                 {
@@ -211,7 +285,7 @@ namespace ZooScan
                 changeset->Set(PreviewStateChangeset::TypeFlag::ScanArea);
             }
 
-            void PrepareForScan(int pixelsPerLine, int bytesPerLine, int imageHeight) const
+            void PrepareForScan(int pixelsPerLine, int bytesPerLine, int imageHeight)
             {
                 m_StateComponent->m_PixelsPerLine = pixelsPerLine;
                 m_StateComponent->m_BytesPerLine = bytesPerLine;
@@ -236,14 +310,14 @@ namespace ZooScan
                 m_StateComponent->m_Offset = 0;
             }
 
-            void GetReadBuffer(SANE_Byte *&buffer, int &maxLength) const
+            void GetReadBuffer(SANE_Byte *&buffer, int &maxLength)
             {
                 buffer = m_StateComponent->m_Image + m_StateComponent->m_Offset;
                 maxLength = static_cast<int>(
                         std::min(1024UL * 1024UL, m_StateComponent->m_ImageSize - m_StateComponent->m_Offset));
             }
 
-            void CommitReadBuffer(int readLength) const
+            void CommitReadBuffer(int readLength)
             {
                 m_StateComponent->m_Offset += readLength;
 
@@ -251,7 +325,7 @@ namespace ZooScan
                 changeset->Set(PreviewStateChangeset::TypeFlag::Image);
             }
 
-            void ResetReadBuffer() const
+            void ResetReadBuffer()
             {
                 m_StateComponent->m_Offset = 0;
             }
