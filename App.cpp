@@ -2,8 +2,6 @@
 #include <sane/sane.h>
 #include <stdexcept>
 
-#include <tiffio.h>
-
 #include "App.hpp"
 #include "AppState.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
@@ -11,7 +9,9 @@
 #include "DeviceOptionsPanel.hpp"
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
+#include "FileFormat.hpp"
 #include "PreviewPanel.hpp"
+#include "TiffFormat.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
@@ -28,6 +28,8 @@ ZooScan::App::App()
 
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);
+
+    FileFormat::Register<TiffFormat>();
 }
 
 ZooScan::App::~App()
@@ -46,9 +48,11 @@ ZooScan::App::~App()
 
     delete m_AppState;
 
-    delete[] m_FullImage;
+    delete[] m_ScannedImage;
 
     sane_exit();
+
+    FileFormat::Clear();
 }
 
 void ZooScan::App::PopulateMainWindow()
@@ -112,7 +116,7 @@ void ZooScan::App::Update(u_int64_t lastSeenVersion)
 {
     if (m_IsScanning)
     {
-        UpdateScanning();
+        UpdateScan();
     }
 
     if (m_DeviceOptionsPanel != nullptr && (m_DeviceOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
@@ -287,28 +291,28 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     {
         auto description = device->GetOptionDescriptor(options->TLXIndex());
         double value = maxScanArea.x;
-        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
         device->SetOptionValue(options->TLXIndex(), &fValue, nullptr);
     }
     if (options->TLYIndex() != std::numeric_limits<uint32_t>::max())
     {
         auto description = device->GetOptionDescriptor(options->TLYIndex());
         double value = maxScanArea.y;
-        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
         device->SetOptionValue(options->TLYIndex(), &fValue, nullptr);
     }
     if (options->BRXIndex() != std::numeric_limits<uint32_t>::max())
     {
         auto description = device->GetOptionDescriptor(options->BRXIndex());
         double value = maxScanArea.x + maxScanArea.width;
-        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
         device->SetOptionValue(options->BRXIndex(), &fValue, nullptr);
     }
     if (options->BRYIndex() != std::numeric_limits<uint32_t>::max())
     {
         auto description = device->GetOptionDescriptor(options->BRYIndex());
         double value = maxScanArea.y + maxScanArea.height;
-        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : value;
+        SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
         device->SetOptionValue(options->BRYIndex(), &fValue, nullptr);
     }
 
@@ -339,15 +343,14 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
         return;
     }
 
-    auto height = GetScanHeight();
-    g_print("Image size: %d (%d) x %d\n", m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
-
     if (m_PreviewPanel != nullptr)
     {
+        auto height = GetScanHeight();
         auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
         previewPanelUpdater.PrepareForScan(m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
+        previewPanelUpdater.SetProgressBounds(0, m_ScanParameters.bytes_per_line * height);
 
-        m_UpdatePreviewCallbackId = gtk_widget_add_tick_callback(
+        m_ScanCallbackId = gtk_widget_add_tick_callback(
                 GTK_WIDGET(m_MainWindow),
                 [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
                     auto *localApp = static_cast<App *>(data);
@@ -382,15 +385,91 @@ void ZooScan::App::UpdatePreview() const
         device->CancelScan();
         RestoreScanOptions();
 
-        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_UpdatePreviewCallbackId);
+        previewPanelUpdater.SetProgressCompleted();
+
+        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
         return;
     }
 
     previewPanelUpdater.CommitReadBuffer(readLength);
+    previewPanelUpdater.IncreaseProgress(readLength);
 }
 
 void ZooScan::App::OnScanClicked(GtkWidget *)
 {
+    const auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
+
+    auto fileSaveDialog = gtk_file_chooser_dialog_new(
+            "Save Scan", GTK_WINDOW(m_MainWindow), GTK_FILE_CHOOSER_ACTION_SAVE, "_Cancel", GTK_RESPONSE_CANCEL,
+            "_Save", GTK_RESPONSE_ACCEPT, nullptr);
+    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fileSaveDialog), FileFormat::DefaultFileName().c_str());
+
+
+    for (auto format: FileFormat::GetFormats())
+    {
+        auto filter = gtk_file_filter_new();
+        gtk_file_filter_set_name(filter, format->GetName().c_str());
+
+        for (auto ext: format->GetExtensions())
+        {
+            gtk_file_filter_add_pattern(filter, ("*" + ext).c_str());
+        }
+        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fileSaveDialog), filter);
+    }
+
+    ConnectGtkSignal(this, &App::OnFileSave, fileSaveDialog, "response");
+    gtk_window_present(GTK_WINDOW(fileSaveDialog));
+}
+
+void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
+{
+    if (responseId != GTK_RESPONSE_ACCEPT)
+    {
+        m_ImageFilePath = std::filesystem::path();
+        gtk_window_destroy(GTK_WINDOW(widget));
+        return;
+    }
+
+    g_autoptr(GFile) gFile = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(widget));
+    if (gFile == nullptr)
+    {
+        return;
+    }
+    auto path = g_file_get_path(gFile);
+    if (path == nullptr)
+    {
+        return;
+    }
+
+    m_ImageFilePath = std::filesystem::path(path);
+    g_free(path);
+
+    if (auto fileFormat = FileFormat::GetFormatForPath(m_ImageFilePath); fileFormat == nullptr)
+    {
+        auto selectedFilter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(widget));
+        auto filterName = gtk_file_filter_get_name(GTK_FILE_FILTER(selectedFilter));
+        fileFormat = FileFormat::GetFormatByName(filterName);
+        fileFormat->AddExtension(m_ImageFilePath);
+    }
+
+    auto f = fopen(m_ImageFilePath.c_str(), "wb");
+    fclose(f);
+
+    gtk_window_destroy(GTK_WINDOW(widget));
+    StartScan();
+}
+
+void ZooScan::App::StartScan()
+{
+    if (m_ImageFilePath.empty())
+    {
+        return;
+    }
+
     const auto device = GetDevice();
     if (device == nullptr)
     {
@@ -424,15 +503,24 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     }
 
     auto height = GetScanHeight();
-    g_print("Image size: %d (%d) x %d\n", m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
-
-    m_FullImageSize = m_ScanParameters.bytes_per_line * height;
-    m_FullImage = static_cast<SANE_Byte *>(calloc(m_FullImageSize, 1));
-
+    m_ScannedImageSize = m_ScanParameters.bytes_per_line * height;
+    m_ScannedImage = static_cast<SANE_Byte *>(calloc(m_ScannedImageSize, 1));
     m_Offset = 0;
+
+    auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
+    previewPanelUpdater.SetProgressBounds(0, m_ScannedImageSize);
+
+    m_ScanCallbackId = gtk_widget_add_tick_callback(
+            GTK_WIDGET(m_MainWindow),
+            [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
+                auto *localApp = static_cast<App *>(data);
+                localApp->UpdateScan();
+                return G_SOURCE_CONTINUE;
+            },
+            this, nullptr);
 }
 
-void ZooScan::App::UpdateScanning()
+void ZooScan::App::UpdateScan()
 {
     auto device = GetDevice();
     if (device == nullptr)
@@ -440,53 +528,31 @@ void ZooScan::App::UpdateScanning()
         return;
     }
 
+    auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
+
     SANE_Int readLength = 0;
-    auto requestedLength = static_cast<int>(std::min(1024UL * 1024UL, m_FullImageSize - m_Offset));
-    if (requestedLength == 0 || !device->Read(m_FullImage + m_Offset, requestedLength, &readLength))
+    auto requestedLength = static_cast<int>(std::min(1024UL * 1024UL, m_ScannedImageSize - m_Offset));
+    if (requestedLength == 0 || !device->Read(m_ScannedImage + m_Offset, requestedLength, &readLength))
     {
-        g_print("Done reading data\n");
         m_IsScanning = false;
         device->CancelScan();
+        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
 
-        auto options = GetDeviceOptions();
-        int xResolution = options == nullptr               ? 0
-                          : options->GetXResolution() == 0 ? options->GetResolution()
-                                                           : options->GetXResolution();
-        int yResolution = options == nullptr               ? 0
-                          : options->GetYResolution() == 0 ? options->GetResolution()
-                                                           : options->GetYResolution();
+        previewPanelUpdater.SetProgressCompleted();
 
-        TIFF *tifFile = TIFFOpen("test.tiff", "w");
-
-        TIFFSetField(tifFile, TIFFTAG_IMAGEWIDTH, m_ScanParameters.pixels_per_line);
-        TIFFSetField(tifFile, TIFFTAG_IMAGELENGTH, m_ScanParameters.lines);
-        TIFFSetField(tifFile, TIFFTAG_SAMPLESPERPIXEL, m_ScanParameters.format == SANE_FRAME_RGB ? 3 : 1);
-        TIFFSetField(tifFile, TIFFTAG_BITSPERSAMPLE, m_ScanParameters.depth);
-        TIFFSetField(tifFile, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-        TIFFSetField(tifFile, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-        TIFFSetField(
-                tifFile, TIFFTAG_PHOTOMETRIC,
-                m_ScanParameters.format == SANE_FRAME_RGB ? PHOTOMETRIC_RGB : PHOTOMETRIC_MINISBLACK);
-        TIFFSetField(tifFile, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS);
-        TIFFSetField(tifFile, TIFFTAG_ROWSPERSTRIP, 1);
-        TIFFSetField(tifFile, TIFFTAG_XRESOLUTION, xResolution);
-        TIFFSetField(tifFile, TIFFTAG_YRESOLUTION, yResolution);
-        TIFFSetField(tifFile, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
-
-        for (auto i = 0; i < m_ScanParameters.lines; i++)
+        auto fileFormat = FileFormat::GetFormatForPath(m_ImageFilePath);
+        if (fileFormat != nullptr)
         {
-            TIFFWriteScanline(tifFile, m_FullImage + i * m_ScanParameters.bytes_per_line, i, 0);
+            fileFormat->Save(m_ImageFilePath, GetDeviceOptions(), m_ScanParameters, m_ScannedImage);
         }
 
-        TIFFClose(tifFile);
-
-        free(m_FullImage);
-        m_FullImage = nullptr;
-        m_FullImageSize = 0;
+        free(m_ScannedImage);
+        m_ScannedImage = nullptr;
+        m_ScannedImageSize = 0;
 
         return;
     }
 
-    g_print("Read data %d\n", readLength);
     m_Offset += readLength;
+    previewPanelUpdater.IncreaseProgress(readLength);
 }

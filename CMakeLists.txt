@@ -47,7 +47,8 @@ set(SOURCE_FILES
         SaneDevice.cpp
         DeviceSelectorState.cpp
         PreviewPanel.cpp
-        PreviewPanel.hpp
+        TiffFormat.cpp
+        FileFormat.cpp
 )
 
 add_executable(zooscan ${SOURCE_FILES} ${RESOURCE_OUTPUT})

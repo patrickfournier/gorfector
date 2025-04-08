@@ -34,8 +34,14 @@ namespace ZooScan
 
         GtkWidget *m_SettingsBox{};
 
+        SANE_Parameters m_ScanParameters{};
+        uint64_t m_ScannedImageSize{};
+        SANE_Byte *m_ScannedImage{};
+        uint64_t m_Offset{};
         bool m_IsScanning{};
-        guint m_UpdatePreviewCallbackId;
+        guint m_ScanCallbackId;
+
+        std::filesystem::path m_ImageFilePath{};
 
         std::string GetApplicationId() override
         {
@@ -68,11 +74,6 @@ namespace ZooScan
             return m_DeviceSelector->GetState()->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
         }
 
-        SANE_Parameters m_ScanParameters{};
-        uint64_t m_FullImageSize{};
-        SANE_Byte *m_FullImage{};
-        uint64_t m_Offset{};
-
         int GetScanHeight() const;
 
         void OnPreviewClicked(GtkWidget *widget);
@@ -80,7 +81,9 @@ namespace ZooScan
         void RestoreScanOptions() const;
 
         void OnScanClicked(GtkWidget *widget);
-        void UpdateScanning();
+        void OnFileSave(GtkWidget *widget, int responseId);
+        void StartScan();
+        void UpdateScan();
 
         const std::string &GetSelectorDeviceName() const;
 

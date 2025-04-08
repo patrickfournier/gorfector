@@ -329,6 +329,18 @@ namespace ZooScan
             {
                 m_StateComponent->m_Offset = 0;
             }
+
+            void SetProgressBounds(uint64_t min, uint64_t max)
+            {
+            }
+
+            void IncreaseProgress(uint64_t delta)
+            {
+            }
+
+            void SetProgressCompleted()
+            {
+            }
         };
     };
 }
