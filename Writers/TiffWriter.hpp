@@ -15,7 +15,7 @@ namespace ZooScan
         static const std::vector<std::string> k_Extensions;
         static constexpr std::string k_Name = "TIFF";
 
-        TiffWriterStateComponent *m_StateComponent;
+        TiffWriterStateComponent *m_StateComponent{};
         TIFF *m_File{};
         int m_LineCounter{};
 
