@@ -251,6 +251,28 @@ namespace ZooScan
             void DeserializeAndApply(const nlohmann::json &json) const;
         };
 
+        [[nodiscard]] const char *GetDeviceModel() const
+        {
+            auto saneDevice = GetDevice();
+            if (saneDevice == nullptr)
+            {
+                return nullptr;
+            }
+
+            return saneDevice->Model();
+        }
+
+        [[nodiscard]] const char *GetDeviceMaker() const
+        {
+            auto saneDevice = GetDevice();
+            if (saneDevice == nullptr)
+            {
+                return nullptr;
+            }
+
+            return saneDevice->Vendor();
+        }
+
         [[nodiscard]] size_t GetOptionCount() const
         {
             return m_OptionValues.size();

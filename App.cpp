@@ -9,11 +9,12 @@
 #include "DeviceOptionsPanel.hpp"
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
-#include "FileFormat.hpp"
 #include "PreviewPanel.hpp"
-#include "TiffFormat.hpp"
+#include "Writers/FileWriter.hpp"
+#include "Writers/TiffWriter.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
+
 
 ZooScan::App::App()
 {
@@ -29,7 +30,7 @@ ZooScan::App::App()
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);
 
-    FileFormat::Register<TiffFormat>();
+    FileWriter::Register<TiffWriter>(&m_State);
 }
 
 ZooScan::App::~App()
@@ -48,11 +49,14 @@ ZooScan::App::~App()
 
     delete m_AppState;
 
-    delete[] m_ScannedImage;
+    if (m_Buffer != nullptr)
+    {
+        free(m_Buffer);
+    }
 
     sane_exit();
 
-    FileFormat::Clear();
+    FileWriter::Clear();
 }
 
 void ZooScan::App::PopulateMainWindow()
@@ -406,15 +410,20 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     auto fileSaveDialog = gtk_file_chooser_dialog_new(
             "Save Scan", GTK_WINDOW(m_MainWindow), GTK_FILE_CHOOSER_ACTION_SAVE, "_Cancel", GTK_RESPONSE_CANCEL,
             "_Save", GTK_RESPONSE_ACCEPT, nullptr);
-    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fileSaveDialog), FileFormat::DefaultFileName().c_str());
+    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fileSaveDialog), FileWriter::DefaultFileName().c_str());
 
 
-    for (auto format: FileFormat::GetFormats())
+    auto filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "All Files");
+    gtk_file_filter_add_pattern(filter, "*");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fileSaveDialog), filter);
+
+    for (auto format: FileWriter::GetFormats())
     {
-        auto filter = gtk_file_filter_new();
+        filter = gtk_file_filter_new();
         gtk_file_filter_set_name(filter, format->GetName().c_str());
 
-        for (auto ext: format->GetExtensions())
+        for (const auto &ext: format->GetExtensions())
         {
             gtk_file_filter_add_pattern(filter, ("*" + ext).c_str());
         }
@@ -448,25 +457,24 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     m_ImageFilePath = std::filesystem::path(path);
     g_free(path);
 
-    if (auto fileFormat = FileFormat::GetFormatForPath(m_ImageFilePath); fileFormat == nullptr)
+    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
+    if (m_FileWriter == nullptr)
     {
         auto selectedFilter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(widget));
         auto filterName = gtk_file_filter_get_name(GTK_FILE_FILTER(selectedFilter));
-        fileFormat = FileFormat::GetFormatByName(filterName);
-        fileFormat->AddExtension(m_ImageFilePath);
+        m_FileWriter = FileWriter::GetFormatByName(filterName);
+
+        if (m_FileWriter != nullptr)
+        {
+            m_FileWriter->AddExtension(m_ImageFilePath);
+        }
     }
 
-    auto f = fopen(m_ImageFilePath.c_str(), "wb");
-    fclose(f);
-
     gtk_window_destroy(GTK_WINDOW(widget));
-    StartScan();
-}
 
-void ZooScan::App::StartScan()
-{
-    if (m_ImageFilePath.empty())
+    if (m_FileWriter == nullptr)
     {
+        ZooLib::ShowUserError(m_MainWindow, "Cannot determine image file format");
         return;
     }
 
@@ -487,7 +495,9 @@ void ZooScan::App::StartScan()
         return;
     }
 
+    // Must be called after StartScan()
     device->GetParameters(&m_ScanParameters);
+
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
         device->CancelScan();
@@ -502,13 +512,22 @@ void ZooScan::App::StartScan()
         return;
     }
 
-    auto height = GetScanHeight();
-    m_ScannedImageSize = m_ScanParameters.bytes_per_line * height;
-    m_ScannedImage = static_cast<SANE_Byte *>(calloc(m_ScannedImageSize, 1));
-    m_Offset = 0;
+    if (auto error = m_FileWriter->CreateFile(*this, m_ImageFilePath, GetDeviceOptions(), m_ScanParameters, nullptr);
+        error != FileWriter::Error::None)
+    {
+        device->CancelScan();
+        auto errorString = std::string("Failed to create file: ") + m_FileWriter->GetError(error);
+        ZooLib::ShowUserError(m_MainWindow, errorString.c_str());
+        return;
+    }
+
+    auto linesIn1MB = 1024 * 1024 / m_ScanParameters.bytes_per_line;
+    m_BufferSize = m_ScanParameters.bytes_per_line * linesIn1MB;
+    m_Buffer = static_cast<SANE_Byte *>(calloc(m_BufferSize, sizeof(SANE_Byte)));
+    m_WriteOffset = 0;
 
     auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
-    previewPanelUpdater.SetProgressBounds(0, m_ScannedImageSize);
+    previewPanelUpdater.SetProgressBounds(0, m_BufferSize);
 
     m_ScanCallbackId = gtk_widget_add_tick_callback(
             GTK_WIDGET(m_MainWindow),
@@ -522,37 +541,67 @@ void ZooScan::App::StartScan()
 
 void ZooScan::App::UpdateScan()
 {
+    if (m_Buffer == nullptr || m_BufferSize == 0)
+    {
+        return;
+    }
+
     auto device = GetDevice();
     if (device == nullptr)
     {
         return;
     }
 
-    auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
-
-    SANE_Int readLength = 0;
-    auto requestedLength = static_cast<int>(std::min(1024UL * 1024UL, m_ScannedImageSize - m_Offset));
-    if (requestedLength == 0 || !device->Read(m_ScannedImage + m_Offset, requestedLength, &readLength))
+    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
+    if (m_FileWriter == nullptr)
     {
-        m_IsScanning = false;
         device->CancelScan();
-        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
-
-        previewPanelUpdater.SetProgressCompleted();
-
-        auto fileFormat = FileFormat::GetFormatForPath(m_ImageFilePath);
-        if (fileFormat != nullptr)
-        {
-            fileFormat->Save(m_ImageFilePath, GetDeviceOptions(), m_ScanParameters, m_ScannedImage);
-        }
-
-        free(m_ScannedImage);
-        m_ScannedImage = nullptr;
-        m_ScannedImageSize = 0;
-
+        ZooLib::ShowUserError(m_MainWindow, "Unsupported file format");
         return;
     }
 
-    m_Offset += readLength;
+    auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
+
+    SANE_Int readLength = 0;
+    auto requestedLength = m_BufferSize - m_WriteOffset;
+    if (requestedLength > 0)
+    {
+        if (!device->Read(m_Buffer + m_WriteOffset, requestedLength, &readLength))
+        {
+            m_IsScanning = false;
+            device->CancelScan();
+            gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
+
+            previewPanelUpdater.SetProgressCompleted();
+
+            auto dataEnd = m_WriteOffset + readLength;
+            auto availableLines = dataEnd / m_ScanParameters.bytes_per_line;
+            m_FileWriter->AppendBytes(
+                    m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line);
+            m_FileWriter->CloseFile();
+
+            free(m_Buffer);
+            m_Buffer = nullptr;
+            m_BufferSize = 0;
+            m_WriteOffset = 0;
+
+            return;
+        }
+    }
+
+    auto availableBytes = m_WriteOffset + readLength;
+    auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
+    auto savedBytes = m_FileWriter->AppendBytes(
+            m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line);
+    if (savedBytes < availableBytes)
+    {
+        memmove(m_Buffer, m_Buffer + savedBytes, availableBytes - savedBytes);
+        m_WriteOffset = availableBytes - savedBytes;
+    }
+    else
+    {
+        m_WriteOffset = 0;
+    }
+
     previewPanelUpdater.IncreaseProgress(readLength);
 }

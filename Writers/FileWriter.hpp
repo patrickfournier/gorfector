@@ -7,28 +7,42 @@
 #include <string>
 #include <vector>
 
+namespace ZooLib
+{
+    class State;
+}
+
 namespace ZooScan
 {
+    class App;
     class DeviceOptionsState;
 
-    class FileFormat
+    class FileWriter
     {
-        static std::vector<const FileFormat *> s_Formats;
+    public:
+        enum class Error
+        {
+            None,
+            CannotOpenFile
+        };
+
+    private:
+        static std::vector<FileWriter *> s_Formats;
 
     public:
         template<typename TFileFormat>
-        static void Register()
+        static void Register(ZooLib::State *state)
         {
-            static_assert(std::derived_from<TFileFormat, FileFormat>);
+            static_assert(std::derived_from<TFileFormat, FileWriter>);
 
-            if (std::ranges::any_of(s_Formats, [](const FileFormat *format) {
+            if (std::ranges::any_of(s_Formats, [](const FileWriter *format) {
                     return dynamic_cast<const TFileFormat *>(format) != nullptr;
                 }))
             {
                 return;
             }
 
-            auto f = new TFileFormat();
+            auto f = new TFileFormat(state);
             s_Formats.push_back(f);
         }
 
@@ -40,12 +54,12 @@ namespace ZooScan
             s_Formats.clear();
         }
 
-        [[nodiscard]] static const std::vector<const FileFormat *> &GetFormats()
+        [[nodiscard]] static const std::vector<FileWriter *> &GetFormats()
         {
             return s_Formats;
         }
 
-        [[nodiscard]] static const FileFormat *GetFormatByName(const std::string &name)
+        [[nodiscard]] static FileWriter *GetFormatByName(const std::string &name)
         {
             for (auto format: s_Formats)
             {
@@ -56,7 +70,7 @@ namespace ZooScan
             return nullptr;
         }
 
-        [[nodiscard]] static const FileFormat *GetFormatForPath(const std::filesystem::path &path)
+        [[nodiscard]] static FileWriter *GetFormatForPath(const std::filesystem::path &path)
         {
             for (auto format: s_Formats)
             {
@@ -84,20 +98,18 @@ namespace ZooScan
             return "scan" + defaultExtension;
         }
 
-        virtual ~FileFormat() = default;
+        virtual ~FileWriter() = default;
 
         [[nodiscard]] virtual const std::string &GetName() const = 0;
         [[nodiscard]] virtual std::vector<std::string> GetExtensions() const = 0;
 
         [[nodiscard]] bool IsKnownExtension(const std::filesystem::path &path) const
         {
-            auto pathExtensions = path.extension();
-            for (const auto &ext: GetExtensions())
-            {
-                if (pathExtensions.string() == ext)
-                    return true;
-            }
-            return false;
+            auto pathExtension = path.extension();
+
+            return std::ranges::any_of(GetExtensions(), [pathExtension](const std::filesystem::path &ext) {
+                return pathExtension.string() == ext;
+            });
         }
 
         void AddExtension(std::filesystem::path &path) const
@@ -105,8 +117,23 @@ namespace ZooScan
             path = path.string() + GetExtensions()[0];
         }
 
-        virtual void
-        Save(std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
-             SANE_Byte *image) const = 0;
+        virtual Error CreateFile(
+                const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
+                const SANE_Parameters &parameters, SANE_Byte *image) = 0;
+        virtual int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine) = 0;
+        virtual void CloseFile() = 0;
+
+        virtual std::string GetError(Error error)
+        {
+            switch (error)
+            {
+                case Error::None:
+                    return "No error";
+                case Error::CannotOpenFile:
+                    return "Cannot open file";
+                default:
+                    return "Unknown error";
+            }
+        }
     };
 }

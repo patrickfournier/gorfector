@@ -16,13 +16,11 @@ namespace ZooLib
         GtkApplication *m_GtkApp;
         GtkWindow *m_MainWindow{};
 
-        virtual std::string GetApplicationId() = 0;
+        [[nodiscard]] virtual GApplicationFlags GetApplicationFlags() = 0;
 
-        virtual GApplicationFlags GetApplicationFlags() = 0;
+        [[nodiscard]] virtual std::string GetMainWindowTitle() = 0;
 
-        virtual std::string GetMainWindowTitle() = 0;
-
-        virtual std::tuple<int, int> GetMainWindowSize() = 0;
+        [[nodiscard]] virtual std::tuple<int, int> GetMainWindowSize() = 0;
 
         virtual void PopulateMainWindow() = 0;
 
@@ -37,17 +35,19 @@ namespace ZooLib
 
         int Run(int argc = 0, char **argv = nullptr) const;
 
-        GtkWindow *GetMainWindow() const
+        [[nodiscard]] virtual std::string GetApplicationId() const = 0;
+
+        [[nodiscard]] GtkWindow *GetMainWindow() const
         {
             return m_MainWindow;
         }
 
-        State *GetState()
+        [[nodiscard]] State *GetState()
         {
             return &m_State;
         }
 
-        ObserverManager *GetObserverManager()
+        [[nodiscard]] ObserverManager *GetObserverManager()
         {
             return &m_ObserverManager;
         }

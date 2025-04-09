@@ -188,6 +188,10 @@ namespace ZooScan
             sane_cancel(m_Handle);
         }
 
+        /**
+         * Gets the parameters of the device. Must be called after StartScan().
+         * @param parameters A pointer to the parameters structure to be filled with the device parameters.
+         */
         void GetParameters(SANE_Parameters *parameters) const
         {
             if (m_Handle == nullptr)

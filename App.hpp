@@ -11,6 +11,7 @@
 
 namespace ZooScan
 {
+    class FileWriter;
     class DeviceOptionsObserver;
     class DeviceOptionsPanel;
     class DeviceSelectorObserver;
@@ -35,37 +36,33 @@ namespace ZooScan
         GtkWidget *m_SettingsBox{};
 
         SANE_Parameters m_ScanParameters{};
-        uint64_t m_ScannedImageSize{};
-        SANE_Byte *m_ScannedImage{};
-        uint64_t m_Offset{};
+        int32_t m_BufferSize{};
+        SANE_Byte *m_Buffer{};
+        int32_t m_WriteOffset{};
         bool m_IsScanning{};
-        guint m_ScanCallbackId;
+        guint m_ScanCallbackId{};
 
         std::filesystem::path m_ImageFilePath{};
+        FileWriter *m_FileWriter{};
 
-        std::string GetApplicationId() override
-        {
-            return "com.patrickfournier.zooscan";
-        }
-
-        GApplicationFlags GetApplicationFlags() override
+        [[nodiscard]] GApplicationFlags GetApplicationFlags() override
         {
             return G_APPLICATION_FLAGS_NONE;
         }
 
-        std::string GetMainWindowTitle() override
+        [[nodiscard]] std::string GetMainWindowTitle() override
         {
             return "ZooScan";
         }
 
-        std::tuple<int, int> GetMainWindowSize() override
+        [[nodiscard]] std::tuple<int, int> GetMainWindowSize() override
         {
             return std::make_tuple(-1, -1);
         }
 
         void PopulateMainWindow() override;
 
-        SaneDevice *GetDevice() const
+        [[nodiscard]] SaneDevice *GetDevice() const
         {
             if (m_DeviceSelector == nullptr)
             {
@@ -74,7 +71,7 @@ namespace ZooScan
             return m_DeviceSelector->GetState()->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
         }
 
-        int GetScanHeight() const;
+        [[nodiscard]] int GetScanHeight() const;
 
         void OnPreviewClicked(GtkWidget *widget);
         void UpdatePreview() const;
@@ -85,28 +82,33 @@ namespace ZooScan
         void StartScan();
         void UpdateScan();
 
-        const std::string &GetSelectorDeviceName() const;
+        [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 
-        int GetSelectorSaneInitId() const;
+        [[nodiscard]] int GetSelectorSaneInitId() const;
 
     public:
         App();
 
         ~App() override;
 
-        const AppState *GetAppState() const
+        [[nodiscard]] std::string GetApplicationId() const override
+        {
+            return "com.patrickfournier.zooscan";
+        }
+
+        [[nodiscard]] const AppState *GetAppState() const
         {
             return m_AppState;
         }
 
-        AppState *GetAppState()
+        [[nodiscard]] AppState *GetAppState()
         {
             return m_AppState;
         }
 
         void Update(u_int64_t lastSeenVersion);
 
-        SaneDevice *GetDeviceByName(const std::string &deviceName) const
+        [[nodiscard]] SaneDevice *GetDeviceByName(const std::string &deviceName) const
         {
             if (m_DeviceSelector == nullptr)
             {
@@ -116,6 +118,6 @@ namespace ZooScan
             return m_DeviceSelector->GetState()->GetDeviceByName(deviceName);
         }
 
-        const DeviceOptionsState *GetDeviceOptions() const;
+        [[nodiscard]] const DeviceOptionsState *GetDeviceOptions() const;
     };
 }
