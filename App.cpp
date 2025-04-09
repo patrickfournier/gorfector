@@ -13,6 +13,7 @@
 #include "PreviewPanel.hpp"
 #include "Writers/FileWriter.hpp"
 #include "Writers/JpegWriter.hpp"
+#include "Writers/PngWriter.hpp"
 #include "Writers/TiffWriter.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
@@ -34,6 +35,7 @@ ZooScan::App::App()
 
     FileWriter::Register<TiffWriter>(&m_State);
     FileWriter::Register<JpegWriter>(&m_State);
+    FileWriter::Register<PngWriter>(&m_State);
 }
 
 ZooScan::App::~App()

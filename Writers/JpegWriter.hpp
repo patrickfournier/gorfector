@@ -1,8 +1,9 @@
 #pragma once
 
-#include <jpeglib.h>
 #include <string>
 #include <vector>
+
+#include <jpeglib.h>
 
 #include "FileWriter.hpp"
 #include "JpegWriterStateComponent.hpp"

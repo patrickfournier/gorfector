@@ -12,6 +12,7 @@ pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4)
 
 find_package(TIFF)
 find_package(JPEG)
+find_package(PNG)
 
 set(RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/zooscan.xml)
 set(RESOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/zooscan.gresource.c)
@@ -44,13 +45,14 @@ set(SOURCE_FILES
         DeviceSelector.cpp
         DeviceOptionsPanel.cpp
         DeviceOptionsState.cpp
-
-        SaneDevice.cpp
         DeviceSelectorState.cpp
         PreviewPanel.cpp
-        Writers/TiffWriter.cpp
+        SaneDevice.cpp
+
         Writers/FileWriter.cpp
         Writers/JpegWriter.cpp
+        Writers/PngWriter.cpp
+        Writers/TiffWriter.cpp
 )
 
 add_executable(zooscan ${SOURCE_FILES} ${RESOURCE_OUTPUT})
@@ -65,6 +67,7 @@ target_link_libraries(zooscan PRIVATE PkgConfig::GTK4)
 target_link_libraries(zooscan PRIVATE libsane.so)
 target_link_libraries(zooscan PRIVATE TIFF::TIFF)
 target_link_libraries(zooscan PRIVATE JPEG::JPEG)
+target_link_libraries(zooscan PRIVATE PNG::PNG)
 target_link_libraries(zooscan PRIVATE nlohmann_json::nlohmann_json)
 
 add_subdirectory(Tests)

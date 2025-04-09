@@ -78,6 +78,7 @@ namespace ZooScan
             if (device != nullptr)
             {
                 m_SelectedDeviceName = deviceName;
+                // FIXME: can throw
                 device->Open();
             }
             else

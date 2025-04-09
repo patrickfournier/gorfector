@@ -23,7 +23,9 @@ namespace ZooScan
         enum class Error
         {
             None,
-            CannotOpenFile
+            CannotOpenFile,
+            ImageTooLarge,
+            UnknownError
         };
 
     private:
@@ -131,6 +133,9 @@ namespace ZooScan
                     return "No error";
                 case Error::CannotOpenFile:
                     return "Cannot open file";
+                case Error::ImageTooLarge:
+                    return "Image too large";
+                case Error::UnknownError:
                 default:
                     return "Unknown error";
             }
