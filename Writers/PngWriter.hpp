@@ -19,6 +19,8 @@ namespace ZooScan
         FILE *m_File{};
         png_structp m_Png{};
         png_infop m_PngInfo{};
+        SANE_Byte **m_LinePointers{};
+        int m_LinePointerSize{};
 
     public:
         explicit PngWriter(ZooLib::State *state)
@@ -122,22 +124,30 @@ namespace ZooScan
 
         int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine) override
         {
-            png_byte **row_pointers = new png_byte *[numberOfLines];
+            if (m_LinePointers == nullptr || m_LinePointerSize < numberOfLines)
+            {
+                if (m_LinePointers != nullptr)
+                {
+                    delete[] m_LinePointers;
+                }
+
+                m_LinePointers = new SANE_Byte *[numberOfLines];
+                m_LinePointerSize = numberOfLines;
+            }
+
             int i = 0;
 
             if (setjmp(png_jmpbuf(m_Png)))
             {
-                delete[] row_pointers;
                 return i * bytesPerLine;
             }
 
             for (i = 0; i < numberOfLines; ++i)
             {
-                row_pointers[i] = bytes + i * bytesPerLine;
+                m_LinePointers[i] = bytes + i * bytesPerLine;
             }
-            png_write_rows(m_Png, row_pointers, numberOfLines);
+            png_write_rows(m_Png, m_LinePointers, m_LinePointerSize);
 
-            delete[] row_pointers;
             return numberOfLines * bytesPerLine;
         }
 
@@ -155,6 +165,12 @@ namespace ZooScan
             png_write_end(m_Png, nullptr);
             png_destroy_write_struct(&m_Png, &m_PngInfo);
             fclose(m_File);
+
+            if (m_LinePointers != nullptr)
+            {
+                delete[] m_LinePointers;
+                m_LinePointers = nullptr;
+            }
 
             m_File = nullptr;
             m_Png = nullptr;

@@ -11,7 +11,7 @@ namespace ZooScan
     public:
         explicit PngWriterStateComponent(ZooLib::State *state)
             : StateComponent(state)
-            , m_CompressionLevel(9)
+            , m_CompressionLevel(1)
         {
         }
 

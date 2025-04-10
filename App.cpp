@@ -546,6 +546,9 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
 
 void ZooScan::App::UpdateScan()
 {
+    // TODO: UpdateScan should not be called as a tick callback (not frequent enough)
+    // TODO: Saving to file should be done in a separate thread
+
     if (m_Buffer == nullptr || m_BufferSize == 0)
     {
         return;
@@ -557,7 +560,6 @@ void ZooScan::App::UpdateScan()
         return;
     }
 
-    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
     if (m_FileWriter == nullptr)
     {
         device->CancelScan();

@@ -21,7 +21,7 @@ namespace ZooScan
         explicit TiffWriterStateComponent(ZooLib::State *state)
             : StateComponent(state)
             , m_Compression(Compression::Deflate)
-            , m_DeflateCompressionLevel(7)
+            , m_DeflateCompressionLevel(1)
             , m_JpegQuality(75)
         {
         }
