@@ -37,6 +37,11 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     gtk_widget_set_size_request(m_ZoomDropDown, 100, -1);
     gtk_box_append(GTK_BOX(box), m_ZoomDropDown);
 
+    m_ProgressBar = gtk_progress_bar_new();
+    gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(m_ProgressBar), true);
+    gtk_widget_hide(m_ProgressBar);
+    gtk_box_append(GTK_BOX(box), m_ProgressBar);
+
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
 
@@ -719,6 +724,38 @@ void ZooScan::PreviewPanel::Update(uint64_t lastSeenVersion)
                 gtk_drop_down_set_selected(GTK_DROP_DOWN(m_ZoomDropDown), i);
                 break;
             }
+        }
+    }
+
+    if (changeset->IsChanged(PreviewStateChangeset::TypeFlag::Progress))
+    {
+        auto min = static_cast<double>(m_PreviewState->GetProgressMin());
+        auto max = static_cast<double>(m_PreviewState->GetProgressMax());
+        if (min == max)
+        {
+            gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_ProgressBar), nullptr);
+            gtk_widget_hide(m_ProgressBar);
+        }
+        else
+        {
+            gtk_widget_show(m_ProgressBar);
+            auto current = static_cast<double>(m_PreviewState->GetProgressCurrent());
+            current = (current - min) / (max - min);
+
+            auto text = m_PreviewState->GetProgressText();
+            if (text.empty())
+            {
+                text = "Progress: ";
+            }
+            else
+            {
+                text += ": ";
+            }
+
+            text += std::to_string(static_cast<int>(current * 100.0)) + "%";
+
+            gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_ProgressBar), current);
+            gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_ProgressBar), text.c_str());
         }
     }
 

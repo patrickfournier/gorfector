@@ -425,10 +425,10 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
 
     if (m_PreviewPanel != nullptr)
     {
-        auto height = GetScanHeight();
         auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
-        previewPanelUpdater.PrepareForScan(m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, height);
-        previewPanelUpdater.SetProgressBounds(0, m_ScanParameters.bytes_per_line * height);
+        previewPanelUpdater.PrepareForScan(
+                m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines);
+        previewPanelUpdater.InitProgress(std::string(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
 
         m_ScanCallbackId = gtk_widget_add_tick_callback(
                 GTK_WIDGET(m_MainWindow),
@@ -606,7 +606,8 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     m_WriteOffset = 0;
 
     auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
-    previewPanelUpdater.SetProgressBounds(0, m_BufferSize);
+    previewPanelUpdater.InitProgress(
+            m_ImageFilePath.filename(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
 
     m_ScanCallbackId = gtk_widget_add_tick_callback(
             GTK_WIDGET(m_MainWindow),

@@ -44,6 +44,7 @@ namespace ZooScan
 
         GtkWidget *m_RootWidget{};
         GtkWidget *m_ZoomDropDown{};
+        GtkWidget *m_ProgressBar{};
         GdkPixbuf *m_ScannedImage{};
         GdkPixbuf *m_PreviewPixBuf{};
         GtkWidget *m_PreviewImage{};

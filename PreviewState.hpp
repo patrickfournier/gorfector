@@ -20,6 +20,7 @@ namespace ZooScan
             ZoomFactor = 2,
             ScanArea = 4,
             Image = 8,
+            Progress = 16,
         };
 
     private:
@@ -81,6 +82,11 @@ namespace ZooScan
         int m_PixelsPerLine{};
         int m_BytesPerLine{};
         int m_ImageHeight{};
+
+        std::string m_ProgressText;
+        uint64_t m_ProgressMin{};
+        uint64_t m_ProgressMax{};
+        uint64_t m_ProgressCurrent{};
 
         void ApplyPanConstraints()
         {
@@ -164,6 +170,26 @@ namespace ZooScan
         [[nodiscard]] int GetScannedBytesPerLine() const
         {
             return m_BytesPerLine;
+        }
+
+        [[nodiscard]] const std::string &GetProgressText() const
+        {
+            return m_ProgressText;
+        }
+
+        [[nodiscard]] uint64_t GetProgressMin() const
+        {
+            return m_ProgressMin;
+        }
+
+        [[nodiscard]] uint64_t GetProgressMax() const
+        {
+            return m_ProgressMax;
+        }
+
+        [[nodiscard]] uint64_t GetProgressCurrent() const
+        {
+            return m_ProgressCurrent;
         }
 
         static double ClampToNearestZoomFactor(double zoomFactor)
@@ -330,16 +356,34 @@ namespace ZooScan
                 m_StateComponent->m_Offset = 0;
             }
 
-            void SetProgressBounds(uint64_t min, uint64_t max)
+            void InitProgress(const std::string &text, uint64_t min, uint64_t max)
             {
+                m_StateComponent->m_ProgressText = text;
+                m_StateComponent->m_ProgressMin = min;
+                m_StateComponent->m_ProgressMax = max;
+                m_StateComponent->m_ProgressCurrent = min;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
             void IncreaseProgress(uint64_t delta)
             {
+                m_StateComponent->m_ProgressCurrent += delta;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
             void SetProgressCompleted()
             {
+                m_StateComponent->m_ProgressText = std::string();
+                m_StateComponent->m_ProgressMin = 0UL;
+                m_StateComponent->m_ProgressMax = 0UL;
+                m_StateComponent->m_ProgressCurrent = 0UL;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
         };
     };
