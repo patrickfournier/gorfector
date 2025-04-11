@@ -6,12 +6,13 @@
 #include "Rect.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/CommandDispatcher.hpp"
+#include "ZooLib/View.hpp"
 
 namespace ZooScan
 {
     class App;
 
-    class PreviewPanel
+    class PreviewPanel : public ZooLib::View
     {
     private:
         constexpr static auto gdkModifiers = GDK_SHIFT_MASK | GDK_LOCK_MASK | GDK_CONTROL_MASK | GDK_ALT_MASK |
@@ -75,9 +76,9 @@ namespace ZooScan
 
     public:
         PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app);
-        ~PreviewPanel();
+        ~PreviewPanel() override;
 
-        GtkWidget *GetRootWidget() const
+        GtkWidget *GetRootWidget() const override
         {
             return m_RootWidget;
         }
@@ -87,7 +88,7 @@ namespace ZooScan
             return m_PreviewState;
         }
 
-        void Update(u_int64_t lastSeenVersion);
+        void Update(uint64_t lastSeenVersion) override;
     };
 
 }

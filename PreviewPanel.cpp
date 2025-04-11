@@ -61,13 +61,13 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
             },
             this, nullptr);
 
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnResized, m_PreviewImage, "resize");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnZoomDropDownChanged, m_ZoomDropDown, "notify::selected");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragBegin, dragHandler, "drag-begin");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragUpdate, dragHandler, "drag-update");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragEnd, dragHandler, "drag-end");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnMouseMove, mouseHandler, "motion");
-    ZooLib::ConnectGtkSignal(this, &PreviewPanel::OnMouseScroll, scrollHandler, "scroll");
+    ConnectGtkSignal(this, &PreviewPanel::OnResized, m_PreviewImage, "resize");
+    ConnectGtkSignal(this, &PreviewPanel::OnZoomDropDownChanged, m_ZoomDropDown, "notify::selected");
+    ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragBegin, dragHandler, "drag-begin");
+    ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragUpdate, dragHandler, "drag-update");
+    ConnectGtkSignal(this, &PreviewPanel::OnPreviewDragEnd, dragHandler, "drag-end");
+    ConnectGtkSignal(this, &PreviewPanel::OnMouseMove, mouseHandler, "motion");
+    ConnectGtkSignal(this, &PreviewPanel::OnMouseScroll, scrollHandler, "scroll");
 
     m_PreviewState = new PreviewState(m_App->GetState());
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_PreviewState);
@@ -650,13 +650,13 @@ void ZooScan::PreviewPanel::OnMouseScroll(GtkEventControllerScroll *scrollContro
 
 void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
 {
+    gdk_cairo_set_source_pixbuf(cr, m_PreviewPixBuf, 0, 0);
+    cairo_paint(cr);
+
     if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
     {
         return;
     }
-
-    gdk_cairo_set_source_pixbuf(cr, m_PreviewPixBuf, 0, 0);
-    cairo_paint(cr);
 
     Rect<double> scanArea = m_App->GetDeviceOptions()->GetScanArea();
     Rect<double> pixelArea;
@@ -672,7 +672,7 @@ void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
     cairo_stroke(cr);
 }
 
-void ZooScan::PreviewPanel::Update(u_int64_t lastSeenVersion)
+void ZooScan::PreviewPanel::Update(uint64_t lastSeenVersion)
 {
     auto changeset = m_PreviewState->GetAggregatedChangeset(lastSeenVersion);
     if (changeset == nullptr || !changeset->HasAnyChange())

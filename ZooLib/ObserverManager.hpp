@@ -9,10 +9,11 @@ namespace ZooLib
 {
     class ObserverManager
     {
-        std::vector<Observer *> m_Observers;
+        std::vector<Observer *> m_Observers{};
 
         bool m_NeedsSorting{};
-        std::vector<Observer *> m_SortedObservers;
+        std::vector<Observer *> m_SortedObservers{};
+        std::vector<Observer *> m_DeletedObservers{};
 
         template<typename T>
         void SwapRemove(std::vector<T *> &vec, T *item)
@@ -93,6 +94,7 @@ namespace ZooLib
         void RemoveObserver(Observer *observer)
         {
             std::erase(m_Observers, observer);
+            m_DeletedObservers.push_back(observer);
             m_NeedsSorting = true;
         }
 
@@ -101,11 +103,17 @@ namespace ZooLib
             if (m_NeedsSorting)
             {
                 SortObservers();
+                m_DeletedObservers.clear();
                 m_NeedsSorting = false;
             }
 
             for (auto observer: m_SortedObservers)
             {
+                if (std::ranges::find(m_DeletedObservers, observer) != m_DeletedObservers.end())
+                {
+                    continue;
+                }
+
                 observer->Update();
             }
         }

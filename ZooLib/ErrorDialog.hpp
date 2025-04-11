@@ -4,5 +4,5 @@
 
 namespace ZooLib
 {
-    void ShowUserError(GtkWindow *parent, const char *message, ...);
+    void ShowUserError(GtkWindow *parentWindow, const char *message, ...);
 }

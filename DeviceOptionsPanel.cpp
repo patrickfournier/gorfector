@@ -637,7 +637,7 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
     }
 }
 
-void ZooScan::DeviceOptionsPanel::Update(u_int64_t lastSeenVersion)
+void ZooScan::DeviceOptionsPanel::Update(uint64_t lastSeenVersion)
 {
     auto firstChangesetVersion = m_DeviceOptions->FirstChangesetVersion();
     auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersion);

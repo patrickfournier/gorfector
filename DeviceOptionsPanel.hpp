@@ -6,10 +6,11 @@
 #include "DeviceOptionsState.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/CommandDispatcher.hpp"
+#include "ZooLib/View.hpp"
 
 namespace ZooScan
 {
-    class DeviceOptionsPanel
+    class DeviceOptionsPanel : public ZooLib::View
     {
         App *m_App;
 
@@ -55,7 +56,7 @@ namespace ZooScan
             return m_DeviceName;
         }
 
-        [[nodiscard]] GtkWidget *GetRootWidget() const
+        [[nodiscard]] GtkWidget *GetRootWidget() const override
         {
             return m_RootWidget;
         }
@@ -68,8 +69,8 @@ namespace ZooScan
         DeviceOptionsPanel(
                 int saneInitId, const std::string &deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
 
-        ~DeviceOptionsPanel();
+        ~DeviceOptionsPanel() override;
 
-        void Update(u_int64_t lastSeenVersion);
+        void Update(uint64_t lastSeenVersion) override;
     };
 }

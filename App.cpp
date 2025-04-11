@@ -4,8 +4,10 @@
 
 #include "App.hpp"
 
+#include "AboutView.hpp"
 #include "AppState.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
+#include "Commands/SetScanMode.hpp"
 #include "DeviceOptionsObserver.hpp"
 #include "DeviceOptionsPanel.hpp"
 #include "DeviceSelector.hpp"
@@ -15,7 +17,9 @@
 #include "Writers/JpegWriter.hpp"
 #include "Writers/PngWriter.hpp"
 #include "Writers/TiffWriter.hpp"
+#include "ZooLib/AppMenuBarBuilder.hpp"
 #include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/ModalDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 
@@ -33,6 +37,10 @@ ZooScan::App::App()
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);
 
+    m_DeviceSelectorState = new DeviceSelectorState(&m_State);
+    m_DeviceSelectorObserver = new DeviceSelectorObserver(m_DeviceSelectorState, m_AppState);
+    m_ObserverManager.AddObserver(m_DeviceSelectorObserver);
+
     FileWriter::Register<TiffWriter>(&m_State);
     FileWriter::Register<JpegWriter>(&m_State);
     FileWriter::Register<PngWriter>(&m_State);
@@ -45,7 +53,6 @@ ZooScan::App::~App()
     m_ObserverManager.RemoveObserver(m_DeviceSelectorObserver);
     delete m_DeviceSelectorObserver;
 
-    delete m_DeviceSelector;
     delete m_DeviceOptionsPanel;
     delete m_PreviewPanel;
 
@@ -53,6 +60,7 @@ ZooScan::App::~App()
     delete m_ViewUpdateObserver;
 
     delete m_AppState;
+    delete m_DeviceSelectorState;
 
     if (m_Buffer != nullptr)
     {
@@ -74,54 +82,101 @@ void ZooScan::App::PopulateMainWindow()
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
     g_object_unref(cssProvider);
 
+    auto box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_window_set_child(m_MainWindow, box);
+
     auto *grid = gtk_grid_new();
-    gtk_window_set_child(m_MainWindow, grid);
+    gtk_box_append(GTK_BOX(box), grid);
 
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
 
-    m_DeviceSelector = new DeviceSelector(&m_Dispatcher, this);
-    gtk_grid_attach(GTK_GRID(grid), m_DeviceSelector->RootWidget(), 0, 0, 2, 1);
-
-    m_DeviceSelectorObserver = new DeviceSelectorObserver(m_DeviceSelector->GetState(), m_AppState);
-    m_ObserverManager.AddObserver(m_DeviceSelectorObserver);
-
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_grid_attach(GTK_GRID(grid), m_SettingsBox, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), m_SettingsBox, 0, 0, 1, 1);
 
     auto button = gtk_button_new_with_label("Preview");
     ConnectGtkSignal(this, &App::OnPreviewClicked, button, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), button, 0, 1, 1, 1);
 
     button = gtk_button_new_with_label("Scan");
     ConnectGtkSignal(this, &App::OnScanClicked, button, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), button, 0, 3, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
 
     m_PreviewPanel = new PreviewPanel(&m_Dispatcher, this);
-    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 1, 1, 3);
+    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 3);
+}
+
+void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
+{
+    menuBarBuilder->BeginSubMenu("File")
+            ->BeginSection()
+            ->AddMenuItem("Select Device...", "app.select_device")
+            ->EndSection()
+            ->BeginSection()
+            ->AddMenuItem("Quit", "app.quit")
+            ->EndSection()
+            ->EndSubMenu();
+    menuBarBuilder->BeginSubMenu("Edit")
+            ->BeginSection()
+            ->AddMenuItem("Undo", "app.undo")
+            ->AddMenuItem("Redo", "app.redo")
+            ->EndSection()
+            ->BeginSection()
+            ->AddMenuItem("Single Scan", "app.single")
+            ->AddMenuItem("Multiple Scans", "app.multiple")
+            ->EndSection()
+            ->BeginSection()
+            ->AddMenuItem("Settings...", "app.preferences")
+            ->EndSection()
+            ->EndSubMenu();
+    menuBarBuilder->BeginSubMenu("Help")->AddMenuItem("About...", "app.about")->EndSubMenu();
+
+    BindMethodToAction<App>("select_device", &App::SelectDeviceDialog, this);
+    BindMethodToAction<Application>("quit", &Application::Quit, this);
+    BindCommandToToggleAction<SetSingleScanMode>("single", m_AppState->GetScanMode() == AppState::Single, m_AppState);
+    BindCommandToToggleAction<SetBatchScanMode>("multiple", m_AppState->GetScanMode() == AppState::Batch, m_AppState);
+    BindMethodToAction<App>("about", &App::AboutDialog, this);
+
+    SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
+    SetAcceleratorForAction("app.undo", {"<Ctrl>Z"});
+    SetAcceleratorForAction("app.redo", {"<Ctrl><Shift>Z"});
+}
+
+void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
+{
+    auto aboutView = new AboutView();
+    auto dialog = new ZooLib::ModalDialog(m_MainWindow, aboutView, "About ZooScan");
+    dialog->Run();
+}
+
+void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
+{
+    auto deviceSelector = new DeviceSelector(&m_Dispatcher, this, m_DeviceSelectorState);
+    auto dialog = new ZooLib::ModalDialog(m_MainWindow, deviceSelector, "Select Scanner");
+    dialog->Run();
 }
 
 const std::string &ZooScan::App::GetSelectorDeviceName() const
 {
-    if (m_DeviceSelector == nullptr)
+    if (m_DeviceSelectorState == nullptr)
     {
         return DeviceSelectorState::k_NullDeviceName;
     }
 
-    return m_DeviceSelector->GetState()->GetSelectedDeviceName();
+    return m_DeviceSelectorState->GetSelectedDeviceName();
 }
 
 int ZooScan::App::GetSelectorSaneInitId() const
 {
-    if (m_DeviceSelector == nullptr)
+    if (m_DeviceSelectorState == nullptr)
     {
         return 0;
     }
 
-    return m_DeviceSelector->GetState()->GetSelectorSaneInitId();
+    return m_DeviceSelectorState->GetSelectorSaneInitId();
 }
 
-void ZooScan::App::Update(u_int64_t lastSeenVersion)
+void ZooScan::App::Update(uint64_t lastSeenVersion)
 {
     if (m_IsScanning)
     {
@@ -158,6 +213,12 @@ void ZooScan::App::Update(u_int64_t lastSeenVersion)
             m_ObserverManager.AddObserver(m_DeviceOptionsObserver);
         }
     }
+
+    // Update the action associated with the scan mode
+    auto action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "single");
+    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetScanMode() == AppState::Single));
+    action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "multiple");
+    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetScanMode() == AppState::Batch));
 }
 
 const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
@@ -170,11 +231,6 @@ const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
 
 void ZooScan::App::RestoreScanOptions() const
 {
-    if (m_DeviceSelector == nullptr)
-    {
-        return;
-    }
-
     auto device = GetDevice();
     const auto options = GetDeviceOptions();
     if (device == nullptr || options == nullptr)

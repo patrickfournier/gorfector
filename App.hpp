@@ -20,16 +20,13 @@ namespace ZooScan
     class App : public ZooLib::Application
     {
     private:
-        ZooLib::CommandDispatcher m_Dispatcher{};
-
-        ZooLib::State m_State{};
         AppState *m_AppState{};
+        DeviceSelectorState *m_DeviceSelectorState{};
 
         ViewUpdateObserver<App, AppState> *m_ViewUpdateObserver{};
         DeviceSelectorObserver *m_DeviceSelectorObserver{};
         DeviceOptionsObserver *m_DeviceOptionsObserver{};
 
-        DeviceSelector *m_DeviceSelector{};
         DeviceOptionsPanel *m_DeviceOptionsPanel{};
         PreviewPanel *m_PreviewPanel{};
 
@@ -61,14 +58,15 @@ namespace ZooScan
         }
 
         void PopulateMainWindow() override;
+        void PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder) override;
 
         [[nodiscard]] SaneDevice *GetDevice() const
         {
-            if (m_DeviceSelector == nullptr)
+            if (m_DeviceSelectorState == nullptr)
             {
                 return nullptr;
             }
-            return m_DeviceSelector->GetState()->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
+            return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
         }
 
         [[nodiscard]] int GetScanHeight() const;
@@ -85,6 +83,9 @@ namespace ZooScan
         [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 
         [[nodiscard]] int GetSelectorSaneInitId() const;
+
+        void AboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
+        void SelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
 
     public:
         App();
@@ -106,16 +107,16 @@ namespace ZooScan
             return m_AppState;
         }
 
-        void Update(u_int64_t lastSeenVersion);
+        void Update(uint64_t lastSeenVersion);
 
         [[nodiscard]] SaneDevice *GetDeviceByName(const std::string &deviceName) const
         {
-            if (m_DeviceSelector == nullptr)
+            if (m_DeviceSelectorState == nullptr)
             {
                 return nullptr;
             }
 
-            return m_DeviceSelector->GetState()->GetDeviceByName(deviceName);
+            return m_DeviceSelectorState->GetDeviceByName(deviceName);
         }
 
         [[nodiscard]] const DeviceOptionsState *GetDeviceOptions() const;

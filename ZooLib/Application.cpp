@@ -1,4 +1,6 @@
 #include "Application.hpp"
+
+#include "AppMenuBarBuilder.hpp"
 #include "SignalSupport.hpp"
 
 ZooLib::Application::Application()
@@ -18,6 +20,16 @@ ZooLib::Application::~Application()
     m_GtkApp = nullptr;
 }
 
+void ZooLib::Application::CreateMenuBar()
+{
+    auto menuBar = new AppMenuBarBuilder();
+
+    PopulateMenuBar(menuBar);
+
+    gtk_application_set_menubar(m_GtkApp, G_MENU_MODEL(menuBar->GetMenuBarModel()));
+    gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(m_MainWindow), true);
+}
+
 int ZooLib::Application::Run(int argc, char **argv) const
 {
     return g_application_run(G_APPLICATION(m_GtkApp), argc, argv);
@@ -30,6 +42,7 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
     auto size = GetMainWindowSize();
     gtk_window_set_default_size(m_MainWindow, std::get<0>(size), std::get<1>(size));
 
+    CreateMenuBar();
     PopulateMainWindow();
 
     gtk_window_present(m_MainWindow);

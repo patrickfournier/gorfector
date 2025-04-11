@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SaneDevice.hpp"
 #include "ZooLib/Command.hpp"
 
 namespace ZooScan

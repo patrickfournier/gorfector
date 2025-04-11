@@ -4,10 +4,11 @@
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/Application.hpp"
 #include "ZooLib/CommandDispatcher.hpp"
+#include "ZooLib/View.hpp"
 
 namespace ZooScan
 {
-    class DeviceSelector
+    class DeviceSelector : public ZooLib::View
     {
         DeviceSelectorState *m_State;
         ViewUpdateObserver<DeviceSelector, DeviceSelectorState> *m_Observer;
@@ -27,21 +28,22 @@ namespace ZooScan
         void SelectDevice(int deviceIndex);
 
     public:
-        DeviceSelector(ZooLib::CommandDispatcher *parent, ZooLib::Application *app);
+        DeviceSelector(
+                ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState);
 
-        ~DeviceSelector();
+        ~DeviceSelector() override;
 
         DeviceSelectorState *GetState() const
         {
             return m_State;
         }
 
-        GtkWidget *RootWidget() const
+        GtkWidget *GetRootWidget() const override
         {
             return m_DeviceSelectorRoot;
         }
 
-        void Update(u_int64_t lastSeenVersion) const;
+        void Update(uint64_t lastSeenVersion) override;
 
         void SelectDefaultDevice()
         {

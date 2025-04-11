@@ -6,7 +6,15 @@ namespace ZooScan
 {
     class AppState final : public ZooLib::StateComponent
     {
+    public:
+        enum ScanMode
+        {
+            Single,
+            Batch,
+        };
+
         std::string m_OptionPanelDeviceName{};
+        ScanMode m_ScanMode{};
 
     public:
         explicit AppState(ZooLib::State *state)
@@ -23,6 +31,11 @@ namespace ZooScan
             return m_OptionPanelDeviceName;
         }
 
+        [[nodiscard]] ScanMode GetScanMode() const
+        {
+            return m_ScanMode;
+        }
+
         class Updater final : public StateComponent::Updater<AppState>
         {
         public:
@@ -34,6 +47,11 @@ namespace ZooScan
             void UpdateOptionPanelDeviceName(const std::string &deviceName) const
             {
                 m_StateComponent->m_OptionPanelDeviceName = deviceName;
+            }
+
+            void SetScanMode(ScanMode scanMode) const
+            {
+                m_StateComponent->m_ScanMode = scanMode;
             }
         };
     };
