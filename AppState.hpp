@@ -7,14 +7,17 @@ namespace ZooScan
     class AppState final : public ZooLib::StateComponent
     {
     public:
-        enum ScanMode
+        enum AppMode
         {
             Single,
             Batch,
         };
 
         std::string m_OptionPanelDeviceName{};
-        ScanMode m_ScanMode{};
+        AppMode m_AppMode{};
+
+        bool m_IsScanning{};
+        bool m_IsPreviewing{};
 
     public:
         explicit AppState(ZooLib::State *state)
@@ -31,9 +34,19 @@ namespace ZooScan
             return m_OptionPanelDeviceName;
         }
 
-        [[nodiscard]] ScanMode GetScanMode() const
+        [[nodiscard]] AppMode GetAppMode() const
         {
-            return m_ScanMode;
+            return m_AppMode;
+        }
+
+        [[nodiscard]] bool IsScanning() const
+        {
+            return m_IsScanning;
+        }
+
+        [[nodiscard]] bool IsPreviewing() const
+        {
+            return m_IsPreviewing;
         }
 
         class Updater final : public StateComponent::Updater<AppState>
@@ -49,9 +62,19 @@ namespace ZooScan
                 m_StateComponent->m_OptionPanelDeviceName = deviceName;
             }
 
-            void SetScanMode(ScanMode scanMode) const
+            void SetAppMode(AppMode scanMode) const
             {
-                m_StateComponent->m_ScanMode = scanMode;
+                m_StateComponent->m_AppMode = scanMode;
+            }
+
+            void SetIsScanning(bool isScanning) const
+            {
+                m_StateComponent->m_IsScanning = isScanning;
+            }
+
+            void SetIsPreviewing(bool isPreviewing) const
+            {
+                m_StateComponent->m_IsPreviewing = isPreviewing;
             }
         };
     };

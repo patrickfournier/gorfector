@@ -124,6 +124,7 @@ namespace ZooScan
                 const SANE_Parameters &parameters, SANE_Byte *image) = 0;
         virtual int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine) = 0;
         virtual void CloseFile() = 0;
+        virtual void CancelFile() = 0;
 
         virtual std::string GetError(Error error)
         {

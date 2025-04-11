@@ -102,5 +102,13 @@ namespace ZooScan
             delete m_CompressStruct;
             delete m_ErrorHandler;
         }
+
+        void CancelFile() override
+        {
+            fclose(m_File);
+            jpeg_destroy_compress(m_CompressStruct);
+            delete m_CompressStruct;
+            delete m_ErrorHandler;
+        }
     };
 }

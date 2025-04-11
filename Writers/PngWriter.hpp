@@ -157,12 +157,35 @@ namespace ZooScan
             {
                 fclose(m_File);
 
+                if (m_LinePointers != nullptr)
+                {
+                    delete[] m_LinePointers;
+                    m_LinePointers = nullptr;
+                }
+
                 m_File = nullptr;
                 m_Png = nullptr;
                 m_PngInfo = nullptr;
+                return;
             }
 
             png_write_end(m_Png, nullptr);
+            png_destroy_write_struct(&m_Png, &m_PngInfo);
+            fclose(m_File);
+
+            if (m_LinePointers != nullptr)
+            {
+                delete[] m_LinePointers;
+                m_LinePointers = nullptr;
+            }
+
+            m_File = nullptr;
+            m_Png = nullptr;
+            m_PngInfo = nullptr;
+        }
+
+        void CancelFile() override
+        {
             png_destroy_write_struct(&m_Png, &m_PngInfo);
             fclose(m_File);
 

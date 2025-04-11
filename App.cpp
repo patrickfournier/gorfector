@@ -94,16 +94,21 @@ void ZooScan::App::PopulateMainWindow()
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_grid_attach(GTK_GRID(grid), m_SettingsBox, 0, 0, 1, 1);
 
-    auto button = gtk_button_new_with_label("Preview");
-    ConnectGtkSignal(this, &App::OnPreviewClicked, button, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), button, 0, 1, 1, 1);
+    m_PreviewButton = gtk_button_new_with_label("Preview");
+    ConnectGtkSignal(this, &App::OnPreviewClicked, m_PreviewButton, "clicked");
+    gtk_grid_attach(GTK_GRID(grid), m_PreviewButton, 0, 1, 1, 1);
 
-    button = gtk_button_new_with_label("Scan");
-    ConnectGtkSignal(this, &App::OnScanClicked, button, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
+    m_ScanButton = gtk_button_new_with_label("Scan");
+    ConnectGtkSignal(this, &App::OnScanClicked, m_ScanButton, "clicked");
+    gtk_grid_attach(GTK_GRID(grid), m_ScanButton, 0, 2, 1, 1);
+
+    m_CancelButton = gtk_button_new_with_label("Cancel Scan");
+    ConnectGtkSignal(this, &App::OnCancelClicked, m_CancelButton, "clicked");
+    gtk_grid_attach(GTK_GRID(grid), m_CancelButton, 0, 3, 1, 1);
+    gtk_widget_set_sensitive(m_CancelButton, false);
 
     m_PreviewPanel = new PreviewPanel(&m_Dispatcher, this);
-    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 3);
+    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 4);
 }
 
 void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
@@ -133,8 +138,8 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 
     BindMethodToAction<App>("select_device", &App::SelectDeviceDialog, this);
     BindMethodToAction<Application>("quit", &Application::Quit, this);
-    BindCommandToToggleAction<SetSingleScanMode>("single", m_AppState->GetScanMode() == AppState::Single, m_AppState);
-    BindCommandToToggleAction<SetBatchScanMode>("multiple", m_AppState->GetScanMode() == AppState::Batch, m_AppState);
+    BindCommandToToggleAction<SetSingleScanMode>("single", m_AppState->GetAppMode() == AppState::Single, m_AppState);
+    BindCommandToToggleAction<SetBatchScanMode>("multiple", m_AppState->GetAppMode() == AppState::Batch, m_AppState);
     BindMethodToAction<App>("about", &App::AboutDialog, this);
 
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
@@ -178,11 +183,6 @@ int ZooScan::App::GetSelectorSaneInitId() const
 
 void ZooScan::App::Update(uint64_t lastSeenVersion)
 {
-    if (m_IsScanning)
-    {
-        UpdateScan();
-    }
-
     if (m_DeviceOptionsPanel != nullptr && (m_DeviceOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
                                             m_DeviceOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
     {
@@ -216,9 +216,23 @@ void ZooScan::App::Update(uint64_t lastSeenVersion)
 
     // Update the action associated with the scan mode
     auto action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "single");
-    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetScanMode() == AppState::Single));
+    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetAppMode() == AppState::Single));
     action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "multiple");
-    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetScanMode() == AppState::Batch));
+    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetAppMode() == AppState::Batch));
+
+    // TODO: also update the option panel
+    if (m_AppState->IsScanning() || m_AppState->IsPreviewing())
+    {
+        gtk_widget_set_sensitive(m_PreviewButton, false);
+        gtk_widget_set_sensitive(m_ScanButton, false);
+        gtk_widget_set_sensitive(m_CancelButton, true);
+    }
+    else
+    {
+        gtk_widget_set_sensitive(m_PreviewButton, true);
+        gtk_widget_set_sensitive(m_ScanButton, true);
+        gtk_widget_set_sensitive(m_CancelButton, false);
+    }
 }
 
 const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
@@ -384,9 +398,12 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     try
     {
         device->StartScan();
+        auto updater = AppState::Updater(m_AppState);
+        updater.SetIsPreviewing(true);
     }
     catch (const std::runtime_error &e)
     {
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, e.what());
         return;
     }
@@ -394,16 +411,14 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     device->GetParameters(&m_ScanParameters);
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
-        device->CancelScan();
-        RestoreScanOptions();
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
         return;
     }
 
     if (m_ScanParameters.depth != 8)
     {
-        device->CancelScan();
-        RestoreScanOptions();
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
         return;
     }
@@ -426,7 +441,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     }
 }
 
-void ZooScan::App::UpdatePreview() const
+void ZooScan::App::UpdatePreview()
 {
     if (m_PreviewPanel == nullptr)
     {
@@ -447,17 +462,18 @@ void ZooScan::App::UpdatePreview() const
 
     if (maxReadLength == 0 || !device->Read(readBuffer, maxReadLength, &readLength))
     {
-        device->CancelScan();
-        RestoreScanOptions();
-
+        StopScan();
         previewPanelUpdater.SetProgressCompleted();
-
-        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
         return;
     }
 
     previewPanelUpdater.CommitReadBuffer(readLength);
     previewPanelUpdater.IncreaseProgress(readLength);
+}
+
+void ZooScan::App::OnCancelClicked(GtkWidget *)
+{
+    StopScan();
 }
 
 void ZooScan::App::OnScanClicked(GtkWidget *)
@@ -548,10 +564,12 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     try
     {
         device->StartScan();
-        m_IsScanning = true;
+        auto updater = AppState::Updater(m_AppState);
+        updater.SetIsScanning(true);
     }
     catch (const std::runtime_error &e)
     {
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, e.what());
         return;
     }
@@ -561,14 +579,14 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
 
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
-        device->CancelScan();
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
         return;
     }
 
     if (m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
     {
-        device->CancelScan();
+        StopScan();
         ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
         return;
     }
@@ -576,7 +594,7 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     if (auto error = m_FileWriter->CreateFile(*this, m_ImageFilePath, GetDeviceOptions(), m_ScanParameters, nullptr);
         error != FileWriter::Error::None)
     {
-        device->CancelScan();
+        StopScan();
         auto errorString = std::string("Failed to create file: ") + m_FileWriter->GetError(error);
         ZooLib::ShowUserError(m_MainWindow, errorString.c_str());
         return;
@@ -631,22 +649,14 @@ void ZooScan::App::UpdateScan()
     {
         if (!device->Read(m_Buffer + m_WriteOffset, requestedLength, &readLength))
         {
-            m_IsScanning = false;
-            device->CancelScan();
-            gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
-
             previewPanelUpdater.SetProgressCompleted();
 
             auto dataEnd = m_WriteOffset + readLength;
             auto availableLines = dataEnd / m_ScanParameters.bytes_per_line;
             m_FileWriter->AppendBytes(
                     m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line);
-            m_FileWriter->CloseFile();
 
-            free(m_Buffer);
-            m_Buffer = nullptr;
-            m_BufferSize = 0;
-            m_WriteOffset = 0;
+            StopScan();
 
             return;
         }
@@ -667,4 +677,41 @@ void ZooScan::App::UpdateScan()
     }
 
     previewPanelUpdater.IncreaseProgress(readLength);
+}
+
+void ZooScan::App::StopScan()
+{
+    auto device = GetDevice();
+    if (device != nullptr)
+    {
+        device->CancelScan();
+    }
+
+    if (m_ScanCallbackId != 0)
+    {
+        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
+        m_ScanCallbackId = 0;
+    }
+
+    if (m_AppState->IsPreviewing())
+    {
+        RestoreScanOptions();
+    }
+
+    if (m_AppState->IsScanning())
+    {
+        if (m_FileWriter != nullptr)
+        {
+            m_FileWriter->CancelFile();
+        }
+
+        free(m_Buffer);
+        m_Buffer = nullptr;
+        m_BufferSize = 0;
+        m_WriteOffset = 0;
+    }
+
+    auto updater = AppState::Updater(m_AppState);
+    updater.SetIsPreviewing(false);
+    updater.SetIsScanning(false);
 }

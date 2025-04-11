@@ -32,11 +32,14 @@ namespace ZooScan
 
         GtkWidget *m_SettingsBox{};
 
+        GtkWidget *m_PreviewButton{};
+        GtkWidget *m_ScanButton{};
+        GtkWidget *m_CancelButton{};
+
         SANE_Parameters m_ScanParameters{};
         int32_t m_BufferSize{};
         SANE_Byte *m_Buffer{};
         int32_t m_WriteOffset{};
-        bool m_IsScanning{};
         guint m_ScanCallbackId{};
 
         std::filesystem::path m_ImageFilePath{};
@@ -72,13 +75,15 @@ namespace ZooScan
         [[nodiscard]] int GetScanHeight() const;
 
         void OnPreviewClicked(GtkWidget *widget);
-        void UpdatePreview() const;
+        void UpdatePreview();
+        void OnCancelClicked(GtkWidget *);
         void RestoreScanOptions() const;
 
         void OnScanClicked(GtkWidget *widget);
         void OnFileSave(GtkWidget *widget, int responseId);
         void StartScan();
         void UpdateScan();
+        void StopScan();
 
         [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 

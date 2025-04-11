@@ -16,7 +16,7 @@ namespace ZooScan
         static void Execute(const SetSingleScanMode &command, AppState *appState)
         {
             auto updater = AppState::Updater(appState);
-            updater.SetScanMode(AppState::Single);
+            updater.SetAppMode(AppState::Single);
         }
     };
 
@@ -31,7 +31,7 @@ namespace ZooScan
         static void Execute(const SetBatchScanMode &command, AppState *appState)
         {
             auto updater = AppState::Updater(appState);
-            updater.SetScanMode(AppState::Batch);
+            updater.SetAppMode(AppState::Batch);
         }
     };
 }

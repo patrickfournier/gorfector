@@ -118,5 +118,11 @@ namespace ZooScan
             TIFFClose(m_File);
             m_File = nullptr;
         }
+
+        void CancelFile() override
+        {
+            TIFFClose(m_File);
+            m_File = nullptr;
+        }
     };
 }
