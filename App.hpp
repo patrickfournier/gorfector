@@ -91,6 +91,7 @@ namespace ZooScan
 
         void AboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
         void SelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
+        void PreferenceDialog(GSimpleAction *action, GVariant *parameter);
 
     public:
         App();

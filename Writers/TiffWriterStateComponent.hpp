@@ -1,3 +1,7 @@
+#pragma once
+
+#include <tiff.h>
+
 namespace ZooScan
 {
     class TiffWriterStateComponent : public ZooLib::StateComponent
@@ -11,6 +15,11 @@ namespace ZooScan
             Deflate,
             Packbits
         };
+
+        static std::vector<const char *> GetCompressionAlgorithmNames()
+        {
+            return {"None", "LZW", "JPEG", "Deflate", "Packbits", nullptr};
+        }
 
     private:
         Compression m_Compression{};

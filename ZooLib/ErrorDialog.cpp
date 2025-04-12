@@ -1,6 +1,6 @@
 #include <gtk/gtk.h>
 
-#include "ModalDialog.hpp"
+#include "DialogWindow.hpp"
 
 namespace ZooLib
 {
@@ -38,7 +38,7 @@ namespace ZooLib
         va_end(args);
 
         auto errorView = new ErrorView(message);
-        auto errorDialog = new ModalDialog(parentWindow, errorView, "Error");
+        auto errorDialog = new DialogWindow(parentWindow, errorView, "Error", DialogWindow::Flags::Modal);
         errorDialog->Run();
     }
 }

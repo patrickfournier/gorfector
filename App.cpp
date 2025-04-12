@@ -12,14 +12,15 @@
 #include "DeviceOptionsPanel.hpp"
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
+#include "PreferencesView.hpp"
 #include "PreviewPanel.hpp"
 #include "Writers/FileWriter.hpp"
 #include "Writers/JpegWriter.hpp"
 #include "Writers/PngWriter.hpp"
 #include "Writers/TiffWriter.hpp"
 #include "ZooLib/AppMenuBarBuilder.hpp"
+#include "ZooLib/DialogWindow.hpp"
 #include "ZooLib/ErrorDialog.hpp"
-#include "ZooLib/ModalDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 
@@ -140,6 +141,7 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     BindMethodToAction<Application>("quit", &Application::Quit, this);
     BindCommandToToggleAction<SetSingleScanMode>("single", m_AppState->GetAppMode() == AppState::Single, m_AppState);
     BindCommandToToggleAction<SetBatchScanMode>("multiple", m_AppState->GetAppMode() == AppState::Batch, m_AppState);
+    BindMethodToAction<App>("preferences", &App::PreferenceDialog, this);
     BindMethodToAction<App>("about", &App::AboutDialog, this);
 
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
@@ -147,17 +149,26 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     SetAcceleratorForAction("app.redo", {"<Ctrl><Shift>Z"});
 }
 
-void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
-{
-    auto aboutView = new AboutView();
-    auto dialog = new ZooLib::ModalDialog(m_MainWindow, aboutView, "About ZooScan");
-    dialog->Run();
-}
-
 void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto deviceSelector = new DeviceSelector(&m_Dispatcher, this, m_DeviceSelectorState);
-    auto dialog = new ZooLib::ModalDialog(m_MainWindow, deviceSelector, "Select Scanner");
+    auto dialog = new ZooLib::DialogWindow(m_MainWindow, deviceSelector, "Select Scanner");
+    dialog->Run();
+}
+
+void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
+{
+    auto aboutView = new PreferencesView();
+    auto dialog =
+            new ZooLib::DialogWindow(m_MainWindow, aboutView, "Preferences", ZooLib::DialogWindow::Flags::Resizable);
+    gtk_window_set_default_size(GTK_WINDOW(dialog->GetGtkWidget()), 600, 400);
+    dialog->Run();
+}
+
+void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
+{
+    auto aboutView = new AboutView();
+    auto dialog = new ZooLib::DialogWindow(m_MainWindow, aboutView, "About ZooScan");
     dialog->Run();
 }
 
