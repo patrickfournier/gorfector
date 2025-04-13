@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sane/sane.h>
+#include <stdint.h>
 
 #include "SaneException.hpp"
 

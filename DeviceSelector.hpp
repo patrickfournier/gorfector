@@ -23,7 +23,7 @@ namespace ZooScan
 
         void OnRefreshDevicesClicked(GtkWidget *);
         void OnDeviceSelected(GtkWidget *);
-        void OnActivateNetwork(GtkWidget *);
+        void OnActivateNetwork(GtkWidget *, GParamSpec *paramSpec);
 
         void SelectDevice(int deviceIndex);
 

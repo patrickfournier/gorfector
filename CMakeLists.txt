@@ -9,6 +9,7 @@ find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4)
+pkg_check_modules(ADW REQUIRED IMPORTED_TARGET libadwaita-1>=1.1.7)
 
 find_package(TIFF)
 find_package(JPEG)
@@ -64,6 +65,7 @@ set_source_files_properties(${RESOURCE_OUTPUT} PROPERTIES GENERATED TRUE)
 add_dependencies(zooscan resources)
 
 target_link_libraries(zooscan PRIVATE PkgConfig::GTK4)
+target_link_libraries(zooscan PRIVATE PkgConfig::ADW)
 target_link_libraries(zooscan PRIVATE libsane.so)
 target_link_libraries(zooscan PRIVATE TIFF::TIFF)
 target_link_libraries(zooscan PRIVATE JPEG::JPEG)

@@ -21,6 +21,11 @@ namespace ZooScan
             return {"None", "LZW", "JPEG", "Deflate", "Packbits", nullptr};
         }
 
+        static int GetDefaultCompressionAlgorithmIndex()
+        {
+            return static_cast<int>(Compression::Deflate);
+        }
+
     private:
         Compression m_Compression{};
         int m_DeflateCompressionLevel{};

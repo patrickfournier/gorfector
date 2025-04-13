@@ -1,3 +1,4 @@
+#include <adwaita.h>
 #include <memory>
 #include <sane/sane.h>
 #include <stdexcept>
@@ -19,7 +20,6 @@
 #include "Writers/PngWriter.hpp"
 #include "Writers/TiffWriter.hpp"
 #include "ZooLib/AppMenuBarBuilder.hpp"
-#include "ZooLib/DialogWindow.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
@@ -73,7 +73,7 @@ ZooScan::App::~App()
     FileWriter::Clear();
 }
 
-void ZooScan::App::PopulateMainWindow()
+GtkWidget *ZooScan::App::CreateContent()
 {
     auto *display = gdk_display_get_default();
     auto *cssProvider = gtk_css_provider_new();
@@ -83,11 +83,11 @@ void ZooScan::App::PopulateMainWindow()
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
     g_object_unref(cssProvider);
 
-    auto box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_window_set_child(m_MainWindow, box);
-
     auto *grid = gtk_grid_new();
-    gtk_box_append(GTK_BOX(box), grid);
+    gtk_widget_set_margin_bottom(grid, 15);
+    gtk_widget_set_margin_top(grid, 0);
+    gtk_widget_set_margin_start(grid, 10);
+    gtk_widget_set_margin_end(grid, 10);
 
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
@@ -110,22 +110,14 @@ void ZooScan::App::PopulateMainWindow()
 
     m_PreviewPanel = new PreviewPanel(&m_Dispatcher, this);
     gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 4);
+
+    return grid;
 }
 
 void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 {
-    menuBarBuilder->BeginSubMenu("File")
-            ->BeginSection()
+    menuBarBuilder->BeginSection()
             ->AddMenuItem("Select Device...", "app.select_device")
-            ->EndSection()
-            ->BeginSection()
-            ->AddMenuItem("Quit", "app.quit")
-            ->EndSection()
-            ->EndSubMenu();
-    menuBarBuilder->BeginSubMenu("Edit")
-            ->BeginSection()
-            ->AddMenuItem("Undo", "app.undo")
-            ->AddMenuItem("Redo", "app.redo")
             ->EndSection()
             ->BeginSection()
             ->AddMenuItem("Single Scan", "app.single")
@@ -133,9 +125,8 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
             ->EndSection()
             ->BeginSection()
             ->AddMenuItem("Settings...", "app.preferences")
-            ->EndSection()
-            ->EndSubMenu();
-    menuBarBuilder->BeginSubMenu("Help")->AddMenuItem("About...", "app.about")->EndSubMenu();
+            ->AddMenuItem("About...", "app.about")
+            ->EndSection();
 
     BindMethodToAction<App>("select_device", &App::SelectDeviceDialog, this);
     BindMethodToAction<Application>("quit", &Application::Quit, this);
@@ -152,24 +143,46 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto deviceSelector = new DeviceSelector(&m_Dispatcher, this, m_DeviceSelectorState);
-    auto dialog = new ZooLib::DialogWindow(m_MainWindow, deviceSelector, "Select Scanner");
-    dialog->Run();
+    auto dialog = adw_dialog_new();
+    adw_dialog_set_title(dialog, "Select Device");
+    adw_dialog_set_follows_content_size(dialog, true);
+
+    auto box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    auto header = adw_header_bar_new();
+    gtk_box_append(GTK_BOX(box), header);
+    gtk_box_append(GTK_BOX(box), deviceSelector->GetRootWidget());
+
+    adw_dialog_set_child(dialog, box);
+    adw_dialog_present(dialog, m_MainWindow);
 }
 
 void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
 {
-    auto aboutView = new PreferencesView();
-    auto dialog =
-            new ZooLib::DialogWindow(m_MainWindow, aboutView, "Preferences", ZooLib::DialogWindow::Flags::Resizable);
-    gtk_window_set_default_size(GTK_WINDOW(dialog->GetGtkWidget()), 600, 400);
-    dialog->Run();
+    auto dialog = adw_preferences_dialog_new();
+    auto preferencePages = new PreferencesView();
+    for (const auto &page: preferencePages->GetPreferencePages())
+    {
+        adw_preferences_dialog_add(ADW_PREFERENCES_DIALOG(dialog), ADW_PREFERENCES_PAGE(page));
+    }
+
+    adw_dialog_set_title(dialog, "Settings");
+    adw_dialog_present(dialog, m_MainWindow);
 }
 
 void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
 {
-    auto aboutView = new AboutView();
-    auto dialog = new ZooLib::DialogWindow(m_MainWindow, aboutView, "About ZooScan");
-    dialog->Run();
+    auto dialogWindow = adw_about_dialog_new();
+    adw_about_dialog_set_application_icon(
+            ADW_ABOUT_DIALOG(dialogWindow),
+            "decode-symbolic"); // FIXME should use the icon in resources, but does not work
+    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), "ZooScan");
+    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), "0.1");
+    adw_about_dialog_set_comments(
+            ADW_ABOUT_DIALOG(dialogWindow), "An application to scan images."); // FIXME: could be more detailed
+    adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(dialogWindow), GTK_LICENSE_GPL_3_0);
+    adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(dialogWindow), "Patrick Fournier");
+
+    adw_dialog_present(ADW_DIALOG(dialogWindow), m_MainWindow);
 }
 
 const std::string &ZooScan::App::GetSelectorDeviceName() const
@@ -415,7 +428,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     catch (const std::runtime_error &e)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, e.what());
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), e.what());
         return;
     }
 
@@ -423,14 +436,14 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Unsupported format");
         return;
     }
 
     if (m_ScanParameters.depth != 8)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Unsupported depth");
         return;
     }
 
@@ -442,7 +455,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
         previewPanelUpdater.InitProgress(std::string(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
 
         m_ScanCallbackId = gtk_widget_add_tick_callback(
-                GTK_WIDGET(m_MainWindow),
+                m_MainWindow,
                 [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
                     auto *localApp = static_cast<App *>(data);
                     localApp->UpdatePreview();
@@ -487,6 +500,14 @@ void ZooScan::App::OnCancelClicked(GtkWidget *)
     StopScan();
 }
 
+void OnFileSave(GObject *saveDialog, GAsyncResult *res, gpointer data)
+{
+    auto app = static_cast<ZooScan::App *>(data);
+    GError *error;
+    auto file = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(saveDialog), res, &error);
+    app->OnFileSave(file);
+}
+
 void ZooScan::App::OnScanClicked(GtkWidget *)
 {
     const auto device = GetDevice();
@@ -495,16 +516,15 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
         return;
     }
 
-    auto fileSaveDialog = gtk_file_chooser_dialog_new(
-            "Save Scan", GTK_WINDOW(m_MainWindow), GTK_FILE_CHOOSER_ACTION_SAVE, "_Cancel", GTK_RESPONSE_CANCEL,
-            "_Save", GTK_RESPONSE_ACCEPT, nullptr);
-    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fileSaveDialog), FileWriter::DefaultFileName().c_str());
+    auto fileSaveDialog = gtk_file_dialog_new();
+    gtk_file_dialog_set_title(GTK_FILE_DIALOG(fileSaveDialog), "Save Scan");
+    gtk_file_dialog_set_initial_name(GTK_FILE_DIALOG(fileSaveDialog), FileWriter::DefaultFileName().c_str());
 
-
+    GListStore *filters = g_list_store_new(G_TYPE_OBJECT);
     auto filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "All Files");
     gtk_file_filter_add_pattern(filter, "*");
-    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fileSaveDialog), filter);
+    g_list_store_append(filters, filter);
 
     for (auto format: FileWriter::GetFormats())
     {
@@ -515,30 +535,26 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
         {
             gtk_file_filter_add_pattern(filter, ("*" + ext).c_str());
         }
-        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fileSaveDialog), filter);
+        g_list_store_append(filters, filter);
     }
+    g_list_store_append(filters, filter);
+    gtk_file_dialog_set_filters(GTK_FILE_DIALOG(fileSaveDialog), G_LIST_MODEL(filters));
 
-    ConnectGtkSignal(this, &App::OnFileSave, fileSaveDialog, "response");
-    gtk_window_present(GTK_WINDOW(fileSaveDialog));
+    gtk_file_dialog_save(GTK_FILE_DIALOG(fileSaveDialog), GTK_WINDOW(m_MainWindow), nullptr, ::OnFileSave, this);
 }
 
-void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
+void ZooScan::App::OnFileSave(GFile *file)
 {
-    if (responseId != GTK_RESPONSE_ACCEPT)
+    if (file == nullptr)
     {
         m_ImageFilePath = std::filesystem::path();
-        gtk_window_destroy(GTK_WINDOW(widget));
         return;
     }
 
-    g_autoptr(GFile) gFile = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(widget));
-    if (gFile == nullptr)
-    {
-        return;
-    }
-    auto path = g_file_get_path(gFile);
+    auto path = g_file_get_path(file);
     if (path == nullptr)
     {
+        m_ImageFilePath = std::filesystem::path();
         return;
     }
 
@@ -548,21 +564,7 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
     if (m_FileWriter == nullptr)
     {
-        auto selectedFilter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(widget));
-        auto filterName = gtk_file_filter_get_name(GTK_FILE_FILTER(selectedFilter));
-        m_FileWriter = FileWriter::GetFormatByName(filterName);
-
-        if (m_FileWriter != nullptr)
-        {
-            m_FileWriter->AddExtension(m_ImageFilePath);
-        }
-    }
-
-    gtk_window_destroy(GTK_WINDOW(widget));
-
-    if (m_FileWriter == nullptr)
-    {
-        ZooLib::ShowUserError(m_MainWindow, "Cannot determine image file format");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Cannot determine image file format");
         return;
     }
 
@@ -581,7 +583,7 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     catch (const std::runtime_error &e)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, e.what());
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), e.what());
         return;
     }
 
@@ -591,14 +593,14 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, "Unsupported format");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Unsupported format");
         return;
     }
 
     if (m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
     {
         StopScan();
-        ZooLib::ShowUserError(m_MainWindow, "Unsupported depth");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Unsupported depth");
         return;
     }
 
@@ -607,7 +609,7 @@ void ZooScan::App::OnFileSave(GtkWidget *widget, int responseId)
     {
         StopScan();
         auto errorString = std::string("Failed to create file: ") + m_FileWriter->GetError(error);
-        ZooLib::ShowUserError(m_MainWindow, errorString.c_str());
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), errorString.c_str());
         return;
     }
 
@@ -649,7 +651,7 @@ void ZooScan::App::UpdateScan()
     if (m_FileWriter == nullptr)
     {
         device->CancelScan();
-        ZooLib::ShowUserError(m_MainWindow, "Unsupported file format");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), "Unsupported file format");
         return;
     }
 

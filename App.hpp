@@ -47,7 +47,7 @@ namespace ZooScan
 
         [[nodiscard]] GApplicationFlags GetApplicationFlags() override
         {
-            return G_APPLICATION_FLAGS_NONE;
+            return G_APPLICATION_DEFAULT_FLAGS;
         }
 
         [[nodiscard]] std::string GetMainWindowTitle() override
@@ -60,7 +60,7 @@ namespace ZooScan
             return std::make_tuple(-1, -1);
         }
 
-        void PopulateMainWindow() override;
+        GtkWidget *CreateContent() override;
         void PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder) override;
 
         [[nodiscard]] SaneDevice *GetDevice() const
@@ -80,7 +80,6 @@ namespace ZooScan
         void RestoreScanOptions() const;
 
         void OnScanClicked(GtkWidget *widget);
-        void OnFileSave(GtkWidget *widget, int responseId);
         void StartScan();
         void UpdateScan();
         void StopScan();
@@ -126,5 +125,7 @@ namespace ZooScan
         }
 
         [[nodiscard]] const DeviceOptionsState *GetDeviceOptions() const;
+
+        void OnFileSave(GFile *file);
     };
 }

@@ -39,7 +39,7 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
 
     m_ProgressBar = gtk_progress_bar_new();
     gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(m_ProgressBar), true);
-    gtk_widget_hide(m_ProgressBar);
+    gtk_widget_set_visible(m_ProgressBar, false);
     gtk_box_append(GTK_BOX(box), m_ProgressBar);
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -734,11 +734,11 @@ void ZooScan::PreviewPanel::Update(uint64_t lastSeenVersion)
         if (min == max)
         {
             gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_ProgressBar), nullptr);
-            gtk_widget_hide(m_ProgressBar);
+            gtk_widget_set_visible(m_ProgressBar, false);
         }
         else
         {
-            gtk_widget_show(m_ProgressBar);
+            gtk_widget_set_visible(m_ProgressBar, true);
             auto current = static_cast<double>(m_PreviewState->GetProgressCurrent());
             current = (current - min) / (max - min);
 

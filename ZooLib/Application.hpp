@@ -1,10 +1,11 @@
 #pragma once
 
-#include "CommandDispatcher.hpp"
 
-
+#include <adwaita.h>
 #include <gtk/gtk.h>
 #include <string>
+
+#include "CommandDispatcher.hpp"
 #include "ObserverManager.hpp"
 #include "SignalSupport.hpp"
 #include "State.hpp"
@@ -19,8 +20,9 @@ namespace ZooLib
         State m_State{};
         ObserverManager m_ObserverManager{};
 
-        GtkApplication *m_GtkApp;
-        GtkWindow *m_MainWindow{};
+        AdwApplication *m_GtkApp;
+        GtkWidget *m_MainWindow{};
+        GtkWidget *m_MenuButton{};
 
         [[nodiscard]] virtual GApplicationFlags GetApplicationFlags() = 0;
 
@@ -28,7 +30,7 @@ namespace ZooLib
 
         [[nodiscard]] virtual std::tuple<int, int> GetMainWindowSize() = 0;
 
-        virtual void PopulateMainWindow() = 0;
+        virtual GtkWidget *CreateContent() = 0;
         virtual void PopulateMenuBar(AppMenuBarBuilder *menuBarBuilder) = 0;
 
         void OnActivate(GtkApplication *app);
@@ -106,7 +108,7 @@ namespace ZooLib
             {
                 accelerators.push_back(nullptr);
             }
-            gtk_application_set_accels_for_action(m_GtkApp, actionName, accelerators.data());
+            gtk_application_set_accels_for_action(GTK_APPLICATION(m_GtkApp), actionName, accelerators.data());
         }
 
         int Run(int argc = 0, char **argv = nullptr) const;
@@ -118,9 +120,9 @@ namespace ZooLib
 
         [[nodiscard]] virtual std::string GetApplicationId() const = 0;
 
-        [[nodiscard]] GtkWindow *GetMainWindow() const
+        [[nodiscard]] AdwApplicationWindow *GetMainWindow() const
         {
-            return m_MainWindow;
+            return ADW_APPLICATION_WINDOW(m_MainWindow);
         }
 
         [[nodiscard]] State *GetState()

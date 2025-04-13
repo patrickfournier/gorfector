@@ -1,5 +1,4 @@
-#include <c++/11/memory>
-#include <stdexcept>
+#include <memory>
 
 #include "Commands/DeviceSelectorCommands.hpp"
 #include "Commands/SelectDeviceCommand.hpp"
@@ -17,32 +16,31 @@ ZooScan::DeviceSelector::DeviceSelector(
     m_Observer = new ViewUpdateObserver(this, m_State);
     m_App->GetObserverManager()->AddObserver(m_Observer);
 
-    m_DeviceSelectorRoot = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    m_DeviceSelectorRoot = gtk_list_box_new();
+    gtk_widget_set_margin_top(m_DeviceSelectorRoot, 10);
+    gtk_widget_set_margin_bottom(m_DeviceSelectorRoot, 15);
+    gtk_widget_set_margin_start(m_DeviceSelectorRoot, 10);
+    gtk_widget_set_margin_end(m_DeviceSelectorRoot, 10);
 
-    auto box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), box);
+    const char *deviceListNames[] = {"No Scanner Found", nullptr};
+    auto *deviceList = gtk_string_list_new(deviceListNames);
 
-    GtkWidget *deviceLabel = gtk_label_new("Scanner:");
-    gtk_box_append(GTK_BOX(box), deviceLabel);
-
-    const char *deviceList[] = {"No Scanner Found", nullptr};
-    m_DeviceSelectorList = gtk_drop_down_new_from_strings(deviceList);
-    gtk_box_append(GTK_BOX(box), m_DeviceSelectorList);
-    gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
-    gtk_widget_set_sensitive(m_DeviceSelectorList, false);
-    m_DropdownSelectedSignalId = ZooLib::ConnectGtkSignalWithParamSpecs(
+    m_DeviceSelectorList = adw_combo_row_new();
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_DeviceSelectorList), "Select Scanner: ");
+    adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceList));
+    gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), m_DeviceSelectorList);
+    m_DropdownSelectedSignalId = ConnectGtkSignalWithParamSpecs(
             this, &DeviceSelector::OnDeviceSelected, m_DeviceSelectorList, "notify::selected");
 
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_append(GTK_BOX(m_DeviceSelectorRoot), box);
+    auto networkScan = adw_switch_row_new();
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(networkScan), "Include Network Scanners");
+    adw_switch_row_set_active(ADW_SWITCH_ROW(networkScan), false);
+    ConnectGtkSignal(this, &DeviceSelector::OnActivateNetwork, networkScan, "notify::active");
+    gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), networkScan);
 
-    GtkWidget *refreshButton = gtk_button_new_with_label("Refresh Scanner List");
+    auto refreshButton = gtk_button_new_with_label("Refresh Scanner List");
     ConnectGtkSignal(this, &DeviceSelector::OnRefreshDevicesClicked, refreshButton, "clicked");
-    gtk_box_append(GTK_BOX(box), refreshButton);
-
-    auto *networkScan = gtk_check_button_new_with_label("Include Network Scanners");
-    gtk_box_append(GTK_BOX(box), networkScan);
-    ConnectGtkSignal(this, &DeviceSelector::OnActivateNetwork, networkScan, "toggled");
+    gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), refreshButton);
 
     m_Dispatcher.RegisterHandler<SelectDeviceCommand, DeviceSelectorState>(SelectDeviceCommand::Execute, m_State);
     m_Dispatcher.RegisterHandler<RefreshDeviceList, DeviceSelectorState>(RefreshDeviceList::Execute, m_State);
@@ -66,9 +64,9 @@ void ZooScan::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
     m_Dispatcher.Dispatch(RefreshDeviceList());
 }
 
-void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *checkButton)
+void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *widget, GParamSpec *paramSpec)
 {
-    const bool value = gtk_check_button_get_active(GTK_CHECK_BUTTON(checkButton));
+    const bool value = adw_switch_row_get_active(ADW_SWITCH_ROW(widget));
     auto command = ActivateNetworkScan(value);
     m_Dispatcher.Dispatch(command);
 }
@@ -87,7 +85,7 @@ void ZooScan::DeviceSelector::SelectDevice(const int deviceIndex)
 
 void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget *)
 {
-    const auto selectedIndex = static_cast<int>(gtk_drop_down_get_selected(GTK_DROP_DOWN(m_DeviceSelectorList))) - 1;
+    const auto selectedIndex = static_cast<int>(adw_combo_row_get_selected(ADW_COMBO_ROW(m_DeviceSelectorList))) - 1;
     SelectDevice(selectedIndex);
 }
 
@@ -104,7 +102,7 @@ void ZooScan::DeviceSelector::Update(uint64_t lastSeenVersion)
         auto dropDownItemIndex = 0U;
         auto selectedItemIndex = 0U;
 
-        devicesNames[dropDownItemIndex] = "Select Scanner";
+        devicesNames[dropDownItemIndex] = "None";
         deviceNamesCStr[dropDownItemIndex] = devicesNames[dropDownItemIndex].c_str();
         dropDownItemIndex++;
 
@@ -137,27 +135,33 @@ void ZooScan::DeviceSelector::Update(uint64_t lastSeenVersion)
         deviceNamesCStr[dropDownItemIndex] = nullptr;
         try
         {
-            gtk_drop_down_set_model(
-                    GTK_DROP_DOWN(m_DeviceSelectorList), G_LIST_MODEL(gtk_string_list_new(deviceNamesCStr.get())));
-            gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), selectedItemIndex);
-            gtk_widget_set_sensitive(m_DeviceSelectorList, true);
+            if (m_DeviceSelectorList != nullptr)
+            {
+                auto *deviceGList = gtk_string_list_new(deviceNamesCStr.get());
+                adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceGList));
+                adw_combo_row_set_selected(ADW_COMBO_ROW(m_DeviceSelectorList), selectedItemIndex);
+                gtk_widget_set_sensitive(m_DeviceSelectorList, true);
+            }
         }
         catch (const SaneException &)
         {
             const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
-            ZooLib::ShowUserError(GTK_WINDOW(parentWindow), "Cannot open scanner %s.", deviceNamesCStr[0]);
+            ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(parentWindow), "Cannot open scanner %s.", deviceNamesCStr[0]);
         }
     }
     else
     {
         const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
-        ZooLib::ShowUserError(GTK_WINDOW(parentWindow), "No scanner found.");
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(parentWindow), "No scanner found.");
 
-        const char *deviceListStr[] = {"No Scanner Found", nullptr};
-        gtk_drop_down_set_model(GTK_DROP_DOWN(m_DeviceSelectorList), G_LIST_MODEL(gtk_string_list_new(deviceListStr)));
-        gtk_drop_down_set_selected(GTK_DROP_DOWN(m_DeviceSelectorList), 0);
-        gtk_widget_set_sensitive(m_DeviceSelectorList, false);
-        gtk_widget_queue_draw(GTK_WIDGET(parentWindow));
+        if (m_DeviceSelectorList != nullptr)
+        {
+            const char *deviceListNames[] = {"No Scanner Found", nullptr};
+            auto *deviceGList = gtk_string_list_new(deviceListNames);
+            adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceGList));
+            adw_combo_row_set_selected(ADW_COMBO_ROW(m_DeviceSelectorList), 0);
+            gtk_widget_set_sensitive(m_DeviceSelectorList, false);
+        }
     }
 
     g_signal_handler_unblock(m_DeviceSelectorList, m_DropdownSelectedSignalId);

@@ -1,44 +1,21 @@
-#include <gtk/gtk.h>
+#include "ErrorDialog.hpp"
 
-#include "DialogWindow.hpp"
+#include "View.hpp"
 
 namespace ZooLib
 {
-    class ErrorView : public View
+    void ShowUserError(AdwApplicationWindow *parentWindow, const char *format, ...)
     {
-        GtkWidget *m_RootWidget;
+        auto dialog = adw_alert_dialog_new("Error", nullptr);
 
-    public:
-        ErrorView(const char *message)
-        {
-            m_RootWidget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-            auto label = gtk_label_new(message);
-            gtk_box_append(GTK_BOX(m_RootWidget), label);
-        }
-
-        ~ErrorView() override = default;
-
-        [[nodiscard]] GtkWidget *GetRootWidget() const override
-        {
-            return m_RootWidget;
-        }
-
-        void Update(uint64_t lastSeenVersion) override
-        {
-            // No update needed for the error dialog
-        }
-    };
-
-    void ShowUserError(GtkWindow *parentWindow, const char *format, ...)
-    {
         va_list args;
         va_start(args, format);
-        char message[1024];
-        vsnprintf(message, sizeof(message), format, args);
+        adw_alert_dialog_format_body(ADW_ALERT_DIALOG(dialog), format, args);
         va_end(args);
 
-        auto errorView = new ErrorView(message);
-        auto errorDialog = new DialogWindow(parentWindow, errorView, "Error", DialogWindow::Flags::Modal);
-        errorDialog->Run();
+        adw_alert_dialog_add_response(ADW_ALERT_DIALOG(dialog), "ok", "OK");
+        adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(dialog), "ok");
+
+        adw_alert_dialog_choose(ADW_ALERT_DIALOG(dialog), GTK_WIDGET(parentWindow), nullptr, nullptr, nullptr);
     }
 }

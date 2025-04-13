@@ -1,8 +1,8 @@
 #pragma once
 
-#include <gtk/gtktypes.h>
+#include <adwaita.h>
 
 namespace ZooLib
 {
-    void ShowUserError(GtkWindow *parentWindow, const char *message, ...);
+    void ShowUserError(AdwApplicationWindow *parentWindow, const char *message, ...);
 }
