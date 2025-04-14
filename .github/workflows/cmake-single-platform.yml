@@ -25,12 +25,19 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
+        sudo apt-get install cmake
         sudo apt-get install libglib2.0-dev-bin
         sudo apt-get install libgtk-4-dev
         sudo apt-get install libadwaita-1-dev
         sudo apt-get install libsane-dev
         sudo apt-get install libtiff-dev
         sudo apt-get install libpng-dev
+
+    - name: CMake version
+      env:
+        CC: clang
+        CXX: clang++
+      run: cmake --version
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
