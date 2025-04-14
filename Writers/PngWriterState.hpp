@@ -8,11 +8,24 @@ namespace ZooScan
     {
         int m_CompressionLevel{};
 
+        friend void to_json(nlohmann::json &j, const PngWriterState &p);
+        friend void from_json(const nlohmann::json &j, PngWriterState &p);
+
     public:
         explicit PngWriterState(ZooLib::State *state)
             : StateComponent(state)
             , m_CompressionLevel(1)
         {
+        }
+
+        ~PngWriterState() override
+        {
+            m_State->SaveToFile(this);
+        }
+
+        [[nodiscard]] std::string GetSerializationKey() const override
+        {
+            return "PngWriterState";
         }
 
         [[nodiscard]] int GetCompressionLevel() const
@@ -34,4 +47,14 @@ namespace ZooScan
             }
         };
     };
+
+    inline void to_json(nlohmann::json &j, const PngWriterState &p)
+    {
+        j = nlohmann::json{{"CompressionLevel", p.m_CompressionLevel}};
+    }
+
+    inline void from_json(const nlohmann::json &j, PngWriterState &p)
+    {
+        j.at("CompressionLevel").get_to(p.m_CompressionLevel);
+    }
 }

@@ -34,13 +34,14 @@ add_custom_target(
 )
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(json)
+add_subdirectory(ZooLib/json)
 
 set(SOURCE_FILES
         main.cpp
 
         ZooLib/Application.cpp
         ZooLib/ErrorDialog.cpp
+        ZooLib/State.cpp
 
         App.cpp
         DeviceSelector.cpp

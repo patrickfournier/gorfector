@@ -1,7 +1,5 @@
 #pragma once
 
-#include <random>
-
 #include "State.hpp"
 
 namespace ZooLib
@@ -32,6 +30,11 @@ namespace ZooLib
         [[nodiscard]] uint64_t Version() const
         {
             return m_StateVersion;
+        }
+
+        [[nodiscard]] virtual std::string GetSerializationKey() const
+        {
+            return {};
         }
 
         template<typename TState>

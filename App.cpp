@@ -32,6 +32,9 @@ ZooScan::App::App()
         throw std::runtime_error("Failed to initialize SANE");
     }
 
+    auto prefFilePath = std::filesystem::path(g_get_user_config_dir()) / k_ApplicationId / "preferences.json";
+    m_State.SetFilePath(prefFilePath);
+
     m_AppState = new AppState(&m_State);
 
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);

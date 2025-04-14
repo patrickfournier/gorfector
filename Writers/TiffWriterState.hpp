@@ -26,6 +26,9 @@ namespace ZooScan
         int m_DeflateCompressionLevel{};
         int m_JpegQuality{};
 
+        friend void to_json(nlohmann::json &j, const TiffWriterState &p);
+        friend void from_json(const nlohmann::json &j, TiffWriterState &p);
+
     public:
         explicit TiffWriterState(ZooLib::State *state)
             : StateComponent(state)
@@ -33,6 +36,16 @@ namespace ZooScan
             , m_DeflateCompressionLevel(1)
             , m_JpegQuality(75)
         {
+        }
+
+        ~TiffWriterState() override
+        {
+            m_State->SaveToFile(this);
+        }
+
+        [[nodiscard]] std::string GetSerializationKey() const override
+        {
+            return "TiffWriterState";
         }
 
         [[nodiscard]] Compression GetCompression() const
@@ -98,4 +111,19 @@ namespace ZooScan
             }
         };
     };
+
+    inline void to_json(nlohmann::json &j, const TiffWriterState &p)
+    {
+        j = nlohmann::json{
+                {"Compression", p.m_Compression},
+                {"CompressionLevel", p.m_DeflateCompressionLevel},
+                {"JpegQuality", p.m_JpegQuality}};
+    }
+
+    inline void from_json(const nlohmann::json &j, TiffWriterState &p)
+    {
+        j.at("Compression").get_to(p.m_Compression);
+        j.at("CompressionLevel").get_to(p.m_DeflateCompressionLevel);
+        j.at("JpegQuality").get_to(p.m_JpegQuality);
+    }
 }

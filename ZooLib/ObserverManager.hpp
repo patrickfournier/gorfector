@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <ranges>
 #include <stdexcept>
 #include <vector>
+
 #include "Observer.hpp"
 
 namespace ZooLib

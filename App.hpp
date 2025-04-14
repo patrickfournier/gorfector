@@ -19,6 +19,9 @@ namespace ZooScan
 
     class App : public ZooLib::Application
     {
+    public:
+        static constexpr auto k_ApplicationId = "com.patrickfournier.zooscan";
+
     private:
         AppState *m_AppState{};
         DeviceSelectorState *m_DeviceSelectorState{};
@@ -99,7 +102,7 @@ namespace ZooScan
 
         [[nodiscard]] std::string GetApplicationId() const override
         {
-            return "com.patrickfournier.zooscan";
+            return k_ApplicationId;
         }
 
         [[nodiscard]] const AppState *GetAppState() const

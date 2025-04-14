@@ -5,6 +5,8 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ..)
 set(TEST_FILES
         ObserverManager_tests.cpp
         StateComponent_tests.cpp
+
+        ../ZooLib/State.cpp
 )
 
 add_executable(zooscan_standalonetests ${TEST_FILES})

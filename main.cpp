@@ -20,5 +20,8 @@ int main(int argc, char **argv)
 
     app = new ZooScan::App();
     app->Initialize();
-    return app->Run();
+    auto retVal = app->Run();
+    delete app;
+    app = nullptr;
+    return retVal;
 }

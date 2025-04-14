@@ -7,10 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace ZooLib
-{
-    class State;
-}
+#include "ZooLib/State.hpp"
 
 namespace ZooScan
 {
@@ -45,6 +42,7 @@ namespace ZooScan
             }
 
             auto f = new TFileFormat(state);
+            state->LoadFromFile(f->GetStateComponent());
             s_Formats.push_back(f);
         }
 
