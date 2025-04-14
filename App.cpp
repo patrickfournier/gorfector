@@ -74,6 +74,17 @@ ZooScan::App::~App()
     FileWriter::Clear();
 }
 
+void ZooScan::App::OnActivate(GtkApplication *app)
+{
+    Application::OnActivate(app);
+
+    if (GetSelectorDeviceName().empty())
+    {
+        auto action = g_action_map_lookup_action(G_ACTION_MAP(app), "select_device");
+        g_action_activate(action, nullptr);
+    }
+}
+
 GtkWidget *ZooScan::App::CreateContent()
 {
     auto *display = gdk_display_get_default();
@@ -84,35 +95,36 @@ GtkWidget *ZooScan::App::CreateContent()
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
     g_object_unref(cssProvider);
 
-    auto *grid = gtk_grid_new();
-    gtk_widget_set_margin_bottom(grid, 15);
-    gtk_widget_set_margin_top(grid, 0);
-    gtk_widget_set_margin_start(grid, 10);
-    gtk_widget_set_margin_end(grid, 10);
+    auto deviceSelected = !GetSelectorDeviceName().empty();
 
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+    auto *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_margin_bottom(box, 15);
+    gtk_widget_set_margin_top(box, 0);
+    gtk_widget_set_margin_start(box, 10);
+    gtk_widget_set_margin_end(box, 10);
 
-    m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_grid_attach(GTK_GRID(grid), m_SettingsBox, 0, 0, 1, 1);
+    m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+    gtk_box_append(GTK_BOX(box), m_SettingsBox);
 
     m_PreviewButton = gtk_button_new_with_label("Preview");
     ConnectGtkSignal(this, &App::OnPreviewClicked, m_PreviewButton, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), m_PreviewButton, 0, 1, 1, 1);
+    gtk_widget_set_sensitive(m_PreviewButton, deviceSelected);
+    gtk_box_append(GTK_BOX(m_SettingsBox), m_PreviewButton);
 
     m_ScanButton = gtk_button_new_with_label("Scan");
     ConnectGtkSignal(this, &App::OnScanClicked, m_ScanButton, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), m_ScanButton, 0, 2, 1, 1);
+    gtk_widget_set_sensitive(m_ScanButton, deviceSelected);
+    gtk_box_append(GTK_BOX(m_SettingsBox), m_ScanButton);
 
     m_CancelButton = gtk_button_new_with_label("Cancel Scan");
     ConnectGtkSignal(this, &App::OnCancelClicked, m_CancelButton, "clicked");
-    gtk_grid_attach(GTK_GRID(grid), m_CancelButton, 0, 3, 1, 1);
     gtk_widget_set_sensitive(m_CancelButton, false);
+    gtk_box_append(GTK_BOX(m_SettingsBox), m_CancelButton);
 
     m_PreviewPanel = ZooLib::View::Create<PreviewPanel>(&m_Dispatcher, this);
-    gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 4);
+    gtk_box_append(GTK_BOX(box), m_PreviewPanel->GetRootWidget());
 
-    return grid;
+    return box;
 }
 
 void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
@@ -231,7 +243,7 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
     {
         m_DeviceOptionsPanel = ZooLib::View::Create<DeviceOptionsPanel>(
                 GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
-        gtk_box_append(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
+        gtk_box_prepend(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
         m_Dispatcher.RegisterHandler<SetScanAreaCommand, DeviceOptionsState>(
                 SetScanAreaCommand::Execute, m_DeviceOptionsPanel->GetState());
 
@@ -256,10 +268,16 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
         gtk_widget_set_sensitive(m_ScanButton, false);
         gtk_widget_set_sensitive(m_CancelButton, true);
     }
-    else
+    else if (!GetSelectorDeviceName().empty())
     {
         gtk_widget_set_sensitive(m_PreviewButton, true);
         gtk_widget_set_sensitive(m_ScanButton, true);
+        gtk_widget_set_sensitive(m_CancelButton, false);
+    }
+    else
+    {
+        gtk_widget_set_sensitive(m_PreviewButton, false);
+        gtk_widget_set_sensitive(m_ScanButton, false);
         gtk_widget_set_sensitive(m_CancelButton, false);
     }
 }

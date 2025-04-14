@@ -33,3 +33,7 @@
 
 # CTest
 /Tests/Testing/Temporary/*
+/Testing/Temporary/*
+
+# CMake
+/cmake-build-*

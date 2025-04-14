@@ -28,8 +28,18 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     gtk_grid_set_column_spacing(GTK_GRID(m_RootWidget), 0);
     gtk_grid_set_row_spacing(GTK_GRID(m_RootWidget), 5);
 
-    auto box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    auto box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 0, 1, 1);
+
+    m_PreviewPixBuf = nullptr;
+    m_PreviewImage = gtk_drawing_area_new();
+    gtk_widget_add_css_class(GTK_WIDGET(m_PreviewImage), "preview-panel");
+    gtk_widget_set_hexpand(m_PreviewImage, true);
+    gtk_widget_set_vexpand(m_PreviewImage, true);
+    gtk_box_append(GTK_BOX(box), m_PreviewImage);
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
     auto label = gtk_label_new("Zoom:");
     gtk_box_append(GTK_BOX(box), label);
 
@@ -40,17 +50,8 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     m_ProgressBar = gtk_progress_bar_new();
     gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(m_ProgressBar), true);
     gtk_widget_set_visible(m_ProgressBar, false);
+    gtk_widget_set_hexpand(m_ProgressBar, true);
     gtk_box_append(GTK_BOX(box), m_ProgressBar);
-
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
-
-    m_PreviewPixBuf = nullptr;
-    m_PreviewImage = gtk_drawing_area_new();
-    gtk_widget_add_css_class(GTK_WIDGET(m_PreviewImage), "preview-panel");
-    gtk_widget_set_hexpand(m_PreviewImage, true);
-    gtk_widget_set_vexpand(m_PreviewImage, true);
-    gtk_box_append(GTK_BOX(box), m_PreviewImage);
 
     auto dragHandler = gtk_gesture_drag_new();
     gtk_widget_add_controller(m_PreviewImage, GTK_EVENT_CONTROLLER(dragHandler));

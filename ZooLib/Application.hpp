@@ -33,7 +33,7 @@ namespace ZooLib
         virtual GtkWidget *CreateContent() = 0;
         virtual void PopulateMenuBar(AppMenuBarBuilder *menuBarBuilder) = 0;
 
-        void OnActivate(GtkApplication *app);
+        virtual void OnActivate(GtkApplication *app);
 
         template<typename TCommand>
         void SendCommandForAction(GSimpleAction *action, GVariant *parameter)

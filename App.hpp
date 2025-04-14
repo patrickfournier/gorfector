@@ -60,9 +60,10 @@ namespace ZooScan
 
         [[nodiscard]] std::tuple<int, int> GetMainWindowSize() override
         {
-            return std::make_tuple(-1, -1);
+            return std::make_tuple(640, 480);
         }
 
+        void OnActivate(GtkApplication *app) override;
         GtkWidget *CreateContent() override;
         void PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder) override;
 
