@@ -112,7 +112,7 @@ namespace ZooScan
             return m_AppState;
         }
 
-        void Update(uint64_t lastSeenVersion);
+        void Update(const std::vector<uint64_t> &lastSeenVersions);
 
         [[nodiscard]] SaneDevice *GetDeviceByName(const std::string &deviceName) const
         {

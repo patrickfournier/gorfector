@@ -35,7 +35,7 @@ ZooScan::DeviceSelector::DeviceSelector(
     auto networkScan = adw_switch_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(networkScan), "Include Network Scanners");
     adw_switch_row_set_active(ADW_SWITCH_ROW(networkScan), false);
-    ConnectGtkSignal(this, &DeviceSelector::OnActivateNetwork, networkScan, "notify::active");
+    ConnectGtkSignalWithParamSpecs(this, &DeviceSelector::OnActivateNetwork, networkScan, "notify::active");
     gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), networkScan);
 
     auto refreshButton = gtk_button_new_with_label("Refresh Scanner List");
@@ -64,7 +64,7 @@ void ZooScan::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
     m_Dispatcher.Dispatch(RefreshDeviceList());
 }
 
-void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *widget, GParamSpec *paramSpec)
+void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *widget)
 {
     const bool value = adw_switch_row_get_active(ADW_SWITCH_ROW(widget));
     auto command = ActivateNetworkScan(value);
@@ -89,7 +89,7 @@ void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget *)
     SelectDevice(selectedIndex);
 }
 
-void ZooScan::DeviceSelector::Update(uint64_t lastSeenVersion)
+void ZooScan::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVersion)
 {
     g_signal_handler_block(m_DeviceSelectorList, m_DropdownSelectedSignalId);
 

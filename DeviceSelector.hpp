@@ -23,7 +23,7 @@ namespace ZooScan
 
         void OnRefreshDevicesClicked(GtkWidget *);
         void OnDeviceSelected(GtkWidget *);
-        void OnActivateNetwork(GtkWidget *, GParamSpec *paramSpec);
+        void OnActivateNetwork(GtkWidget *);
 
         void SelectDevice(int deviceIndex);
 
@@ -43,7 +43,7 @@ namespace ZooScan
             return m_DeviceSelectorRoot;
         }
 
-        void Update(uint64_t lastSeenVersion) override;
+        void Update(const std::vector<uint64_t> &lastSeenVersion) override;
 
         void SelectDefaultDevice()
         {

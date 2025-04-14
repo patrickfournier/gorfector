@@ -5,7 +5,7 @@
 #include "App.hpp"
 #include "DeviceOptionsState.hpp"
 #include "FileWriter.hpp"
-#include "TiffWriterStateComponent.hpp"
+#include "TiffWriterState.hpp"
 
 
 namespace ZooScan
@@ -15,19 +15,24 @@ namespace ZooScan
         static const std::vector<std::string> k_Extensions;
         static constexpr std::string k_Name = "TIFF";
 
-        TiffWriterStateComponent *m_StateComponent{};
+        TiffWriterState *m_StateComponent{};
         TIFF *m_File{};
         int m_LineCounter{};
 
     public:
         explicit TiffWriter(ZooLib::State *state)
         {
-            m_StateComponent = new TiffWriterStateComponent(state);
+            m_StateComponent = new TiffWriterState(state);
         }
 
         ~TiffWriter() override
         {
             delete m_StateComponent;
+        }
+
+        [[nodiscard]] TiffWriterState *GetStateComponent()
+        {
+            return m_StateComponent;
         }
 
         [[nodiscard]] const std::string &GetName() const override

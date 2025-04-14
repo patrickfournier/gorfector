@@ -677,9 +677,9 @@ void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
     cairo_stroke(cr);
 }
 
-void ZooScan::PreviewPanel::Update(uint64_t lastSeenVersion)
+void ZooScan::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
-    auto changeset = m_PreviewState->GetAggregatedChangeset(lastSeenVersion);
+    auto changeset = m_PreviewState->GetAggregatedChangeset(lastSeenVersions[0]);
     if (changeset == nullptr || !changeset->HasAnyChange())
     {
         return;

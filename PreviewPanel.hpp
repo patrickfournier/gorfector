@@ -89,7 +89,7 @@ namespace ZooScan
             return m_PreviewState;
         }
 
-        void Update(uint64_t lastSeenVersion) override;
+        void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };
 
 }

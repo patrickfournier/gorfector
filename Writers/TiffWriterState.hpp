@@ -4,7 +4,7 @@
 
 namespace ZooScan
 {
-    class TiffWriterStateComponent : public ZooLib::StateComponent
+    class TiffWriterState : public ZooLib::StateComponent
     {
     public:
         enum class Compression
@@ -21,18 +21,13 @@ namespace ZooScan
             return {"None", "LZW", "JPEG", "Deflate", "Packbits", nullptr};
         }
 
-        static int GetDefaultCompressionAlgorithmIndex()
-        {
-            return static_cast<int>(Compression::Deflate);
-        }
-
     private:
         Compression m_Compression{};
         int m_DeflateCompressionLevel{};
         int m_JpegQuality{};
 
     public:
-        explicit TiffWriterStateComponent(ZooLib::State *state)
+        explicit TiffWriterState(ZooLib::State *state)
             : StateComponent(state)
             , m_Compression(Compression::Deflate)
             , m_DeflateCompressionLevel(1)
@@ -43,6 +38,11 @@ namespace ZooScan
         [[nodiscard]] Compression GetCompression() const
         {
             return m_Compression;
+        }
+
+        [[nodiscard]] int GetCompressionIndex() const
+        {
+            return static_cast<int>(m_Compression);
         }
 
         [[nodiscard]] int GetTiffCompression() const
@@ -73,5 +73,29 @@ namespace ZooScan
         {
             return m_JpegQuality;
         }
+
+        class Updater final : public StateComponent::Updater<TiffWriterState>
+        {
+        public:
+            explicit Updater(TiffWriterState *state)
+                : StateComponent::Updater<TiffWriterState>(state)
+            {
+            }
+
+            void SetCompression(Compression compression)
+            {
+                m_StateComponent->m_Compression = compression;
+            }
+
+            void SetDeflateCompressionLevel(int compressionLevel)
+            {
+                m_StateComponent->m_DeflateCompressionLevel = compressionLevel;
+            }
+
+            void SetJpegQuality(int quality)
+            {
+                m_StateComponent->m_JpegQuality = quality;
+            }
+        };
     };
 }

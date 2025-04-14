@@ -5,7 +5,7 @@
 #include <zlib.h>
 
 #include "FileWriter.hpp"
-#include "PngWriterStateComponent.hpp"
+#include "PngWriterState.hpp"
 
 namespace ZooScan
 {
@@ -15,7 +15,7 @@ namespace ZooScan
         static const std::vector<std::string> k_Extensions;
         static constexpr std::string k_Name = "PNG";
 
-        PngWriterStateComponent *m_StateComponent{};
+        PngWriterState *m_StateComponent{};
         FILE *m_File{};
         png_structp m_Png{};
         png_infop m_PngInfo{};
@@ -25,12 +25,17 @@ namespace ZooScan
     public:
         explicit PngWriter(ZooLib::State *state)
         {
-            m_StateComponent = new PngWriterStateComponent(state);
+            m_StateComponent = new PngWriterState(state);
         }
 
         ~PngWriter() override
         {
             delete m_StateComponent;
+        }
+
+        [[nodiscard]] PngWriterState *GetStateComponent()
+        {
+            return m_StateComponent;
         }
 
         [[nodiscard]] const std::string &GetName() const override

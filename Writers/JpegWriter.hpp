@@ -6,7 +6,7 @@
 #include <jpeglib.h>
 
 #include "FileWriter.hpp"
-#include "JpegWriterStateComponent.hpp"
+#include "JpegWriterState.hpp"
 
 namespace ZooScan
 {
@@ -15,7 +15,7 @@ namespace ZooScan
         static const std::vector<std::string> k_Extensions;
         static constexpr std::string k_Name = "JPEG";
 
-        JpegWriterStateComponent *m_StateComponent{};
+        JpegWriterState *m_StateComponent{};
 
         jpeg_compress_struct *m_CompressStruct{};
         jpeg_error_mgr *m_ErrorHandler{};
@@ -24,12 +24,17 @@ namespace ZooScan
     public:
         explicit JpegWriter(ZooLib::State *state)
         {
-            m_StateComponent = new JpegWriterStateComponent(state);
+            m_StateComponent = new JpegWriterState(state);
         }
 
         ~JpegWriter()
         {
             delete m_StateComponent;
+        }
+
+        [[nodiscard]] JpegWriterState *GetStateComponent()
+        {
+            return m_StateComponent;
         }
 
         [[nodiscard]] const std::string &GetName() const override

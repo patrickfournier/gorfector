@@ -5,7 +5,6 @@
 
 #include "App.hpp"
 
-#include "AboutView.hpp"
 #include "AppState.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "Commands/SetScanMode.hpp"
@@ -54,8 +53,7 @@ ZooScan::App::~App()
     m_ObserverManager.RemoveObserver(m_DeviceSelectorObserver);
     delete m_DeviceSelectorObserver;
 
-    delete m_DeviceOptionsPanel;
-    delete m_PreviewPanel;
+    // m_DeviceOptionsPanel and m_PreviewPanel are automatically deleted when their root widget is destroyed.
 
     m_ObserverManager.RemoveObserver(m_ViewUpdateObserver);
     delete m_ViewUpdateObserver;
@@ -108,7 +106,7 @@ GtkWidget *ZooScan::App::CreateContent()
     gtk_grid_attach(GTK_GRID(grid), m_CancelButton, 0, 3, 1, 1);
     gtk_widget_set_sensitive(m_CancelButton, false);
 
-    m_PreviewPanel = new PreviewPanel(&m_Dispatcher, this);
+    m_PreviewPanel = ZooLib::View::Create<PreviewPanel>(&m_Dispatcher, this);
     gtk_grid_attach(GTK_GRID(grid), m_PreviewPanel->GetRootWidget(), 1, 0, 1, 4);
 
     return grid;
@@ -142,7 +140,7 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 
 void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
-    auto deviceSelector = new DeviceSelector(&m_Dispatcher, this, m_DeviceSelectorState);
+    auto deviceSelector = ZooLib::View::Create<DeviceSelector>(&m_Dispatcher, this, m_DeviceSelectorState);
     auto dialog = adw_dialog_new();
     adw_dialog_set_title(dialog, "Select Device");
     adw_dialog_set_follows_content_size(dialog, true);
@@ -159,7 +157,10 @@ void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter
 void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialog = adw_preferences_dialog_new();
-    auto preferencePages = new PreferencesView();
+    auto preferencePages = ZooLib::View::Create<PreferencesView>(
+            this, &m_Dispatcher, FileWriter::GetFormatByType<TiffWriter>()->GetStateComponent(),
+            FileWriter::GetFormatByType<PngWriter>()->GetStateComponent(),
+            FileWriter::GetFormatByType<JpegWriter>()->GetStateComponent());
     for (const auto &page: preferencePages->GetPreferencePages())
     {
         adw_preferences_dialog_add(ADW_PREFERENCES_DIALOG(dialog), ADW_PREFERENCES_PAGE(page));
@@ -174,7 +175,8 @@ void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
     auto dialogWindow = adw_about_dialog_new();
     adw_about_dialog_set_application_icon(
             ADW_ABOUT_DIALOG(dialogWindow),
-            "decode-symbolic"); // FIXME should use the icon in resources, but does not work
+            //        "decode-symbolic"); // FIXME should use the icon in resources, but does not work
+            "scanner-symbolic");
     adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), "ZooScan");
     adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), "0.1");
     adw_about_dialog_set_comments(
@@ -205,7 +207,7 @@ int ZooScan::App::GetSelectorSaneInitId() const
     return m_DeviceSelectorState->GetSelectorSaneInitId();
 }
 
-void ZooScan::App::Update(uint64_t lastSeenVersion)
+void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     if (m_DeviceOptionsPanel != nullptr && (m_DeviceOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
                                             m_DeviceOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
@@ -217,15 +219,15 @@ void ZooScan::App::Update(uint64_t lastSeenVersion)
         }
 
         gtk_box_remove(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
-        delete m_DeviceOptionsPanel;
+        // m_DeviceOptionsPanel is automatically deleted when its root widget is destroyed.
         m_DeviceOptionsPanel = nullptr;
         m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
     }
 
     if (m_DeviceOptionsPanel == nullptr && m_SettingsBox != nullptr && !GetSelectorDeviceName().empty())
     {
-        m_DeviceOptionsPanel =
-                new DeviceOptionsPanel(GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
+        m_DeviceOptionsPanel = ZooLib::View::Create<DeviceOptionsPanel>(
+                GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
         gtk_box_append(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
         m_Dispatcher.RegisterHandler<SetScanAreaCommand, DeviceOptionsState>(
                 SetScanAreaCommand::Execute, m_DeviceOptionsPanel->GetState());

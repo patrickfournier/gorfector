@@ -61,12 +61,18 @@ namespace ZooScan
             return s_Formats;
         }
 
-        [[nodiscard]] static FileWriter *GetFormatByName(const std::string &name)
+        template<typename TFileWriter>
+        [[nodiscard]] static TFileWriter *GetFormatByType()
         {
+            static_assert(std::derived_from<TFileWriter, FileWriter>);
+
             for (auto format: s_Formats)
             {
-                if (format->GetName() == name)
-                    return format;
+                auto writer = dynamic_cast<TFileWriter *>(format);
+                if (writer != nullptr)
+                {
+                    return writer;
+                }
             }
 
             return nullptr;

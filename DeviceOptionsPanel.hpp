@@ -18,7 +18,7 @@ namespace ZooScan
         const std::string m_DeviceName;
         DeviceOptionsState *m_DeviceOptions;
 
-        ZooLib::CommandDispatcher m_Dispatcher{};
+        ZooLib::CommandDispatcher m_Dispatcher;
 
         GtkWidget *m_RootWidget;
         GtkWidget *m_Viewport;
@@ -71,6 +71,6 @@ namespace ZooScan
 
         ~DeviceOptionsPanel() override;
 
-        void Update(uint64_t lastSeenVersion) override;
+        void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };
 }

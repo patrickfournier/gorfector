@@ -637,12 +637,12 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
     }
 }
 
-void ZooScan::DeviceOptionsPanel::Update(uint64_t lastSeenVersion)
+void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     auto firstChangesetVersion = m_DeviceOptions->FirstChangesetVersion();
-    auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersion);
+    auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersions[0]);
 
-    if (firstChangesetVersion > lastSeenVersion || changeset->RebuildAll())
+    if (firstChangesetVersion > lastSeenVersions[0] || changeset->RebuildAll())
     {
         BuildUI();
     }
