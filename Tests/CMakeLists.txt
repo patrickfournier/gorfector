@@ -1,4 +1,5 @@
 project(StandAloneTests)
+enable_testing()
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ..)
 
@@ -13,8 +14,5 @@ add_executable(zooscan_standalonetests ${TEST_FILES})
 
 target_link_libraries(zooscan_standalonetests gtest gtest_main)
 
-enable_testing()
-add_test(NAME zooscan_test
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/zooscan_standalonetests
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
+include(GoogleTest)
+gtest_discover_tests(zooscan_standalonetests)
