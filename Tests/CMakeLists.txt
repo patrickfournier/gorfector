@@ -12,3 +12,9 @@ set(TEST_FILES
 add_executable(zooscan_standalonetests ${TEST_FILES})
 
 target_link_libraries(zooscan_standalonetests gtest gtest_main)
+
+enable_testing()
+add_test(NAME zooscan_test
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/zooscan_standalonetests
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)

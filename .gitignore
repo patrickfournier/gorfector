@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# CTest
+/Tests/Testing/Temporary/*
