@@ -22,10 +22,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Init submodules
+      run: git submodule update --init --recursive
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake
         sudo apt-get install libglib2.0-dev-bin
         sudo apt-get install libgtk-4-dev
         sudo apt-get install libadwaita-1-dev
