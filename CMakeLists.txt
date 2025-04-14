@@ -60,7 +60,7 @@ set(SOURCE_FILES
 add_executable(zooscan ${SOURCE_FILES} ${RESOURCE_OUTPUT})
 
 target_include_directories(zooscan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(zooscan PRIVATE -fexperimental-library -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result)
+target_compile_options(zooscan PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result)
 
 set_source_files_properties(${RESOURCE_OUTPUT} PROPERTIES GENERATED TRUE)
 add_dependencies(zooscan resources)
