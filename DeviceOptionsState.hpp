@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <nlohmann/json.hpp>
+#include <utility>
 
 #include "DeviceOptionValue.hpp"
 #include "DeviceOptionValueBase.hpp"
@@ -100,6 +101,10 @@ namespace ZooScan
 
     class DeviceOptionsState : public ZooLib::StateComponent, public ZooLib::ChangesetManager<Changeset>
     {
+    public:
+        static constexpr uint32_t k_InvalidIndex = std::numeric_limits<uint32_t>::max();
+
+    private:
         const std::string m_DeviceName;
         std::vector<DeviceOptionValueBase *> m_OptionValues;
 
@@ -200,19 +205,19 @@ namespace ZooScan
 
 
     public:
-        DeviceOptionsState(ZooLib::State *state, const std::string &deviceName)
+        DeviceOptionsState(ZooLib::State *state, std::string deviceName)
             : StateComponent(state)
-            , m_DeviceName(deviceName)
-            , m_PreviewIndex(std::numeric_limits<uint32_t>::max())
-            , m_ModeIndex(std::numeric_limits<uint32_t>::max())
-            , m_TLXIndex(std::numeric_limits<uint32_t>::max())
-            , m_TLYIndex(std::numeric_limits<uint32_t>::max())
-            , m_BRXIndex(std::numeric_limits<uint32_t>::max())
-            , m_BRYIndex(std::numeric_limits<uint32_t>::max())
-            , m_ResolutionIndex(std::numeric_limits<uint32_t>::max())
-            , m_XResolutionIndex(std::numeric_limits<uint32_t>::max())
-            , m_YResolutionIndex(std::numeric_limits<uint32_t>::max())
-            , m_BitDepthIndex(std::numeric_limits<uint32_t>::max())
+            , m_DeviceName(std::move(deviceName))
+            , m_PreviewIndex(k_InvalidIndex)
+            , m_ModeIndex(k_InvalidIndex)
+            , m_TLXIndex(k_InvalidIndex)
+            , m_TLYIndex(k_InvalidIndex)
+            , m_BRXIndex(k_InvalidIndex)
+            , m_BRYIndex(k_InvalidIndex)
+            , m_ResolutionIndex(k_InvalidIndex)
+            , m_XResolutionIndex(k_InvalidIndex)
+            , m_YResolutionIndex(k_InvalidIndex)
+            , m_BitDepthIndex(k_InvalidIndex)
         {
             BuildOptions();
         }

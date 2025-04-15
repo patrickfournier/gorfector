@@ -20,8 +20,10 @@ namespace ZooScan
 
         ZooLib::CommandDispatcher m_Dispatcher;
 
-        GtkWidget *m_RootWidget;
-        GtkWidget *m_Viewport;
+        GtkWidget *m_RootWidget{};
+        GtkWidget *m_OptionParent;
+        GtkWidget *m_PageBasic{};
+        GtkWidget *m_PageAdvanced{};
 
         ViewUpdateObserver<DeviceOptionsPanel, DeviceOptionsState> *m_OptionUpdateObserver;
 
@@ -30,14 +32,15 @@ namespace ZooScan
         static std::string SaneIntOrFixedToString(int value, const DeviceOptionValueBase *option);
         static const char *SaneUnitToString(SANE_Unit unit);
 
-        void BuildUI();
+        void AddOtherOptions();
 
         static GtkWidget *AddSettingBox(GtkBox *parent, const SANE_Option_Descriptor *option);
 
-        void AddCheckButton(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex);
-        void
-        AddVectorRow(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex, uint32_t valueIndex);
-        void AddStringRow(GtkBox *parent, const DeviceOptionValueBase *option, uint32_t settingIndex);
+        void AddCheckButton(GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex);
+        void AddVectorRow(
+                GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex, uint32_t valueIndex,
+                bool multiValue);
+        void AddStringRow(GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex);
 
         void OnCheckBoxChanged(GtkWidget *widget);
         void OnDropDownChanged(GtkWidget *widget);
@@ -67,9 +70,13 @@ namespace ZooScan
         }
 
         DeviceOptionsPanel(
-                int saneInitId, const std::string &deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
+                int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
 
         ~DeviceOptionsPanel() override;
+        void BuildUI();
+        void AddCommonOptions();
+        GtkWidget *
+        AddOptionRow(uint64_t optionIndex, GtkWidget *parent, bool skipBasicOptions, bool skipAdvancedOptions);
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };

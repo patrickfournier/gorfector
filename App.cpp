@@ -97,14 +97,18 @@ GtkWidget *ZooScan::App::CreateContent()
 
     auto deviceSelected = !GetSelectorDeviceName().empty();
 
-    auto *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    auto *box = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_widget_set_margin_bottom(box, 15);
     gtk_widget_set_margin_top(box, 0);
     gtk_widget_set_margin_start(box, 10);
     gtk_widget_set_margin_end(box, 10);
 
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-    gtk_box_append(GTK_BOX(box), m_SettingsBox);
+    gtk_widget_set_margin_bottom(m_SettingsBox, 0);
+    gtk_widget_set_margin_top(m_SettingsBox, 0);
+    gtk_widget_set_margin_start(m_SettingsBox, 0);
+    gtk_widget_set_margin_end(m_SettingsBox, 10);
+    gtk_paned_set_start_child(GTK_PANED(box), m_SettingsBox);
 
     m_PreviewButton = gtk_button_new_with_label("Preview");
     ConnectGtkSignal(this, &App::OnPreviewClicked, m_PreviewButton, "clicked");
@@ -122,7 +126,12 @@ GtkWidget *ZooScan::App::CreateContent()
     gtk_box_append(GTK_BOX(m_SettingsBox), m_CancelButton);
 
     m_PreviewPanel = ZooLib::View::Create<PreviewPanel>(&m_Dispatcher, this);
-    gtk_box_append(GTK_BOX(box), m_PreviewPanel->GetRootWidget());
+    auto previewBox = m_PreviewPanel->GetRootWidget();
+    gtk_widget_set_margin_bottom(previewBox, 0);
+    gtk_widget_set_margin_top(previewBox, 0);
+    gtk_widget_set_margin_start(previewBox, 10);
+    gtk_widget_set_margin_end(previewBox, 0);
+    gtk_paned_set_end_child(GTK_PANED(box), previewBox);
 
     return box;
 }

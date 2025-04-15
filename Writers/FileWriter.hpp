@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <filesystem>
-#include <ranges>
 #include <sane/sane.h>
 #include <string>
 #include <vector>
