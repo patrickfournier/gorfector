@@ -75,8 +75,9 @@ namespace ZooScan
         ~DeviceOptionsPanel() override;
         void BuildUI();
         void AddCommonOptions();
-        GtkWidget *
-        AddOptionRow(uint64_t optionIndex, GtkWidget *parent, bool skipBasicOptions, bool skipAdvancedOptions);
+        GtkWidget *AddOptionRow(
+                uint64_t optionIndex, GtkWidget *page, GtkWidget *parent, bool skipBasicOptions,
+                bool skipAdvancedOptions);
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };

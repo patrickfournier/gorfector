@@ -11,7 +11,7 @@
 exts="\.\(cpp\|hpp\)$"
 
 # The formatter to use
-formatter=$(which clang-format-21)
+formatter=$(which clang-format)
 formatter_config=".clang-format"
 formatter_options="--sort-includes -Werror"
 

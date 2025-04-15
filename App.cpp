@@ -97,18 +97,28 @@ GtkWidget *ZooScan::App::CreateContent()
 
     auto deviceSelected = !GetSelectorDeviceName().empty();
 
-    auto *box = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_widget_set_margin_bottom(box, 15);
-    gtk_widget_set_margin_top(box, 0);
-    gtk_widget_set_margin_start(box, 10);
-    gtk_widget_set_margin_end(box, 10);
+    auto *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_widget_set_margin_bottom(paned, 15);
+    gtk_widget_set_margin_top(paned, 0);
+    gtk_widget_set_margin_start(paned, 10);
+    gtk_widget_set_margin_end(paned, 10);
+
+    gtk_paned_set_wide_handle(GTK_PANED(paned), true);
+    gtk_paned_set_position(GTK_PANED(paned), 200);
+
+    auto clamp = adw_clamp_new();
+    adw_clamp_set_unit(ADW_CLAMP(clamp), ADW_LENGTH_UNIT_SP);
+    adw_clamp_set_tightening_threshold(ADW_CLAMP(clamp), 600);
+    adw_clamp_set_maximum_size(ADW_CLAMP(clamp), 800);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
+    gtk_paned_set_start_child(GTK_PANED(paned), clamp);
 
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
     gtk_widget_set_margin_bottom(m_SettingsBox, 0);
     gtk_widget_set_margin_top(m_SettingsBox, 0);
     gtk_widget_set_margin_start(m_SettingsBox, 0);
     gtk_widget_set_margin_end(m_SettingsBox, 10);
-    gtk_paned_set_start_child(GTK_PANED(box), m_SettingsBox);
+    adw_clamp_set_child(ADW_CLAMP(clamp), m_SettingsBox);
 
     m_PreviewButton = gtk_button_new_with_label("Preview");
     ConnectGtkSignal(this, &App::OnPreviewClicked, m_PreviewButton, "clicked");
@@ -131,9 +141,9 @@ GtkWidget *ZooScan::App::CreateContent()
     gtk_widget_set_margin_top(previewBox, 0);
     gtk_widget_set_margin_start(previewBox, 10);
     gtk_widget_set_margin_end(previewBox, 0);
-    gtk_paned_set_end_child(GTK_PANED(box), previewBox);
+    gtk_paned_set_end_child(GTK_PANED(paned), previewBox);
 
-    return box;
+    return paned;
 }
 
 void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)

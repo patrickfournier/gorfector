@@ -322,6 +322,9 @@ ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(scroller), TRUE);
     gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(scroller), TRUE);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(scroller), FALSE);
+    gtk_scrolled_window_set_overlay_scrolling(GTK_SCROLLED_WINDOW(scroller), FALSE);
+
     auto viewport = gtk_viewport_new(gtk_adjustment_new(0, 0, 0, 0, 0, 0), gtk_adjustment_new(0, 0, 0, 0, 0, 0));
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroller), viewport);
 
@@ -330,9 +333,13 @@ ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(
 
     auto viewSwitcher = adw_view_switcher_new();
     adw_view_switcher_set_policy(ADW_VIEW_SWITCHER(viewSwitcher), ADW_VIEW_SWITCHER_POLICY_WIDE);
+
     auto stack = adw_view_stack_new();
-    adw_view_stack_set_hhomogeneous(ADW_VIEW_STACK(stack), true);
+    adw_view_stack_set_hhomogeneous(ADW_VIEW_STACK(stack), TRUE);
+    adw_view_stack_set_vhomogeneous(ADW_VIEW_STACK(stack), FALSE);
     adw_view_switcher_set_stack(ADW_VIEW_SWITCHER(viewSwitcher), ADW_VIEW_STACK(stack));
+    gtk_widget_set_margin_start(stack, 10);
+    gtk_widget_set_margin_end(stack, 10);
     gtk_box_append(GTK_BOX(box), stack);
 
     gtk_box_append(GTK_BOX(m_RootWidget), viewSwitcher);
@@ -391,36 +398,37 @@ void ZooScan::DeviceOptionsPanel::AddCommonOptions()
 {
     auto optionGroup = adw_preferences_group_new();
     adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(optionGroup), "Common Options");
+    gtk_widget_set_margin_bottom(optionGroup, 10);
+    gtk_widget_set_margin_top(optionGroup, 10);
     AddWidgetToParent(m_PageBasic, optionGroup);
 
     if (m_DeviceOptions->XResolutionIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->XResolutionIndex(), optionGroup, false, false);
-        AddOptionRow(m_DeviceOptions->YResolutionIndex(), optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->XResolutionIndex(), m_PageBasic, optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->YResolutionIndex(), m_PageBasic, optionGroup, false, false);
     }
     else
     {
-        AddOptionRow(m_DeviceOptions->ResolutionIndex(), optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->ResolutionIndex(), m_PageBasic, optionGroup, false, false);
     }
 
     auto *expander = adw_expander_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(expander), "Scan Area");
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(optionGroup), expander);
 
-
-    AddOptionRow(m_DeviceOptions->TLXIndex(), expander, false, false);
-    AddOptionRow(m_DeviceOptions->TLYIndex(), expander, false, false);
-    AddOptionRow(m_DeviceOptions->BRXIndex(), expander, false, false);
-    AddOptionRow(m_DeviceOptions->BRYIndex(), expander, false, false);
+    AddOptionRow(m_DeviceOptions->TLXIndex(), m_PageBasic, expander, false, false);
+    AddOptionRow(m_DeviceOptions->TLYIndex(), m_PageBasic, expander, false, false);
+    AddOptionRow(m_DeviceOptions->BRXIndex(), m_PageBasic, expander, false, false);
+    AddOptionRow(m_DeviceOptions->BRYIndex(), m_PageBasic, expander, false, false);
 
     if (m_DeviceOptions->ModeIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->ModeIndex(), optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->ModeIndex(), m_PageBasic, optionGroup, false, false);
     }
 
     if (m_DeviceOptions->BitDepthIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->BitDepthIndex(), optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->BitDepthIndex(), m_PageBasic, optionGroup, false, false);
     }
 }
 
@@ -429,18 +437,18 @@ void ZooScan::DeviceOptionsPanel::AddOtherOptions()
     auto parent = m_PageBasic;
     for (auto optionIndex = 0UL; optionIndex < m_DeviceOptions->GetOptionCount(); optionIndex++)
     {
-        parent = AddOptionRow(optionIndex, parent, false, true);
+        parent = AddOptionRow(optionIndex, m_PageBasic, parent, false, true);
     }
 
     parent = m_PageAdvanced;
     for (auto optionIndex = 0UL; optionIndex < m_DeviceOptions->GetOptionCount(); optionIndex++)
     {
-        parent = AddOptionRow(optionIndex, parent, true, false);
+        parent = AddOptionRow(optionIndex, m_PageAdvanced, parent, true, false);
     }
 }
 
 GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
-        uint64_t optionIndex, GtkWidget *parent, bool skipBasicOptions, bool skipAdvancedOptions)
+        uint64_t optionIndex, GtkWidget *page, GtkWidget *parent, bool skipBasicOptions, bool skipAdvancedOptions)
 {
     auto device = m_App->GetDeviceByName(m_DeviceName);
     auto optionDescriptor = device->GetOptionDescriptor(optionIndex);
@@ -462,14 +470,14 @@ GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
         return parent;
     }
 
+    // This is used to avoid creating empty groups: only create the pending group if there is at least
+    // one option in it.
     static GtkWidget *pendingGroup = nullptr;
-    static GtkWidget *pendingGroupParent = nullptr;
     if (optionDescriptor->type != SANE_TYPE_GROUP && pendingGroup != nullptr)
     {
-        AddWidgetToParent(pendingGroupParent, pendingGroup);
+        AddWidgetToParent(page, pendingGroup);
 
         pendingGroup = nullptr;
-        pendingGroupParent = nullptr;
     }
 
     switch (optionDescriptor->type)
@@ -530,14 +538,14 @@ GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
         {
             auto group = adw_preferences_group_new();
             adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(group), optionDescriptor->title);
+            gtk_widget_set_margin_bottom(group, 10);
+            gtk_widget_set_margin_top(group, 10);
             if (optionDescriptor->desc != nullptr && strlen(optionDescriptor->desc) > 0)
             {
                 adw_preferences_group_set_description(ADW_PREFERENCES_GROUP(group), optionDescriptor->desc);
             }
 
             pendingGroup = group;
-            pendingGroupParent = parent;
-
             parent = group;
             break;
         }
