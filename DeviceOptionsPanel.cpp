@@ -112,8 +112,7 @@ void ZooScan::DeviceOptionsPanel::AddCheckButton(
     else
     {
         gtk_widget_set_sensitive(checkButton, true);
-        // ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget,
-        // "notify::selected");
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnCheckBoxChanged, checkButton, "notify::active");
     }
 
     AddWidgetToParent(parent, checkButton);
@@ -121,9 +120,6 @@ void ZooScan::DeviceOptionsPanel::AddCheckButton(
     auto index = WidgetIndex(settingIndex, 0);
     g_object_set_data(G_OBJECT(checkButton), "OptionIndex", GINT_TO_POINTER(index.Hash()));
     m_Widgets[index.Hash()] = checkButton;
-
-    // ConnectGtkSignalWithParamSpecs(this, &DeviceSelector::OnActivateNetwork, checkButton, "notify::active");
-    // ConnectGtkSignal(this, &DeviceOptionsPanel::OnCheckBoxChanged, checkButton, "toggled");
 }
 
 void ZooScan::DeviceOptionsPanel::AddVectorRow(
@@ -170,8 +166,7 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(
         adw_preferences_row_set_title(ADW_PREFERENCES_ROW(valueWidget), title.c_str());
         adw_action_row_set_subtitle(ADW_ACTION_ROW(valueWidget), description.c_str());
         adw_spin_row_set_value(ADW_SPIN_ROW(valueWidget), fieldValue);
-
-        // ConnectGtkSignal(this, &DeviceOptionsPanel::OnSpinButtonChanged, valueWidget, "value-changed");
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnSpinButtonChanged, valueWidget, "notify::value");
     }
     else if (auto wordList = option->GetNumberList(); wordList != nullptr)
     {
@@ -201,9 +196,7 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(
         auto *stringList = gtk_string_list_new(options.get());
         adw_combo_row_set_model(ADW_COMBO_ROW(valueWidget), G_LIST_MODEL(stringList));
         adw_combo_row_set_selected(ADW_COMBO_ROW(valueWidget), activeIndex);
-
-        // ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget,
-        // "notify::selected");
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
     }
     else // no constraint
     {
@@ -213,7 +206,9 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(
         gtk_widget_set_tooltip_text(valueWidget, description.c_str());
         gtk_editable_set_text(GTK_EDITABLE(valueWidget), valueStr.c_str());
 
-        // ConnectGtkSignal(this, &DeviceOptionsPanel::OnNumericTextFieldChanged, focusController, "leave");
+        auto focusController = gtk_event_controller_focus_new();
+        gtk_widget_add_controller(valueWidget, focusController);
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnNumericTextFieldChanged, focusController, "leave");
     }
 
     if (valueWidget != nullptr)
@@ -268,9 +263,7 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
         auto *gStringList = gtk_string_list_new(stringList);
         adw_combo_row_set_model(ADW_COMBO_ROW(valueWidget), G_LIST_MODEL(gStringList));
         adw_combo_row_set_selected(ADW_COMBO_ROW(valueWidget), activeIndex);
-
-        // ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget,
-        // "notify::selected");
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
     }
     else // no constraint
     {
@@ -279,7 +272,9 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
         gtk_widget_set_tooltip_text(valueWidget, description);
         gtk_editable_set_text(GTK_EDITABLE(valueWidget), value.c_str());
 
-        // ConnectGtkSignal(this, &DeviceOptionsPanel::OnNumericTextFieldChanged, focusController, "leave");
+        auto focusController = gtk_event_controller_focus_new();
+        gtk_widget_add_controller(valueWidget, focusController);
+        ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnStringTextFieldChanged, focusController, "leave");
     }
 
     if (valueWidget != nullptr)
@@ -589,8 +584,8 @@ void ZooScan::DeviceOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
     auto optionIndex = index.m_OptionIndex;
     auto valueIndex = index.m_ValueIndex;
 
-    auto *checkBox = GTK_CHECK_BUTTON(widget);
-    auto isChecked = gtk_check_button_get_active(checkBox);
+    auto *checkBox = ADW_SWITCH_ROW(widget);
+    auto isChecked = adw_switch_row_get_active(checkBox);
 
     try
     {
@@ -615,8 +610,8 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     auto option = m_DeviceOptions->GetOption(optionIndex);
     auto saneType = option->GetValueType();
 
-    auto *dropDown = GTK_DROP_DOWN(widget);
-    auto selectedItem = G_OBJECT(gtk_drop_down_get_selected_item(dropDown));
+    auto *dropDown = ADW_COMBO_ROW(widget);
+    auto selectedItem = G_OBJECT(adw_combo_row_get_selected_item(dropDown));
     if (saneType == SANE_TYPE_FIXED)
     {
         // FIXME: drop down item should have the real value so we don't need to parse it
@@ -676,9 +671,8 @@ void ZooScan::DeviceOptionsPanel::OnNumericTextFieldChanged(GtkEventControllerFo
 
     if ((saneType == SANE_TYPE_FIXED) || (saneType == SANE_TYPE_INT))
     {
-        auto *textField = GTK_ENTRY(widget);
-        auto *entryBuffer = gtk_entry_get_buffer(textField);
-        auto text = gtk_entry_buffer_get_text(entryBuffer);
+        auto *textField = GTK_EDITABLE(widget);
+        auto text = gtk_editable_get_text(textField);
         int value;
 
         try
@@ -729,9 +723,8 @@ void ZooScan::DeviceOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFoc
 
     if (saneType == SANE_TYPE_STRING)
     {
-        auto *textField = GTK_ENTRY(widget);
-        auto *entryBuffer = gtk_entry_get_buffer(textField);
-        auto text = gtk_entry_buffer_get_text(entryBuffer);
+        auto *textField = GTK_EDITABLE(widget);
+        auto text = gtk_editable_get_text(textField);
 
         try
         {
@@ -759,8 +752,8 @@ void ZooScan::DeviceOptionsPanel::OnSpinButtonChanged(GtkWidget *widget)
 
     if ((saneType == SANE_TYPE_FIXED) || (saneType == SANE_TYPE_INT))
     {
-        auto *spinButton = GTK_SPIN_BUTTON(widget);
-        auto fieldValue = gtk_spin_button_get_value(spinButton);
+        auto *spinButton = ADW_SPIN_ROW(widget);
+        auto fieldValue = adw_spin_row_get_value(spinButton);
         int value;
         if (saneType == SANE_TYPE_FIXED)
         {
@@ -804,7 +797,7 @@ void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                 case SANE_TYPE_BOOL:
                 {
                     auto boolOption = dynamic_cast<const DeviceOptionValue<bool> *>(option);
-                    gtk_check_button_set_active(GTK_CHECK_BUTTON(widget), boolOption->GetValue() != 0);
+                    adw_switch_row_set_active(ADW_SWITCH_ROW(widget), boolOption->GetValue() != 0);
                     break;
                 }
 
@@ -814,11 +807,11 @@ void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                     auto intOption = dynamic_cast<const DeviceOptionValue<int> *>(option);
                     auto value = intOption->GetValue(changedIndex.m_ValueIndex);
 
-                    if (GTK_IS_DROP_DOWN(widget))
+                    if (ADW_IS_COMBO_ROW(widget))
                     {
                         auto valueStr = settingValueType == SANE_TYPE_FIXED ? std::to_string(SANE_UNFIX(value))
                                                                             : std::to_string(value);
-                        auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
+                        auto items = adw_combo_row_get_model(ADW_COMBO_ROW(widget));
                         uint32_t valuePosition = 0;
                         for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
                         {
@@ -831,22 +824,21 @@ void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                             }
                         }
 
-                        gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
+                        adw_combo_row_set_selected(ADW_COMBO_ROW(widget), valuePosition);
                     }
-                    else if (GTK_IS_SPIN_BUTTON(widget))
+                    else if (ADW_IS_SPIN_ROW(widget))
                     {
                         double fieldValue = value;
                         if (settingValueType == SANE_TYPE_FIXED)
                         {
                             fieldValue = SANE_UNFIX(fieldValue);
                         }
-                        gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), fieldValue);
+                        adw_spin_row_set_value(ADW_SPIN_ROW(widget), fieldValue);
                     }
-                    else if (GTK_IS_ENTRY(widget))
+                    else if (ADW_IS_ENTRY_ROW(widget))
                     {
-                        auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
                         auto text = SaneIntOrFixedToString(value, option);
-                        gtk_entry_buffer_set_text(entryBuffer, text.c_str(), static_cast<int>(text.length()));
+                        gtk_editable_set_text(GTK_EDITABLE(widget), text.c_str());
                     }
                     break;
                 }
@@ -856,9 +848,9 @@ void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                     auto strOption = dynamic_cast<const DeviceOptionValue<std::string> *>(option);
                     auto value = strOption->GetValue();
 
-                    if (GTK_IS_DROP_DOWN(widget))
+                    if (ADW_IS_COMBO_ROW(widget))
                     {
-                        auto items = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
+                        auto items = adw_combo_row_get_model(ADW_COMBO_ROW(widget));
                         uint32_t valuePosition = 0;
                         for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
                         {
@@ -871,12 +863,11 @@ void ZooScan::DeviceOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                             }
                         }
 
-                        gtk_drop_down_set_selected(GTK_DROP_DOWN(widget), valuePosition);
+                        adw_combo_row_set_selected(ADW_COMBO_ROW(widget), valuePosition);
                     }
-                    else if (GTK_IS_ENTRY(widget))
+                    else if (ADW_IS_ENTRY_ROW(widget))
                     {
-                        auto *entryBuffer = gtk_entry_get_buffer(GTK_ENTRY(widget));
-                        gtk_entry_buffer_set_text(entryBuffer, value.c_str(), static_cast<int>(value.length()));
+                        gtk_editable_set_text(GTK_EDITABLE(widget), value.c_str());
                     }
                     break;
                 }
