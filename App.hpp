@@ -97,7 +97,7 @@ namespace ZooScan
         void PreferenceDialog(GSimpleAction *action, GVariant *parameter);
 
     public:
-        App();
+        App(int argc, char **argv);
 
         ~App() override;
 

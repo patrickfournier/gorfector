@@ -10,6 +10,8 @@
 
 namespace ZooScan
 {
+    class OptionRewriter;
+
     class DeviceOptionsPanel : public ZooLib::View
     {
         App *m_App;
@@ -32,9 +34,14 @@ namespace ZooScan
         static std::string SaneIntOrFixedToString(int value, const DeviceOptionValueBase *option);
         static const char *SaneUnitToString(SANE_Unit unit);
 
-        void AddOtherOptions();
+        OptionRewriter *m_Rewriter{};
 
-        static GtkWidget *AddSettingBox(GtkBox *parent, const SANE_Option_Descriptor *option);
+        void BuildUI();
+        std::vector<uint32_t> AddCommonOptions();
+        void AddOtherOptions(const std::vector<uint32_t> &excludeIndices);
+        std::tuple<GtkWidget *, GtkWidget *> AddOptionRow(
+                uint64_t optionIndex, GtkWidget *parent, GtkWidget *pendingGroup, bool skipBasicOptions,
+                bool skipAdvancedOptions);
 
         void AddCheckButton(GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex);
         void AddVectorRow(
@@ -49,6 +56,11 @@ namespace ZooScan
         void OnSpinButtonChanged(GtkWidget *widget);
 
     public:
+        DeviceOptionsPanel(
+                int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
+
+        ~DeviceOptionsPanel() override;
+
         [[nodiscard]] int GetSaneInitId() const
         {
             return m_SaneInitId;
@@ -68,16 +80,6 @@ namespace ZooScan
         {
             return m_DeviceOptions;
         }
-
-        DeviceOptionsPanel(
-                int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
-
-        ~DeviceOptionsPanel() override;
-        void BuildUI();
-        void AddCommonOptions();
-        GtkWidget *AddOptionRow(
-                uint64_t optionIndex, GtkWidget *page, GtkWidget *parent, bool skipBasicOptions,
-                bool skipAdvancedOptions);
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };

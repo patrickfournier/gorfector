@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "OptionRewriter/OptionRewriter.hpp"
 #include "SaneDevice.hpp"
 #include "ZooLib/StateComponent.hpp"
 
@@ -17,6 +18,7 @@ namespace ZooScan
         std::string m_SelectedDeviceName{};
         bool m_ScanNetwork{};
         int m_SANEInitId{};
+        bool m_DumpSane{};
 
         void GetDevicesFromSANE()
         {
@@ -85,6 +87,11 @@ namespace ZooScan
             {
                 m_SelectedDeviceName = k_NullDeviceName;
             }
+
+            if (m_DumpSane && (m_SelectedDeviceName != k_NullDeviceName))
+            {
+                OptionRewriter::Dump(GetDeviceByName(m_SelectedDeviceName));
+            }
         }
 
     public:
@@ -105,7 +112,7 @@ namespace ZooScan
 
             for (const auto device: m_DeviceList)
             {
-                if (device->Name() == deviceName)
+                if (device->GetName() == deviceName)
                 {
                     return device;
                 }
@@ -129,7 +136,7 @@ namespace ZooScan
             GetDevicesFromSANE();
             if (!m_DeviceList.empty())
             {
-                SelectDevice(m_DeviceList[0]->Name());
+                SelectDevice(m_DeviceList[0]->GetName());
             }
         }
 
@@ -162,6 +169,11 @@ namespace ZooScan
             void SelectDevice(const std::string &deviceName) const
             {
                 m_StateComponent->SelectDevice(deviceName);
+            }
+
+            void SetDumpSaneOptions(const bool dumpSane) const
+            {
+                m_StateComponent->m_DumpSane = dumpSane;
             }
         };
     };

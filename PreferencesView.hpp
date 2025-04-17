@@ -2,6 +2,7 @@
 
 #include <adwaita.h>
 
+#include "Commands/DevMode/SetDumpSaneOptions.hpp"
 #include "Commands/SetJpegQuality.hpp"
 #include "Commands/SetPngCompressionLevel.hpp"
 #include "Commands/SetTiffCompression.hpp"
@@ -21,11 +22,12 @@ namespace ZooScan
         App *m_App;
         ZooLib::CommandDispatcher m_Dispatcher;
 
-        GtkWidget *m_PreferencesPages[2]{};
+        GtkWidget *m_PreferencesPages[3]{};
 
         TiffWriterState *m_TiffWriterStateComponent{};
         PngWriterState *m_PngWriterStateComponent{};
         JpegWriterState *m_JpegWriterStateComponent{};
+        DeviceSelectorState *m_DeviceSelectorState;
 
         GtkWidget *m_TiffCompressionAlgo{};
         GtkWidget *m_TiffDeflateCompressionLevel{};
@@ -91,6 +93,17 @@ namespace ZooScan
             adw_action_row_set_subtitle(ADW_ACTION_ROW(m_JpegQuality), "0 = lowest quality, 100 = maximum quality.");
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_JpegQuality);
             ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_JpegQuality, "notify::value");
+
+            m_Dispatcher.RegisterHandler<SetTiffCompression, TiffWriterState>(
+                    SetTiffCompression::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler<SetTiffDeflateLevel, TiffWriterState>(
+                    SetTiffDeflateLevel::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler<SetTiffJpegQuality, TiffWriterState>(
+                    SetTiffJpegQuality::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler<SetPngCompressionLevel, PngWriterState>(
+                    SetPngCompressionLevel::Execute, m_PngWriterStateComponent);
+            m_Dispatcher.RegisterHandler<SetJpegQuality, JpegWriterState>(
+                    SetJpegQuality::Execute, m_JpegWriterStateComponent);
         }
 
         void OnCompressionAlgoSelected(GtkWidget *widget)
@@ -121,39 +134,65 @@ namespace ZooScan
             }
         }
 
+        void BuildDeveloperSettingsBox(GtkWidget *parent)
+        {
+            auto prefGroup = adw_preferences_group_new();
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), "General");
+            adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
+
+            auto checkbox = adw_switch_row_new();
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkbox), "Dump SANE options");
+            adw_action_row_set_subtitle(
+                    ADW_ACTION_ROW(checkbox), "When selecting a scanner, dump its SANE options to stdout. This is "
+                                              "useful for creating scanner config files.");
+            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), checkbox);
+            ZooLib::ConnectGtkSignalWithParamSpecs(
+                    this, &PreferencesView::OnDumpSaneOptionsChanged, checkbox, "notify::active");
+
+            m_Dispatcher.RegisterHandler<SetDumpSaneOptions, DeviceSelectorState>(
+                    SetDumpSaneOptions::Execute, m_DeviceSelectorState);
+        }
+
+        void OnDumpSaneOptionsChanged(GtkWidget *widget)
+        {
+            m_Dispatcher.Dispatch(SetDumpSaneOptions(adw_switch_row_get_active(ADW_SWITCH_ROW(widget))));
+        }
+
     public:
         PreferencesView(
                 App *app, ZooLib::CommandDispatcher *parentDispatcher, TiffWriterState *tiffWriterStateComponent,
-                PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent)
+                PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent,
+                DeviceSelectorState *deviceSelectorState)
             : m_App(app)
             , m_Dispatcher(parentDispatcher)
             , m_TiffWriterStateComponent(tiffWriterStateComponent)
             , m_PngWriterStateComponent(pngWriterStateComponent)
             , m_JpegWriterStateComponent(jpegWriterStateComponent)
+            , m_DeviceSelectorState(deviceSelectorState)
         {
-            m_PreferencesPages[0] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[0]), "General");
-            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[0]), "configure-symbolic");
+            auto i = 0;
+            m_PreferencesPages[i] = adw_preferences_page_new();
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "General");
+            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "configure-symbolic");
 
-            m_PreferencesPages[1] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[1]), "Image Formats");
-            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[1]), "emblem-photos-symbolic");
-            BuildFileSettingsBox(m_PreferencesPages[1]);
+            ++i;
+            m_PreferencesPages[i] = adw_preferences_page_new();
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "Image Formats");
+            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "emblem-photos-symbolic");
+            BuildFileSettingsBox(m_PreferencesPages[i]);
+
+            if (m_App->GetAppState()->IsDeveloperMode())
+            {
+                ++i;
+                m_PreferencesPages[i] = adw_preferences_page_new();
+                adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "Developer");
+                adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "diagnostics-symbolic");
+                BuildDeveloperSettingsBox(m_PreferencesPages[i]);
+            }
 
             m_ViewUpdateObserver = new ViewUpdateObserver(
                     this, m_TiffWriterStateComponent, m_JpegWriterStateComponent, m_PngWriterStateComponent);
             app->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
-
-            m_Dispatcher.RegisterHandler<SetTiffCompression, TiffWriterState>(
-                    SetTiffCompression::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetTiffDeflateLevel, TiffWriterState>(
-                    SetTiffDeflateLevel::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetTiffJpegQuality, TiffWriterState>(
-                    SetTiffJpegQuality::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetPngCompressionLevel, PngWriterState>(
-                    SetPngCompressionLevel::Execute, m_PngWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetJpegQuality, JpegWriterState>(
-                    SetJpegQuality::Execute, m_JpegWriterStateComponent);
         }
 
         ~PreferencesView() override
@@ -175,7 +214,14 @@ namespace ZooScan
 
         [[nodiscard]] std::vector<GtkWidget *> GetPreferencePages() const
         {
-            return {m_PreferencesPages[0], m_PreferencesPages[1]};
+            auto numPages = sizeof(m_PreferencesPages) / sizeof(m_PreferencesPages[0]);
+            auto pages = std::vector<GtkWidget *>(numPages);
+            for (auto i = 0UZ; i < numPages; ++i)
+            {
+                pages[i] = m_PreferencesPages[i];
+            }
+
+            return pages;
         }
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override

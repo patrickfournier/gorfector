@@ -55,6 +55,8 @@ set(SOURCE_FILES
         Writers/JpegWriter.cpp
         Writers/PngWriter.cpp
         Writers/TiffWriter.cpp
+        OptionRewriter/EpsonPerfectionV600PhotoRewriter.cpp
+        OptionRewriter/OptionRewriter.cpp
 )
 
 add_executable(zooscan ${SOURCE_FILES} ${RESOURCE_OUTPUT})

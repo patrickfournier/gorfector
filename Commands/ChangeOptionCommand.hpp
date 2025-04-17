@@ -36,7 +36,6 @@ namespace ZooScan
         {
             auto updater = DeviceOptionsState::Updater(state);
             updater.SetOptionValue(command.m_SettingIndex, command.m_ValueIndex, command.m_Value);
-            ;
         }
     };
 

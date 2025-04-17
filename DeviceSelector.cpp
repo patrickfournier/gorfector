@@ -80,7 +80,7 @@ void ZooScan::DeviceSelector::SelectDevice(const int deviceIndex)
     }
 
     m_Dispatcher.Dispatch(
-            SelectDeviceCommand(device == nullptr ? DeviceSelectorState::k_NullDeviceName : device->Name()));
+            SelectDeviceCommand(device == nullptr ? DeviceSelectorState::k_NullDeviceName : device->GetName()));
 }
 
 void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget *)
@@ -116,14 +116,14 @@ void ZooScan::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVersio
                 continue;
             }
 
-            if (device->Name() == m_State->GetSelectedDeviceName())
+            if (device->GetName() == m_State->GetSelectedDeviceName())
             {
                 selectedItemIndex = deviceIndex + 1;
             }
 
-            std::string deviceName = device->Vendor();
+            std::string deviceName = device->GetVendor();
             deviceName += " ";
-            deviceName += device->Model();
+            deviceName += device->GetModel();
 
             devicesNames[dropDownItemIndex] = deviceName;
             deviceNamesCStr[dropDownItemIndex] = devicesNames[dropDownItemIndex].c_str();

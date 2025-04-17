@@ -2,6 +2,7 @@
 #include <memory>
 #include <utility>
 #include "Commands/ChangeOptionCommand.hpp"
+#include "OptionRewriter/EpsonPerfectionV600PhotoRewriter.hpp"
 #include "SaneDevice.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/ErrorDialog.hpp"
@@ -72,24 +73,6 @@ void AddWidgetToParent(GtkWidget *parent, GtkWidget *child)
     }
 }
 
-GtkWidget *ZooScan::DeviceOptionsPanel::AddSettingBox(GtkBox *parent, const SANE_Option_Descriptor *option)
-{
-    auto settingBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_append(GTK_BOX(parent), settingBox);
-
-    if (DeviceOptionValueBase::ShouldHide(*option))
-    {
-        gtk_widget_set_visible(settingBox, false);
-    }
-
-    if (DeviceOptionValueBase::IsAdvanced(*option))
-    {
-        gtk_widget_add_css_class(settingBox, "advanced");
-    }
-
-    return settingBox;
-}
-
 void ZooScan::DeviceOptionsPanel::AddCheckButton(
         GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
 {
@@ -98,14 +81,17 @@ void ZooScan::DeviceOptionsPanel::AddCheckButton(
         return;
 
     auto checkButton = adw_switch_row_new();
-    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkButton), option->GetTitle());
+    auto title = m_Rewriter->GetTitle(settingIndex, option->GetTitle());
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkButton), title);
+    auto description = m_Rewriter->GetDescription(settingIndex, option->GetDescription());
     if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
     {
         adw_action_row_set_subtitle(ADW_ACTION_ROW(checkButton), option->GetDescription());
     }
     adw_switch_row_set_active(ADW_SWITCH_ROW(checkButton), boolOption->GetValue() != 0);
 
-    if (option->IsDisplayOnly())
+    auto isDisplayOnly = m_Rewriter->IsDisplayOnly(settingIndex, option->IsDisplayOnly());
+    if (isDisplayOnly)
     {
         gtk_widget_set_sensitive(checkButton, false);
     }
@@ -130,8 +116,8 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(
     if (intOption == nullptr)
         return;
 
-    std::string title(multiValue ? std::to_string(valueIndex) : option->GetTitle());
-    std::string description(multiValue ? "" : option->GetDescription());
+    std::string title(multiValue ? std::to_string(valueIndex) : m_Rewriter->GetTitle(settingIndex, option->GetTitle()));
+    std::string description(multiValue ? "" : m_Rewriter->GetDescription(settingIndex, option->GetDescription()));
     int value = intOption->GetValue(valueIndex);
 
     if (!multiValue)
@@ -213,7 +199,8 @@ void ZooScan::DeviceOptionsPanel::AddVectorRow(
 
     if (valueWidget != nullptr)
     {
-        if (option->IsDisplayOnly())
+        auto isDisplayOnly = m_Rewriter->IsDisplayOnly(settingIndex, option->IsDisplayOnly());
+        if (isDisplayOnly)
         {
             gtk_widget_set_sensitive(valueWidget, false);
         }
@@ -237,12 +224,14 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
     if (strOption == nullptr)
         return;
 
-    auto title = option->GetTitle();
-    auto description = option->GetDescription();
+    auto title(m_Rewriter->GetTitle(settingIndex, option->GetTitle()));
+    auto description(m_Rewriter->GetDescription(settingIndex, option->GetDescription()));
+    auto stringList = option->GetStringList();
+    auto rewrittenStringList = m_Rewriter->GetStringList(settingIndex, stringList);
     auto value = strOption->GetValue();
 
     GtkWidget *valueWidget = nullptr;
-    if (auto stringList = option->GetStringList(); stringList != nullptr)
+    if (stringList != nullptr)
     {
         auto activeIndex = 0;
         auto index = 0;
@@ -253,6 +242,7 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
             if (strcmp(optionValue, value.c_str()) == 0)
             {
                 activeIndex = index;
+                break;
             }
             index++;
         }
@@ -260,7 +250,7 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
         valueWidget = adw_combo_row_new();
         adw_preferences_row_set_title(ADW_PREFERENCES_ROW(valueWidget), title);
         adw_action_row_set_subtitle(ADW_ACTION_ROW(valueWidget), description);
-        auto *gStringList = gtk_string_list_new(stringList);
+        auto *gStringList = gtk_string_list_new(rewrittenStringList);
         adw_combo_row_set_model(ADW_COMBO_ROW(valueWidget), G_LIST_MODEL(gStringList));
         adw_combo_row_set_selected(ADW_COMBO_ROW(valueWidget), activeIndex);
         ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
@@ -279,7 +269,8 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
 
     if (valueWidget != nullptr)
     {
-        if (option->IsDisplayOnly())
+        auto isDisplayOnly = m_Rewriter->IsDisplayOnly(settingIndex, option->IsDisplayOnly());
+        if (isDisplayOnly)
         {
             gtk_widget_set_sensitive(valueWidget, false);
         }
@@ -305,6 +296,8 @@ ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(
 {
     if (m_DeviceName.empty())
         return;
+
+    m_Rewriter = new EpsonPerfectionV600PhotoRewriter();
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
 
@@ -385,11 +378,11 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
             ADW_VIEW_STACK(m_OptionParent), m_PageAdvanced, "advanced", "Advanced",
             "settings-symbolic"); // FIXME use wrench-wide-symbolic
 
-    AddCommonOptions();
-    AddOtherOptions();
+    auto commonOptionIndices = AddCommonOptions();
+    AddOtherOptions(commonOptionIndices);
 }
 
-void ZooScan::DeviceOptionsPanel::AddCommonOptions()
+std::vector<uint32_t> ZooScan::DeviceOptionsPanel::AddCommonOptions()
 {
     auto optionGroup = adw_preferences_group_new();
     adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(optionGroup), "Common Options");
@@ -399,82 +392,106 @@ void ZooScan::DeviceOptionsPanel::AddCommonOptions()
 
     if (m_DeviceOptions->XResolutionIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->XResolutionIndex(), m_PageBasic, optionGroup, false, false);
-        AddOptionRow(m_DeviceOptions->YResolutionIndex(), m_PageBasic, optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->XResolutionIndex(), optionGroup, nullptr, false, false);
+        AddOptionRow(m_DeviceOptions->YResolutionIndex(), optionGroup, nullptr, false, false);
     }
     else
     {
-        AddOptionRow(m_DeviceOptions->ResolutionIndex(), m_PageBasic, optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->ResolutionIndex(), optionGroup, nullptr, false, false);
     }
 
     auto *expander = adw_expander_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(expander), "Scan Area");
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(optionGroup), expander);
 
-    AddOptionRow(m_DeviceOptions->TLXIndex(), m_PageBasic, expander, false, false);
-    AddOptionRow(m_DeviceOptions->TLYIndex(), m_PageBasic, expander, false, false);
-    AddOptionRow(m_DeviceOptions->BRXIndex(), m_PageBasic, expander, false, false);
-    AddOptionRow(m_DeviceOptions->BRYIndex(), m_PageBasic, expander, false, false);
+    AddOptionRow(m_DeviceOptions->TLXIndex(), expander, nullptr, false, false);
+    AddOptionRow(m_DeviceOptions->TLYIndex(), expander, nullptr, false, false);
+    AddOptionRow(m_DeviceOptions->BRXIndex(), expander, nullptr, false, false);
+    AddOptionRow(m_DeviceOptions->BRYIndex(), expander, nullptr, false, false);
 
     if (m_DeviceOptions->ModeIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->ModeIndex(), m_PageBasic, optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->ModeIndex(), optionGroup, nullptr, false, false);
     }
 
     if (m_DeviceOptions->BitDepthIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddOptionRow(m_DeviceOptions->BitDepthIndex(), m_PageBasic, optionGroup, false, false);
+        AddOptionRow(m_DeviceOptions->BitDepthIndex(), optionGroup, nullptr, false, false);
     }
+
+    return std::vector{m_DeviceOptions->ResolutionIndex(),  m_DeviceOptions->XResolutionIndex(),
+                       m_DeviceOptions->YResolutionIndex(), m_DeviceOptions->TLXIndex(),
+                       m_DeviceOptions->TLYIndex(),         m_DeviceOptions->BRXIndex(),
+                       m_DeviceOptions->BRYIndex(),         m_DeviceOptions->ModeIndex(),
+                       m_DeviceOptions->BitDepthIndex()};
 }
 
-void ZooScan::DeviceOptionsPanel::AddOtherOptions()
+void ZooScan::DeviceOptionsPanel::AddOtherOptions(const std::vector<uint32_t> &excludeIndices)
 {
     auto parent = m_PageBasic;
+    GtkWidget *pendingGroup = nullptr;
     for (auto optionIndex = 0UL; optionIndex < m_DeviceOptions->GetOptionCount(); optionIndex++)
     {
-        parent = AddOptionRow(optionIndex, m_PageBasic, parent, false, true);
+        if (std::ranges::find(excludeIndices, optionIndex) == excludeIndices.end())
+        {
+            std::tie(parent, pendingGroup) = AddOptionRow(optionIndex, parent, pendingGroup, false, true);
+        }
     }
 
     parent = m_PageAdvanced;
     for (auto optionIndex = 0UL; optionIndex < m_DeviceOptions->GetOptionCount(); optionIndex++)
     {
-        parent = AddOptionRow(optionIndex, m_PageAdvanced, parent, true, false);
+        if (std::ranges::find(excludeIndices, optionIndex) == excludeIndices.end())
+        {
+            std::tie(parent, pendingGroup) = AddOptionRow(optionIndex, parent, pendingGroup, true, false);
+        }
     }
 }
 
-GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
-        uint64_t optionIndex, GtkWidget *page, GtkWidget *parent, bool skipBasicOptions, bool skipAdvancedOptions)
+std::tuple<GtkWidget *, GtkWidget *> ZooScan::DeviceOptionsPanel::AddOptionRow(
+        uint64_t optionIndex, GtkWidget *parent, GtkWidget *pendingGroup, bool skipBasicOptions,
+        bool skipAdvancedOptions)
 {
+    // We use the device to get all options, including those that have no associated value (like groups).
     auto device = m_App->GetDeviceByName(m_DeviceName);
+    if (device == nullptr)
+    {
+        return {parent, pendingGroup};
+    }
+
     auto optionDescriptor = device->GetOptionDescriptor(optionIndex);
-    const auto *optionValue = m_DeviceOptions->GetOption(optionIndex);
     if (optionDescriptor == nullptr)
     {
-        return parent;
+        return {parent, pendingGroup};
     }
 
-    if (DeviceOptionValueBase::ShouldHide(*optionDescriptor))
+    // Do not display numeric values with more than 4 elements.
+    auto isLargeVector = (optionDescriptor->type == SANE_TYPE_INT || optionDescriptor->type == SANE_TYPE_FIXED) &&
+                         optionDescriptor->size > 4;
+    auto shouldHide = SaneDevice::ShouldHide(*optionDescriptor) || isLargeVector;
+    if (m_Rewriter->ShouldHide(optionIndex, m_Rewriter->ShouldHide(optionIndex, shouldHide)))
     {
-        return parent;
+        return {parent, pendingGroup};
     }
 
+    auto isAdvanced = m_Rewriter->IsAdvanced(optionIndex, SaneDevice::IsAdvanced(*optionDescriptor));
     if ((optionDescriptor->type != SANE_TYPE_GROUP) &&
-        ((DeviceOptionValueBase::IsAdvanced(*optionDescriptor) && skipAdvancedOptions) ||
-         (!DeviceOptionValueBase::IsAdvanced(*optionDescriptor) && skipBasicOptions)))
+        ((isAdvanced && skipAdvancedOptions) || (!isAdvanced && skipBasicOptions)))
     {
-        return parent;
+        return {parent, pendingGroup};
     }
 
     // This is used to avoid creating empty groups: only create the pending group if there is at least
     // one option in it.
-    static GtkWidget *pendingGroup = nullptr;
     if (optionDescriptor->type != SANE_TYPE_GROUP && pendingGroup != nullptr)
     {
-        AddWidgetToParent(page, pendingGroup);
-
+        AddWidgetToParent(parent, pendingGroup);
+        parent = pendingGroup;
         pendingGroup = nullptr;
     }
 
+    // Get the value for the option.
+    const auto *optionValue = m_DeviceOptions->GetOption(optionIndex);
     switch (optionDescriptor->type)
     {
         case SANE_TYPE_BOOL:
@@ -503,10 +520,12 @@ GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
                 else
                 {
                     vectorBox = adw_expander_row_new();
-                    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(vectorBox), optionValue->GetTitle());
-                    if (optionDescriptor->desc != nullptr && strlen(optionDescriptor->desc) > 0)
+                    auto title = m_Rewriter->GetTitle(optionIndex, optionDescriptor->title);
+                    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(vectorBox), title);
+                    auto description = m_Rewriter->GetDescription(optionIndex, optionDescriptor->desc);
+                    if (description != nullptr && strlen(description) > 0)
                     {
-                        adw_expander_row_set_subtitle(ADW_EXPANDER_ROW(vectorBox), optionDescriptor->desc);
+                        adw_expander_row_set_subtitle(ADW_EXPANDER_ROW(vectorBox), description);
                     }
 
                     AddWidgetToParent(parent, vectorBox);
@@ -532,28 +551,32 @@ GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
         case SANE_TYPE_GROUP:
         {
             auto group = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(group), optionDescriptor->title);
+            auto title = m_Rewriter->GetTitle(optionIndex, optionDescriptor->title);
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(group), title);
             gtk_widget_set_margin_bottom(group, 10);
             gtk_widget_set_margin_top(group, 10);
-            if (optionDescriptor->desc != nullptr && strlen(optionDescriptor->desc) > 0)
+            auto description = m_Rewriter->GetDescription(optionIndex, optionDescriptor->desc);
+            if (description != nullptr && strlen(description) > 0)
             {
-                adw_preferences_group_set_description(ADW_PREFERENCES_GROUP(group), optionDescriptor->desc);
+                adw_preferences_group_set_description(ADW_PREFERENCES_GROUP(group), description);
             }
 
             pendingGroup = group;
-            parent = group;
             break;
         }
 
         case SANE_TYPE_BUTTON:
         {
-            auto *button = gtk_button_new_with_label(optionDescriptor->title);
-            if (optionDescriptor->desc != nullptr && strlen(optionDescriptor->desc) > 0)
+            auto title = m_Rewriter->GetTitle(optionIndex, optionDescriptor->title);
+            auto *button = gtk_button_new_with_label(title);
+            auto description = m_Rewriter->GetDescription(optionIndex, optionDescriptor->desc);
+            if (description != nullptr && strlen(description) > 0)
             {
-                gtk_widget_set_tooltip_text(button, optionDescriptor->desc);
+                gtk_widget_set_tooltip_text(button, description);
             }
 
-            if (optionValue->IsDisplayOnly())
+            auto isDisplayOnly = m_Rewriter->IsDisplayOnly(optionIndex, optionValue->IsDisplayOnly());
+            if (isDisplayOnly)
             {
                 gtk_widget_set_sensitive(button, false);
             }
@@ -571,7 +594,7 @@ GtkWidget *ZooScan::DeviceOptionsPanel::AddOptionRow(
             break;
     }
 
-    return parent;
+    return {parent, pendingGroup};
 }
 
 void ZooScan::DeviceOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
@@ -611,16 +634,15 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     auto saneType = option->GetValueType();
 
     auto *dropDown = ADW_COMBO_ROW(widget);
-    auto selectedItem = G_OBJECT(adw_combo_row_get_selected_item(dropDown));
+    auto selectedItem = adw_combo_row_get_selected(dropDown);
     if (saneType == SANE_TYPE_FIXED)
     {
-        // FIXME: drop down item should have the real value so we don't need to parse it
-        auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(selectedItem));
-        auto value = std::stod(itemName);
-        auto fixedValue = SANE_FIX(value);
+        auto valueList = option->GetNumberList();
+        selectedItem = std::min(selectedItem + 1, static_cast<guint>(valueList[0]));
+        auto value = valueList[selectedItem];
         try
         {
-            m_Dispatcher.Dispatch(ChangeOptionCommand<int>(optionIndex, valueIndex, fixedValue));
+            m_Dispatcher.Dispatch(ChangeOptionCommand(optionIndex, valueIndex, value));
         }
         catch (std::runtime_error &e)
         {
@@ -629,12 +651,12 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     }
     else if (saneType == SANE_TYPE_INT)
     {
-        // FIXME: drop down item should have the real value so we don't need to parse it
-        auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(selectedItem));
-        auto value = std::stoi(itemName);
+        auto valueList = option->GetNumberList();
+        selectedItem = std::min(selectedItem + 1, static_cast<guint>(valueList[0]));
+        auto value = valueList[selectedItem];
         try
         {
-            m_Dispatcher.Dispatch(ChangeOptionCommand<int>(optionIndex, valueIndex, value));
+            m_Dispatcher.Dispatch(ChangeOptionCommand(optionIndex, valueIndex, value));
         }
         catch (std::runtime_error &e)
         {
@@ -643,10 +665,11 @@ void ZooScan::DeviceOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     }
     else if (saneType == SANE_TYPE_STRING)
     {
-        auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(selectedItem));
+        auto valueList = option->GetStringList();
+        auto value = valueList[selectedItem];
         try
         {
-            m_Dispatcher.Dispatch(ChangeOptionCommand<std::string>(optionIndex, valueIndex, itemName));
+            m_Dispatcher.Dispatch(ChangeOptionCommand<std::string>(optionIndex, valueIndex, value));
         }
         catch (std::runtime_error &e)
         {

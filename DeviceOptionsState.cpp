@@ -306,7 +306,7 @@ void ZooScan::DeviceOptionsState::Updater::DeserializeAndApply(const nlohmann::j
         auto device = json["device"];
         if (device.contains("name"))
         {
-            if (strcmp(saneDevice->Name(), device["name"].get<std::string>().c_str()) != 0)
+            if (strcmp(saneDevice->GetName(), device["name"].get<std::string>().c_str()) != 0)
             {
                 return;
             }
@@ -726,10 +726,10 @@ nlohmann::json *ZooScan::DeviceOptionsState::Serialize() const
 
     auto json = new nlohmann::json();
 
-    (*json)["device"]["name"] = device->Name();
-    (*json)["device"]["vendor"] = device->Vendor();
-    (*json)["device"]["model"] = device->Model();
-    (*json)["device"]["type"] = device->Type();
+    (*json)["device"]["name"] = device->GetName();
+    (*json)["device"]["vendor"] = device->GetVendor();
+    (*json)["device"]["model"] = device->GetModel();
+    (*json)["device"]["type"] = device->GetType();
 
     (*json)["options"] = nlohmann::json::object();
     for (auto optionValue: m_OptionValues)

@@ -13,6 +13,9 @@ namespace ZooScan
             Batch,
         };
 
+    private:
+        const bool m_DevMode;
+
         std::string m_OptionPanelDeviceName{};
         AppMode m_AppMode{};
 
@@ -20,8 +23,9 @@ namespace ZooScan
         bool m_IsPreviewing{};
 
     public:
-        explicit AppState(ZooLib::State *state)
+        explicit AppState(ZooLib::State *state, bool devMode)
             : StateComponent(state)
+            , m_DevMode(devMode)
         {
         }
 
@@ -37,6 +41,11 @@ namespace ZooScan
         [[nodiscard]] AppMode GetAppMode() const
         {
             return m_AppMode;
+        }
+
+        [[nodiscard]] bool IsDeveloperMode() const
+        {
+            return m_DevMode;
         }
 
         [[nodiscard]] bool IsScanning() const

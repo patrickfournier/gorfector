@@ -264,7 +264,7 @@ namespace ZooScan
                 return nullptr;
             }
 
-            return saneDevice->Model();
+            return saneDevice->GetModel();
         }
 
         [[nodiscard]] const char *GetDeviceMaker() const
@@ -275,7 +275,7 @@ namespace ZooScan
                 return nullptr;
             }
 
-            return saneDevice->Vendor();
+            return saneDevice->GetVendor();
         }
 
         [[nodiscard]] size_t GetOptionCount() const

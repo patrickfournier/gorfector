@@ -23,7 +23,7 @@
 #include "ZooLib/SignalSupport.hpp"
 
 
-ZooScan::App::App()
+ZooScan::App::App(int argc, char **argv)
 {
     SANE_Int saneVersion;
     if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
@@ -35,7 +35,16 @@ ZooScan::App::App()
     auto prefFilePath = std::filesystem::path(g_get_user_config_dir()) / k_ApplicationId / "preferences.json";
     m_State.SetFilePath(prefFilePath);
 
-    m_AppState = new AppState(&m_State);
+    bool devMode{};
+    for (int i = 1; i < argc; ++i)
+    {
+        if (std::strcmp(argv[i], "--dev") == 0)
+        {
+            devMode = true;
+        }
+    }
+
+    m_AppState = new AppState(&m_State, devMode);
 
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);
@@ -194,7 +203,7 @@ void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
     auto preferencePages = ZooLib::View::Create<PreferencesView>(
             this, &m_Dispatcher, FileWriter::GetFormatByType<TiffWriter>()->GetStateComponent(),
             FileWriter::GetFormatByType<PngWriter>()->GetStateComponent(),
-            FileWriter::GetFormatByType<JpegWriter>()->GetStateComponent());
+            FileWriter::GetFormatByType<JpegWriter>()->GetStateComponent(), m_DeviceSelectorState);
     for (const auto &page: preferencePages->GetPreferencePages())
     {
         adw_preferences_dialog_add(ADW_PREFERENCES_DIALOG(dialog), ADW_PREFERENCES_PAGE(page));

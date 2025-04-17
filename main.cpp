@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     signal(SIGTERM, SignalHandler);
     signal(SIGKILL, SignalHandler);
 
-    app = new ZooScan::App();
+    app = new ZooScan::App(argc, argv);
     app->Initialize();
     auto retVal = app->Run();
     delete app;

@@ -2,6 +2,7 @@
 
 #include <sane/sane.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "SaneException.hpp"
 
@@ -68,22 +69,22 @@ namespace ZooScan
             m_Handle = nullptr;
         }
 
-        [[nodiscard]] const char *Name() const
+        [[nodiscard]] const char *GetName() const
         {
             return m_Device->name;
         }
 
-        [[nodiscard]] const char *Vendor() const
+        [[nodiscard]] const char *GetVendor() const
         {
             return m_Device->vendor;
         }
 
-        [[nodiscard]] const char *Model() const
+        [[nodiscard]] const char *GetModel() const
         {
             return m_Device->model;
         }
 
-        [[nodiscard]] const char *Type() const
+        [[nodiscard]] const char *GetType() const
         {
             return m_Device->type;
         }
@@ -204,6 +205,44 @@ namespace ZooScan
             {
                 throw SaneException("Failed to get parameters.");
             }
+        }
+
+        [[nodiscard]] static bool IsDisplayOnly(const SANE_Option_Descriptor &optionDescriptor)
+        {
+            auto caps = optionDescriptor.cap;
+            return (caps & SANE_CAP_SOFT_DETECT) && !(caps & SANE_CAP_SOFT_SELECT) && !(caps & SANE_CAP_HARD_SELECT);
+        }
+
+        [[nodiscard]] static bool ShouldHide(const SANE_Option_Descriptor &optionDescriptor)
+        {
+            auto caps = optionDescriptor.cap;
+            bool notSettable = (caps & SANE_CAP_INACTIVE) || (caps & SANE_CAP_HARD_SELECT);
+
+            if (notSettable)
+                return true;
+
+            bool hideBecauseOfTitle =
+                    optionDescriptor.title != nullptr && (strcasestr(optionDescriptor.title, "deprecat") != nullptr ||
+                                                          strcasestr(optionDescriptor.title, "preview") != nullptr);
+
+            if (hideBecauseOfTitle)
+                return true;
+
+            bool hideBecauseOfDesc =
+                    optionDescriptor.desc != nullptr && (strcasestr(optionDescriptor.desc, "deprecat") != nullptr ||
+                                                         strcasestr(optionDescriptor.desc, "preview") != nullptr);
+
+            return hideBecauseOfDesc;
+        }
+
+        [[nodiscard]] static bool IsSoftwareSettable(const SANE_Option_Descriptor &optionDescriptor)
+        {
+            return (optionDescriptor.cap & SANE_CAP_SOFT_SELECT);
+        }
+
+        [[nodiscard]] static bool IsAdvanced(const SANE_Option_Descriptor &optionDescriptor)
+        {
+            return (optionDescriptor.cap & SANE_CAP_ADVANCED);
         }
     };
 }
