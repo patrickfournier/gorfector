@@ -1,0 +1,602 @@
+{
+  "devices": [
+    {
+      "model": "Perfection V600 Photo",
+      "vendor": "Epson"
+    }
+  ],
+  "option_hash": "9db442de88357ebf",
+  "options": [
+    {
+      "comment": "<no name> ()",
+      "description": "",
+      "flags": [],
+      "id": 1,
+      "string_list": [],
+      "title": "Scan Mode"
+    },
+    {
+      "comment": "mode ()",
+      "description": "Selects the scan mode.",
+      "flags": [],
+      "id": 2,
+      "string_list": [
+        "Black and White",
+        "Gray",
+        "Color"
+      ],
+      "title": "Scan Mode"
+    },
+    {
+      "comment": "depth ()",
+      "description": "Number of bits per sample.",
+      "flags": [],
+      "id": 3,
+      "string_list": [],
+      "title": "Bit Depth"
+    },
+    {
+      "comment": "halftoning ()",
+      "description": "Selects the halftone.",
+      "flags": [],
+      "id": 4,
+      "string_list": [
+        "None",
+        "Halftone A (Hard Tone)",
+        "Halftone B (Soft Tone)",
+        "Halftone C (Net Screen)"
+      ],
+      "title": "Halftoning"
+    },
+    {
+      "comment": "dropout (advanced)",
+      "description": "Selects the dropout.",
+      "flags": [],
+      "id": 5,
+      "string_list": [
+        "None",
+        "Red",
+        "Green",
+        "Blue"
+      ],
+      "title": "Dropout"
+    },
+    {
+      "comment": "brightness-method (advanced)",
+      "description": "Selects the method to change the brightness of the acquired image.",
+      "flags": [],
+      "id": 6,
+      "string_list": [
+        "iscan",
+        "gimp"
+      ],
+      "title": "Brightness Method"
+    },
+    {
+      "comment": "brightness ()",
+      "description": "Controls the brightness of the acquired image.",
+      "flags": [],
+      "id": 7,
+      "string_list": [],
+      "title": "Brightness"
+    },
+    {
+      "comment": "contrast ()",
+      "description": "Controls the contrast of the acquired image.",
+      "flags": [],
+      "id": 8,
+      "string_list": [],
+      "title": "Contrast"
+    },
+    {
+      "comment": "sharpness ()",
+      "description": "",
+      "flags": [],
+      "id": 9,
+      "string_list": [],
+      "title": "Sharpness"
+    },
+    {
+      "comment": "gamma-correction ()",
+      "description": "Selects the gamma correction value.",
+      "flags": [],
+      "id": 10,
+      "string_list": [
+        "1.0",
+        "1.8"
+      ],
+      "title": "Gamma Correction"
+    },
+    {
+      "comment": "color-correction (advanced)",
+      "description": "Sets the color correction table for the selected output device.",
+      "flags": [],
+      "id": 11,
+      "string_list": [
+        "User defined"
+      ],
+      "title": "Color correction"
+    },
+    {
+      "comment": "resolution ()",
+      "description": "Sets the resolution of the scanned image.",
+      "flags": [],
+      "id": 12,
+      "string_list": [],
+      "title": "Resolution"
+    },
+    {
+      "comment": "x-resolution (advanced)",
+      "description": "Sets the horizontal resolution of the scanned image.",
+      "flags": [],
+      "id": 13,
+      "string_list": [],
+      "title": "Horizontal Resolution"
+    },
+    {
+      "comment": "y-resolution (advanced)",
+      "description": "Sets the vertical resolution of the scanned image.",
+      "flags": [],
+      "id": 14,
+      "string_list": [],
+      "title": "Vertical Resolution"
+    },
+    {
+      "comment": "threshold ()",
+      "description": "Sets the minimum brightness to get a white pixel.",
+      "flags": [],
+      "id": 15,
+      "string_list": [],
+      "title": "Threshold"
+    },
+    {
+      "comment": "<no name> (advanced)",
+      "description": "",
+      "flags": [],
+      "id": 16,
+      "string_list": [],
+      "title": "Advanced"
+    },
+    {
+      "comment": "mirror ()",
+      "description": "Mirror the image.",
+      "flags": [],
+      "id": 17,
+      "string_list": [],
+      "title": "Mirror image"
+    },
+    {
+      "comment": "speed ()",
+      "description": "Determines the speed at which the scan proceeds.",
+      "flags": ["ForceHidden"],
+      "id": 18,
+      "string_list": [],
+      "title": "Scan speed"
+    },
+    {
+      "comment": "auto-area-segmentation ()",
+      "description": "",
+      "flags": [],
+      "id": 19,
+      "string_list": [],
+      "title": "Automatic Area Segmentation"
+    },
+    {
+      "comment": "short-resolution ()",
+      "description": "Display short resolution list",
+      "flags": ["ForceHidden"],
+      "id": 20,
+      "string_list": [],
+      "title": "Short resolution list"
+    },
+    {
+      "comment": "zoom ()",
+      "description": "Defines the zoom factor the scanner will use",
+      "flags": [],
+      "id": 21,
+      "string_list": [],
+      "title": "Zoom"
+    },
+    {
+      "comment": "red-gamma-table ()",
+      "description": "Gamma-correction table for the red band.",
+      "flags": [],
+      "id": 22,
+      "string_list": [],
+      "title": "Red intensity"
+    },
+    {
+      "comment": "green-gamma-table ()",
+      "description": "Gamma-correction table for the green band.",
+      "flags": [],
+      "id": 23,
+      "string_list": [],
+      "title": "Green intensity"
+    },
+    {
+      "comment": "blue-gamma-table ()",
+      "description": "Gamma-correction table for the blue band.",
+      "flags": [],
+      "id": 24,
+      "string_list": [],
+      "title": "Blue intensity"
+    },
+    {
+      "comment": "wait-for-button (advanced)",
+      "description": "After sending the scan command, wait until the button on the scanner is pressed to actually start the scan process.",
+      "flags": [],
+      "id": 25,
+      "string_list": [],
+      "title": "Wait for Button"
+    },
+    {
+      "comment": "monitor-button (advanced, display only)",
+      "description": "Indicates whether a button on the scanner has been pressed.",
+      "flags": ["ForceHidden"],
+      "id": 26,
+      "string_list": [],
+      "title": "Monitor Button"
+    },
+    {
+      "comment": "polling-time (advanced, display only)",
+      "description": "Time between queries when waiting for device state changes.",
+      "flags": ["ForceHidden"],
+      "id": 27,
+      "string_list": [],
+      "title": "Polling Time"
+    },
+    {
+      "comment": "needs-polling (advanced, display only)",
+      "description": "Indicates whether the scanner needs to poll.",
+      "flags": ["ForceHidden"],
+      "id": 28,
+      "string_list": [],
+      "title": "Needs Polling"
+    },
+    {
+      "comment": "<no name> (advanced)",
+      "description": "Matrix multiplication of RGB values.",
+      "flags": [],
+      "id": 29,
+      "string_list": [],
+      "title": "Color Correction Coefficients"
+    },
+    {
+      "comment": "cct-1 (advanced)",
+      "description": "Controls red level",
+      "flags": [],
+      "id": 30,
+      "string_list": [],
+      "title": "Red"
+    },
+    {
+      "comment": "cct-2 (advanced)",
+      "description": "Adds to red based on green level",
+      "flags": [],
+      "id": 31,
+      "string_list": [],
+      "title": "Shift Green to Red"
+    },
+    {
+      "comment": "cct-3 (advanced)",
+      "description": "Adds to red based on blue level",
+      "flags": [],
+      "id": 32,
+      "string_list": [],
+      "title": "Shift Blue to Red"
+    },
+    {
+      "comment": "cct-4 (advanced)",
+      "description": "Adds to green based on red level",
+      "flags": [],
+      "id": 33,
+      "string_list": [],
+      "title": "Shift Red to Green"
+    },
+    {
+      "comment": "cct-5 (advanced)",
+      "description": "Controls green level",
+      "flags": [],
+      "id": 34,
+      "string_list": [],
+      "title": "Green"
+    },
+    {
+      "comment": "cct-6 (advanced)",
+      "description": "Adds to green based on blue level",
+      "flags": [],
+      "id": 35,
+      "string_list": [],
+      "title": "Shift Blue to Green"
+    },
+    {
+      "comment": "cct-7 (advanced)",
+      "description": "Adds to blue based on red level",
+      "flags": [],
+      "id": 36,
+      "string_list": [],
+      "title": "Shift Red to Blue"
+    },
+    {
+      "comment": "cct-8 (advanced)",
+      "description": "Adds to blue based on green level",
+      "flags": [],
+      "id": 37,
+      "string_list": [],
+      "title": "Shift Green to Blue"
+    },
+    {
+      "comment": "cct-9 (advanced)",
+      "description": "Control blue level",
+      "flags": [],
+      "id": 38,
+      "string_list": [],
+      "title": "Blue"
+    },
+    {
+      "comment": "<no name> (advanced)",
+      "description": "",
+      "flags": [],
+      "id": 39,
+      "string_list": [],
+      "title": "Preview"
+    },
+    {
+      "comment": "preview ()",
+      "description": "Request a preview-quality scan.",
+      "flags": [],
+      "id": 40,
+      "string_list": [],
+      "title": "Preview"
+    },
+    {
+      "comment": "preview-speed ()",
+      "description": "",
+      "flags": ["ForceHidden"],
+      "id": 41,
+      "string_list": [],
+      "title": "Speed"
+    },
+    {
+      "comment": "<no name> (advanced)",
+      "description": "",
+      "flags": [],
+      "id": 42,
+      "string_list": [],
+      "title": "Geometry"
+    },
+    {
+      "comment": "scan-area ()",
+      "description": "Select the area to scan based on common media sizes.",
+      "flags": [],
+      "id": 43,
+      "string_list": [
+        "Maximum",
+        "A4",
+        "A5 Landscape",
+        "A5 Portrait",
+        "B5",
+        "Letter",
+        "Executive",
+        "CD"
+      ],
+      "title": "Scan Area"
+    },
+    {
+      "comment": "tl-x ()",
+      "description": "Top-left x position of scan area.",
+      "flags": [],
+      "id": 44,
+      "string_list": [],
+      "title": "Top Left X"
+    },
+    {
+      "comment": "tl-y ()",
+      "description": "Top-left y position of scan area.",
+      "flags": [],
+      "id": 45,
+      "string_list": [],
+      "title": "Top Left Y"
+    },
+    {
+      "comment": "br-x ()",
+      "description": "Bottom-right x position of scan area.",
+      "flags": [],
+      "id": 46,
+      "string_list": [],
+      "title": "Bottom Right X"
+    },
+    {
+      "comment": "br-y ()",
+      "description": "Bottom-right y position of scan area.",
+      "flags": [],
+      "id": 47,
+      "string_list": [],
+      "title": "Bottom Right Y"
+    },
+    {
+      "comment": "quick-format ()",
+      "description": "Select an area to scan based on well-known media sizes. (DEPRECATED)",
+      "flags": [],
+      "id": 48,
+      "string_list": [
+        "Maximum",
+        "A4",
+        "A5 Landscape",
+        "A5 Portrait",
+        "B5",
+        "Letter",
+        "Executive",
+        "CD"
+      ],
+      "title": "Quick format"
+    },
+    {
+      "comment": "<no name> (advanced)",
+      "description": "",
+      "flags": [],
+      "id": 49,
+      "string_list": [],
+      "title": "Optional equipment"
+    },
+    {
+      "comment": "source ()",
+      "description": "Selects the scan source.",
+      "flags": [],
+      "id": 50,
+      "string_list": [
+        "Flatbed",
+        "Transparency Unit"
+      ],
+      "title": "Scan Source"
+    },
+    {
+      "comment": "auto-eject ()",
+      "description": "Eject document after scanning",
+      "flags": [],
+      "id": 51,
+      "string_list": [],
+      "title": "Auto eject"
+    },
+    {
+      "comment": "film-type ()",
+      "description": "",
+      "flags": [],
+      "id": 52,
+      "string_list": [
+        "Positive Film",
+        "Negative Film"
+      ],
+      "title": "Film type"
+    },
+    {
+      "comment": "focus-position (advanced)",
+      "description": "Sets the focus position to either the glass or 2.5mm above the glass",
+      "flags": [],
+      "id": 53,
+      "string_list": [
+        "Focus on glass",
+        "Focus 2.5mm above glass"
+      ],
+      "title": "Focus Position"
+    },
+    {
+      "comment": "bay ()",
+      "description": "Select bay to scan",
+      "flags": [],
+      "id": 54,
+      "string_list": [
+        " 1 ",
+        " 2 ",
+        " 3 ",
+        " 4 ",
+        " 5 ",
+        " 6 "
+      ],
+      "title": "Bay"
+    },
+    {
+      "comment": "eject ()",
+      "description": "Eject the sheet in the ADF",
+      "flags": [],
+      "id": 55,
+      "string_list": [],
+      "title": "Eject"
+    },
+    {
+      "comment": "adf-mode ()",
+      "description": "Selects the ADF mode (simplex/duplex)",
+      "flags": [],
+      "id": 56,
+      "string_list": [
+        "Simplex",
+        "Duplex"
+      ],
+      "title": "ADF Mode"
+    },
+    {
+      "comment": "detect-doc-size (advanced)",
+      "description": "Activates document size auto-detection.  The scan area will be set to match the detected document size.",
+      "flags": [],
+      "id": 57,
+      "string_list": [],
+      "title": "Auto-detect document size"
+    },
+    {
+      "comment": "scan-area-is-valid (advanced, display only)",
+      "description": "Indicates whether the current scan area settings are valid.",
+      "flags": ["ForceHidden"],
+      "id": 58,
+      "string_list": [],
+      "title": "Scan Area Is Valid"
+    },
+    {
+      "comment": "adf-auto-scan (advanced)",
+      "description": "Skips per sheet device setup for faster throughput.",
+      "flags": [],
+      "id": 59,
+      "string_list": [],
+      "title": "ADF Auto Scan"
+    },
+    {
+      "comment": "double-feed-detection-sensitivity (advanced)",
+      "description": "Sets the sensitivity with which multi-sheet page feeds are detected and reported as errors.",
+      "flags": [],
+      "id": 60,
+      "string_list": [
+        "None",
+        "Low",
+        "High"
+      ],
+      "title": "Double Feed Detection Sensitivity"
+    },
+    {
+      "comment": "ext-sane-status (advanced, display only)",
+      "description": "Ugly kludge to provide additional status message strings to a frontend.",
+      "flags": ["ForceHidden"],
+      "id": 61,
+      "string_list": [],
+      "title": "Extended SANE Status"
+    },
+    {
+      "comment": "adf-duplex-direction-matches (advanced, display only)",
+      "description": "Indicates whether the device's ADF duplex mode, if available, scans in the same direction for the front and back.",
+      "flags": [],
+      "id": 62,
+      "string_list": [],
+      "title": "ADF Duplex Direction Matches"
+    },
+    {
+      "comment": "deskew (advanced)",
+      "description": "Rotate image so it appears upright.",
+      "flags": [],
+      "id": 63,
+      "string_list": [],
+      "title": "Deskew"
+    },
+    {
+      "comment": "autocrop (advanced)",
+      "description": "Determines empty margins in the scanned image and removes them.  This normally reduces the image to the size of the original document but may remove more.",
+      "flags": [],
+      "id": 64,
+      "string_list": [],
+      "title": "Trim image to paper size"
+    },
+    {
+      "comment": "calibrate (advanced)",
+      "description": "Performs color matching to make sure that the document's color tones are scanned correctly.",
+      "flags": [],
+      "id": 65,
+      "string_list": [],
+      "title": "Calibrate"
+    },
+    {
+      "comment": "clean (advanced)",
+      "description": "Cleans the scanners reading section.",
+      "flags": [],
+      "id": 66,
+      "string_list": [],
+      "title": "Clean"
+    }
+  ]
+}

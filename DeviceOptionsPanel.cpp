@@ -1,8 +1,10 @@
 #include "DeviceOptionsPanel.hpp"
+
 #include <memory>
 #include <utility>
+
 #include "Commands/ChangeOptionCommand.hpp"
-#include "OptionRewriter/EpsonPerfectionV600PhotoRewriter.hpp"
+#include "OptionRewriter.hpp"
 #include "SaneDevice.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/ErrorDialog.hpp"
@@ -297,7 +299,12 @@ ZooScan::DeviceOptionsPanel::DeviceOptionsPanel(
     if (m_DeviceName.empty())
         return;
 
-    m_Rewriter = new EpsonPerfectionV600PhotoRewriter();
+    m_Rewriter = new OptionRewriter();
+    auto device = m_App->GetDeviceByName(m_DeviceName);
+    if (device != nullptr)
+    {
+        m_Rewriter->LoadOptionDescriptionFile(device->GetVendor(), device->GetModel());
+    }
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
 
@@ -371,12 +378,11 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
 
     m_PageBasic = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     adw_view_stack_add_titled_with_icon(
-            ADW_VIEW_STACK(m_OptionParent), m_PageBasic, "basic", "Basic", "settings-symbolic");
+            ADW_VIEW_STACK(m_OptionParent), m_PageBasic, "basic", "Basic", "scanner-symbolic");
 
     m_PageAdvanced = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     adw_view_stack_add_titled_with_icon(
-            ADW_VIEW_STACK(m_OptionParent), m_PageAdvanced, "advanced", "Advanced",
-            "settings-symbolic"); // FIXME use wrench-wide-symbolic
+            ADW_VIEW_STACK(m_OptionParent), m_PageAdvanced, "advanced", "Advanced", "scanner-symbolic");
 
     auto commonOptionIndices = AddCommonOptions();
     AddOtherOptions(commonOptionIndices);
@@ -409,21 +415,10 @@ std::vector<uint32_t> ZooScan::DeviceOptionsPanel::AddCommonOptions()
     AddOptionRow(m_DeviceOptions->BRXIndex(), expander, nullptr, false, false);
     AddOptionRow(m_DeviceOptions->BRYIndex(), expander, nullptr, false, false);
 
-    if (m_DeviceOptions->ModeIndex() != DeviceOptionsState::k_InvalidIndex)
-    {
-        AddOptionRow(m_DeviceOptions->ModeIndex(), optionGroup, nullptr, false, false);
-    }
-
-    if (m_DeviceOptions->BitDepthIndex() != DeviceOptionsState::k_InvalidIndex)
-    {
-        AddOptionRow(m_DeviceOptions->BitDepthIndex(), optionGroup, nullptr, false, false);
-    }
-
     return std::vector{m_DeviceOptions->ResolutionIndex(),  m_DeviceOptions->XResolutionIndex(),
                        m_DeviceOptions->YResolutionIndex(), m_DeviceOptions->TLXIndex(),
                        m_DeviceOptions->TLYIndex(),         m_DeviceOptions->BRXIndex(),
-                       m_DeviceOptions->BRYIndex(),         m_DeviceOptions->ModeIndex(),
-                       m_DeviceOptions->BitDepthIndex()};
+                       m_DeviceOptions->BRYIndex()};
 }
 
 void ZooScan::DeviceOptionsPanel::AddOtherOptions(const std::vector<uint32_t> &excludeIndices)

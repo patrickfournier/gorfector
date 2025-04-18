@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "OptionRewriter/OptionRewriter.hpp"
+#include "OptionRewriter.hpp"
 #include "SaneDevice.hpp"
 #include "ZooLib/StateComponent.hpp"
 

@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <sane/sane.h>
 
-#include "OptionRewriter/OptionRewriter.hpp"
+#include "SaneDevice.hpp"
 
 namespace ZooScan
 {
