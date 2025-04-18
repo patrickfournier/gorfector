@@ -4,6 +4,7 @@
 #include "Commands/SetPanCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "Commands/SetZoomCommand.hpp"
+#include "Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 enum class ScanAreaCursorRegions
@@ -40,7 +41,7 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
-    auto label = gtk_label_new("Zoom:");
+    auto label = gtk_label_new(_("Zoom:"));
     gtk_box_append(GTK_BOX(box), label);
 
     m_ZoomDropDown = gtk_drop_down_new_from_strings(PreviewState::k_ZoomValueStrings);
@@ -746,7 +747,7 @@ void ZooScan::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions
             auto text = m_PreviewState->GetProgressText();
             if (text.empty())
             {
-                text = "Progress: ";
+                text = _("Progress: ");
             }
             else
             {

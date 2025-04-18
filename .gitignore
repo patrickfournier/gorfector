@@ -37,3 +37,7 @@
 
 # CMake
 /cmake-build-*
+
+# Gettext
+/locale/messages.pot
+/locale/*/LC_MESSAGES/messages.mo

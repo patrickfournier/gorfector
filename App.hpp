@@ -84,7 +84,6 @@ namespace ZooScan
         void RestoreScanOptions() const;
 
         void OnScanClicked(GtkWidget *widget);
-        void StartScan();
         void UpdateScan();
         void StopScan();
 

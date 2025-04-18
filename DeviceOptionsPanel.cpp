@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "Commands/ChangeOptionCommand.hpp"
+#include "Gettext.hpp"
 #include "OptionRewriter.hpp"
 #include "SaneDevice.hpp"
 #include "ViewUpdateObserver.hpp"
@@ -18,17 +19,17 @@ const char *ZooScan::DeviceOptionsPanel::SaneUnitToString(SANE_Unit unit)
         case SANE_UNIT_NONE:
             return nullptr;
         case SANE_UNIT_PIXEL:
-            return "px";
+            return _("px");
         case SANE_UNIT_BIT:
-            return "bit";
+            return _("bit");
         case SANE_UNIT_MM:
-            return "mm";
+            return _("mm");
         case SANE_UNIT_DPI:
-            return "DPI";
+            return _("DPI");
         case SANE_UNIT_PERCENT:
-            return "%%";
+            return _("%%");
         case SANE_UNIT_MICROSECOND:
-            return "ms";
+            return _("μs");
         default:
             return nullptr;
     }
@@ -86,9 +87,9 @@ void ZooScan::DeviceOptionsPanel::AddCheckButton(
     auto title = m_Rewriter->GetTitle(settingIndex, option->GetTitle());
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkButton), title);
     auto description = m_Rewriter->GetDescription(settingIndex, option->GetDescription());
-    if (option->GetDescription() != nullptr && strlen(option->GetDescription()) > 0)
+    if (description != nullptr && strlen(description) > 0)
     {
-        adw_action_row_set_subtitle(ADW_ACTION_ROW(checkButton), option->GetDescription());
+        adw_action_row_set_subtitle(ADW_ACTION_ROW(checkButton), description);
     }
     adw_switch_row_set_active(ADW_SWITCH_ROW(checkButton), boolOption->GetValue() != 0);
 
@@ -229,12 +230,21 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
     auto title(m_Rewriter->GetTitle(settingIndex, option->GetTitle()));
     auto description(m_Rewriter->GetDescription(settingIndex, option->GetDescription()));
     auto stringList = option->GetStringList();
-    auto rewrittenStringList = m_Rewriter->GetStringList(settingIndex, stringList);
     auto value = strOption->GetValue();
 
     GtkWidget *valueWidget = nullptr;
     if (stringList != nullptr)
     {
+        auto stringListLen = 0;
+        while (stringList[stringListLen] != nullptr)
+        {
+            stringListLen++;
+        }
+        stringListLen++; // for the nullptr element
+
+        auto rewrittenStringList = new SANE_String_Const[stringListLen];
+        m_Rewriter->GetStringList(settingIndex, stringList, rewrittenStringList);
+
         auto activeIndex = 0;
         auto index = 0;
         while (stringList[index] != nullptr)
@@ -256,6 +266,8 @@ void ZooScan::DeviceOptionsPanel::AddStringRow(
         adw_combo_row_set_model(ADW_COMBO_ROW(valueWidget), G_LIST_MODEL(gStringList));
         adw_combo_row_set_selected(ADW_COMBO_ROW(valueWidget), activeIndex);
         ConnectGtkSignalWithParamSpecs(this, &DeviceOptionsPanel::OnDropDownChanged, valueWidget, "notify::selected");
+
+        delete[] rewrittenStringList;
     }
     else // no constraint
     {
@@ -378,11 +390,11 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
 
     m_PageBasic = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     adw_view_stack_add_titled_with_icon(
-            ADW_VIEW_STACK(m_OptionParent), m_PageBasic, "basic", "Basic", "scanner-symbolic");
+            ADW_VIEW_STACK(m_OptionParent), m_PageBasic, "basic", _("Basic"), "scanner-symbolic");
 
     m_PageAdvanced = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     adw_view_stack_add_titled_with_icon(
-            ADW_VIEW_STACK(m_OptionParent), m_PageAdvanced, "advanced", "Advanced", "scanner-symbolic");
+            ADW_VIEW_STACK(m_OptionParent), m_PageAdvanced, "advanced", _("Advanced"), "scanner-symbolic");
 
     auto commonOptionIndices = AddCommonOptions();
     AddOtherOptions(commonOptionIndices);
@@ -391,7 +403,7 @@ void ZooScan::DeviceOptionsPanel::BuildUI()
 std::vector<uint32_t> ZooScan::DeviceOptionsPanel::AddCommonOptions()
 {
     auto optionGroup = adw_preferences_group_new();
-    adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(optionGroup), "Common Options");
+    adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(optionGroup), _("Common Options"));
     gtk_widget_set_margin_bottom(optionGroup, 10);
     gtk_widget_set_margin_top(optionGroup, 10);
     AddWidgetToParent(m_PageBasic, optionGroup);
@@ -407,7 +419,7 @@ std::vector<uint32_t> ZooScan::DeviceOptionsPanel::AddCommonOptions()
     }
 
     auto *expander = adw_expander_row_new();
-    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(expander), "Scan Area");
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(expander), _("Scan Area"));
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(optionGroup), expander);
 
     AddOptionRow(m_DeviceOptions->TLXIndex(), expander, nullptr, false, false);

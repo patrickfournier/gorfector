@@ -8,6 +8,7 @@
 #include "Commands/SetTiffCompression.hpp"
 #include "Commands/SetTiffDeflateLevel.hpp"
 #include "Commands/SetTiffJpegQuality.hpp"
+#include "Gettext.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "Writers/JpegWriterState.hpp"
 #include "Writers/PngWriterState.hpp"
@@ -40,11 +41,11 @@ namespace ZooScan
         void BuildFileSettingsBox(GtkWidget *parent)
         {
             auto prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), "TIFF Settings");
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("TIFF Settings"));
             adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
 
             m_TiffCompressionAlgo = adw_combo_row_new();
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffCompressionAlgo), "Compression Algorithm");
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffCompressionAlgo), _("Compression Algorithm"));
             auto algos = TiffWriterState::GetCompressionAlgorithmNames();
             adw_combo_row_set_model(
                     ADW_COMBO_ROW(m_TiffCompressionAlgo), G_LIST_MODEL(gtk_string_list_new(algos.data())));
@@ -54,43 +55,42 @@ namespace ZooScan
 
             m_TiffDeflateCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
             adw_preferences_row_set_title(
-                    ADW_PREFERENCES_ROW(m_TiffDeflateCompressionLevel), "Deflate Compression Level");
+                    ADW_PREFERENCES_ROW(m_TiffDeflateCompressionLevel), _("Deflate Compression Level"));
             adw_action_row_set_subtitle(
                     ADW_ACTION_ROW(m_TiffDeflateCompressionLevel),
-                    "0 = no compression, 9 = maximum compression. Higher compression levels may "
-                    "slow down the scanning process.");
+                    _("0 = no compression, 9 = maximum compression. Higher compression levels may slow down the "
+                      "scanning process."));
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffDeflateCompressionLevel);
             ConnectGtkSignalWithParamSpecs(
                     this, &PreferencesView::OnValueChanged, m_TiffDeflateCompressionLevel, "notify::value");
 
             m_TiffJpegQuality = adw_spin_row_new_with_range(0, 100, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffJpegQuality), "JPEG Quality");
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffJpegQuality), _("JPEG Quality"));
             adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(m_TiffJpegQuality), "0 = lowest quality, 100 = maximum quality.");
+                    ADW_ACTION_ROW(m_TiffJpegQuality), _("0 = lowest quality, 100 = maximum quality."));
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffJpegQuality);
             ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_TiffJpegQuality, "notify::value");
 
             prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), "PNG Settings");
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("PNG Settings"));
             adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
 
             m_PngCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_PngCompressionLevel), "Compression Level");
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_PngCompressionLevel), _("Compression Level"));
             adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(m_PngCompressionLevel),
-                    "0 = no compression, 9 = maximum compression. Higher compression levels may "
-                    "slow down the scanning process.");
+                    ADW_ACTION_ROW(m_PngCompressionLevel), _("0 = no compression, 9 = maximum compression. Higher "
+                                                             "compression levels may slow down the scanning process."));
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_PngCompressionLevel);
             ConnectGtkSignalWithParamSpecs(
                     this, &PreferencesView::OnValueChanged, m_PngCompressionLevel, "notify::value");
 
             prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), "JPEG Settings");
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("JPEG Settings"));
             adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
 
             m_JpegQuality = adw_spin_row_new_with_range(0, 100, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_JpegQuality), "Quality");
-            adw_action_row_set_subtitle(ADW_ACTION_ROW(m_JpegQuality), "0 = lowest quality, 100 = maximum quality.");
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_JpegQuality), _("Quality"));
+            adw_action_row_set_subtitle(ADW_ACTION_ROW(m_JpegQuality), _("0 = lowest quality, 100 = maximum quality."));
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_JpegQuality);
             ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_JpegQuality, "notify::value");
 
@@ -137,14 +137,14 @@ namespace ZooScan
         void BuildDeveloperSettingsBox(GtkWidget *parent)
         {
             auto prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), "General");
+            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("General"));
             adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
 
             auto checkbox = adw_switch_row_new();
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkbox), "Dump SANE options");
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkbox), _("Dump SANE options"));
             adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(checkbox), "When selecting a scanner, dump its SANE options to stdout. This is "
-                                              "useful for creating scanner config files.");
+                    ADW_ACTION_ROW(checkbox), _("When selecting a scanner, dump its SANE options to stdout. This is "
+                                                "useful for creating scanner config files."));
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), checkbox);
             ZooLib::ConnectGtkSignalWithParamSpecs(
                     this, &PreferencesView::OnDumpSaneOptionsChanged, checkbox, "notify::active");
@@ -172,12 +172,12 @@ namespace ZooScan
         {
             auto i = 0;
             m_PreferencesPages[i] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "General");
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("General"));
             adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "configure-symbolic");
 
             ++i;
             m_PreferencesPages[i] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "Image Formats");
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Image Formats"));
             adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "emblem-photos-symbolic");
             BuildFileSettingsBox(m_PreferencesPages[i]);
 
@@ -185,7 +185,7 @@ namespace ZooScan
             {
                 ++i;
                 m_PreferencesPages[i] = adw_preferences_page_new();
-                adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "Developer");
+                adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Developer"));
                 adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "diagnostics-symbolic");
                 BuildDeveloperSettingsBox(m_PreferencesPages[i]);
             }

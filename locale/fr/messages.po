@@ -1,0 +1,879 @@
+# French translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# patrick <patrick@patrickfournier.com>, 2025.
+# Patrick Fournier <>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-18 19:17-0400\n"
+"PO-Revision-Date: 2025-04-18 16:57-0400\n"
+"Last-Translator: Patrick Fournier <>\n"
+"Language-Team: French - Canada\n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 46.0\n"
+
+#: entrée standard:163
+msgid " 1 "
+msgstr " 1 "
+
+#: entrée standard:164
+msgid " 2 "
+msgstr " 2 "
+
+#: entrée standard:165
+msgid " 3 "
+msgstr " 3 "
+
+#: entrée standard:166
+msgid " 4 "
+msgstr " 4 "
+
+#: entrée standard:167
+msgid " 5 "
+msgstr " 5 "
+
+#: entrée standard:168
+msgid " 6 "
+msgstr " 6 "
+
+#: DeviceOptionsPanel.cpp:30
+#, c-format
+msgid "%%"
+msgstr "%%"
+
+#: PreferencesView.hpp:70 PreferencesView.hpp:93
+msgid "0 = lowest quality, 100 = maximum quality."
+msgstr "0 = qualité la plus basse, 100 = qualité maximale."
+
+#: PreferencesView.hpp:61 PreferencesView.hpp:81
+msgid ""
+"0 = no compression, 9 = maximum compression. Higher compression levels may "
+"slow down the scanning process."
+msgstr ""
+"0 = pas de compression, 9 = compression maximale. Des niveaux de compression "
+"plus élevés peuvent ralentir le processus de numérisation."
+
+#: entrée standard:138
+msgid "1.0"
+msgstr "1,0"
+
+#: entrée standard:139
+msgid "1.8"
+msgstr "1,8"
+
+#: entrée standard:142 standard:150
+msgid "A4"
+msgstr "A4"
+
+#: entrée standard:143 standard:151
+msgid "A5 Landscape"
+msgstr "A5 Paysage"
+
+#: entrée standard:144 standard:152
+msgid "A5 Portrait"
+msgstr "A5 Portrait"
+
+#: entrée standard:60
+msgid "ADF Auto Scan"
+msgstr "AAD Scan Automatique"
+
+#: entrée standard:63
+msgid "ADF Duplex Direction Matches"
+msgstr "Même direction"
+
+#: entrée standard:57
+msgid "ADF Mode"
+msgstr "Mode AAD"
+
+#: App.cpp:174
+msgid "About..."
+msgstr "À propos..."
+
+#: entrée standard:115
+msgid ""
+"Activates document size auto-detection.  The scan area will be set to match "
+"the detected document size."
+msgstr ""
+"Active la détection automatique de la taille du document. La zone de "
+"numérisation sera définie pour correspondre à la taille détectée du document."
+
+#: entrée standard:100
+msgid "Adds to blue based on green level"
+msgstr "Ajoute au bleu en fonction du niveau de vert"
+
+#: entrée standard:99
+msgid "Adds to blue based on red level"
+msgstr "Ajoute au bleu en fonction du niveau de rouge"
+
+#: entrée standard:98
+msgid "Adds to green based on blue level"
+msgstr "Ajoute au vert en fonction du niveau de bleu"
+
+#: entrée standard:96
+msgid "Adds to green based on red level"
+msgstr "Ajoute au vert en fonction du niveau de rouge"
+
+#: entrée standard:95
+msgid "Adds to red based on blue level"
+msgstr "Ajoute au rouge en fonction du niveau de bleu"
+
+#: entrée standard:94
+msgid "Adds to red based on green level"
+msgstr "Ajoute au rouge en fonction du niveau de vert"
+
+#: DeviceOptionsPanel.cpp:397 entrée standard:17
+msgid "Advanced"
+msgstr "Avancé"
+
+#: entrée standard:88
+msgid ""
+"After sending the scan command, wait until the button on the scanner is "
+"pressed to actually start the scan process."
+msgstr ""
+"Après avoir demandé la numérisation, attendre que le bouton sur le scanner "
+"soit pressé pour commencer la numérisation."
+
+#: App.cpp:581
+msgid "All Files"
+msgstr "Tous les fichiers"
+
+#: App.cpp:231
+msgid "An application to scan images."
+msgstr "Une application pour numériser des images."
+
+#: entrée standard:52
+msgid "Auto eject"
+msgstr "Éjection automatique"
+
+#: entrée standard:58
+msgid "Auto-detect document size"
+msgstr "Détection automatique de la taille du document"
+
+#: entrée standard:20
+msgid "Automatic Area Segmentation"
+msgstr "Segmentation automatique de l'image'"
+
+#: entrée standard:145 standard:153
+msgid "B5"
+msgstr "B5"
+
+#: DeviceOptionsPanel.cpp:393
+msgid "Basic"
+msgstr "Basique"
+
+#: entrée standard:55
+msgid "Bay"
+msgstr "Baie"
+
+#: entrée standard:4
+msgid "Bit Depth"
+msgstr "Profondeur"
+
+#: entrée standard:125
+msgid "Black and White"
+msgstr "Noir et blanc"
+
+#: entrée standard:39 standard:135
+msgid "Blue"
+msgstr "Bleu"
+
+#: entrée standard:25
+msgid "Blue intensity"
+msgstr "Intensité du bleu"
+
+#: entrée standard:47
+msgid "Bottom Right X"
+msgstr "Inférieur droit X"
+
+#: entrée standard:48
+msgid "Bottom Right Y"
+msgstr "Inférieur droit Y"
+
+#: entrée standard:106
+msgid "Bottom-right x position of scan area."
+msgstr "Coordonnée x du coin inférieur droit de la zone de numérisation."
+
+#: entrée standard:107
+msgid "Bottom-right y position of scan area."
+msgstr "Coordonnée y du coin inférieur droit de la zone de numérisation."
+
+#: entrée standard:8
+msgid "Brightness"
+msgstr "Luminosité"
+
+#: entrée standard:7
+msgid "Brightness Method"
+msgstr "Méthode de luminosité"
+
+#: entrée standard:148 standard:156
+msgid "CD"
+msgstr "CD"
+
+#: entrée standard:66
+msgid "Calibrate"
+msgstr "Calibrer"
+
+#: App.cpp:147
+msgid "Cancel Scan"
+msgstr "Annuler la numérisation"
+
+#: App.cpp:623
+msgid "Cannot determine image file format"
+msgstr "Impossible de déterminer le format de fichier image"
+
+#: DeviceSelector.cpp:152
+#, c-format
+msgid "Cannot open scanner %s."
+msgstr "Impossible d'ouvrir le scanner %s."
+
+#: entrée standard:67
+msgid "Clean"
+msgstr ""
+
+#: entrée standard:124
+msgid "Cleans the scanners reading section."
+msgstr ""
+
+#: entrée standard:127
+msgid "Color"
+msgstr "Couleur"
+
+#: entrée standard:30
+msgid "Color Correction Coefficients"
+msgstr "Coefficients de correction des couleurs"
+
+#: entrée standard:12
+msgid "Color correction"
+msgstr "Correction des couleurs"
+
+#: DeviceOptionsPanel.cpp:406
+msgid "Common Options"
+msgstr "Options communes"
+
+#: PreferencesView.hpp:48
+msgid "Compression Algorithm"
+msgstr "Algorithme de compression"
+
+#: PreferencesView.hpp:79
+msgid "Compression Level"
+msgstr "Niveau de compression"
+
+#: entrée standard:9
+msgid "Contrast"
+msgstr "Contraste"
+
+#: entrée standard:101
+msgid "Control blue level"
+msgstr "Contrôle du niveau de bleu"
+
+#: entrée standard:97
+msgid "Controls green level"
+msgstr "Contrôle du niveau de vert"
+
+#: entrée standard:93
+msgid "Controls red level"
+msgstr "Contrôle du niveau de rouge"
+
+#: entrée standard:73
+msgid "Controls the brightness of the acquired image."
+msgstr "Ajuste la luminosité de l'image acquise."
+
+#: entrée standard:74
+msgid "Controls the contrast of the acquired image."
+msgstr "Ajuste le contraste de l'image acquise."
+
+#: DeviceOptionsPanel.cpp:28
+msgid "DPI"
+msgstr "PPP"
+
+#: entrée standard:84
+msgid "Defines the zoom factor the scanner will use"
+msgstr "Définit le facteur de zoom que le scanner utilisera"
+
+#: PreferencesView.hpp:58
+msgid "Deflate Compression Level"
+msgstr "Niveau de compression Deflate"
+
+#: entrée standard:64
+msgid "Deskew"
+msgstr "Correction de désalignement"
+
+#: entrée standard:122
+msgid ""
+"Determines empty margins in the scanned image and removes them.  This "
+"normally reduces the image to the size of the original document but may "
+"remove more."
+msgstr ""
+"Détermine les marges vides de l'image numérisée et les supprime. Cela réduit "
+"normalement l'image à la taille du document d'origine, mais peut en "
+"supprimer davantage."
+
+#: entrée standard:82
+msgid "Determines the speed at which the scan proceeds."
+msgstr "Détermine la vitesse de numérisation."
+
+#: PreferencesView.hpp:188
+msgid "Developer"
+msgstr "Développeur"
+
+#: entrée standard:83
+msgid "Display short resolution list"
+msgstr "Afficher la liste courte des résolutions"
+
+#: entrée standard:61
+msgid "Double Feed Detection Sensitivity"
+msgstr "Sensibilité de détection des doubles feuilles"
+
+#: entrée standard:6
+msgid "Dropout"
+msgstr "Dropout"
+
+#: PreferencesView.hpp:144
+msgid "Dump SANE options"
+msgstr "Imprimer les options SANE"
+
+#: entrée standard:170
+msgid "Duplex"
+msgstr "Recto-verso"
+
+#: entrée standard:56
+msgid "Eject"
+msgstr "Éjecter"
+
+#: entrée standard:110
+msgid "Eject document after scanning"
+msgstr "Éjecter le document après numérisation"
+
+#: entrée standard:113
+msgid "Eject the sheet in the ADF"
+msgstr "Éjecter la feuille dans l'AAD"
+
+#: entrée standard:147 standard:155
+msgid "Executive"
+msgstr "Exécutif"
+
+#: entrée standard:62
+msgid "Extended SANE Status"
+msgstr "État SANE étendu"
+
+#: App.cpp:667
+msgid "Failed to create file: "
+msgstr "Échec de la création du fichier: "
+
+#: entrée standard:53
+msgid "Film Type"
+msgstr "Type de pellicule"
+
+#: entrée standard:157
+msgid "Flatbed"
+msgstr "À plat"
+
+#: entrée standard:162
+msgid "Focus 2.5mm above glass"
+msgstr "Mise au point 2,5 mm au-dessus du verre"
+
+#: entrée standard:54
+msgid "Focus Position"
+msgstr "Position de mise au point"
+
+#: entrée standard:161
+msgid "Focus on glass"
+msgstr "Mise au point sur le verre"
+
+#: entrée standard:11
+msgid "Gamma Correction"
+msgstr "Correction gamma"
+
+#: entrée standard:87
+msgid "Gamma-correction table for the blue band."
+msgstr "Table de correction gamma pour la bande bleue."
+
+#: entrée standard:86
+msgid "Gamma-correction table for the green band."
+msgstr "Table de correction gamma pour la bande verte."
+
+#: entrée standard:85
+msgid "Gamma-correction table for the red band."
+msgstr "Table de correction gamma pour la bande rouge."
+
+#: PreferencesView.hpp:140 PreferencesView.hpp:175
+msgid "General"
+msgstr "Général"
+
+#: entrée standard:43
+msgid "Geometry"
+msgstr "Géométrie"
+
+#: entrée standard:126
+msgid "Gray"
+msgstr "Gris"
+
+#: entrée standard:35 standard:134
+msgid "Green"
+msgstr "Vert"
+
+#: entrée standard:24
+msgid "Green intensity"
+msgstr "Intensité du vert"
+
+#: entrée standard:129
+msgid "Halftone A (Hard Tone)"
+msgstr "Demi-teinte A (ton dur)"
+
+#: entrée standard:130
+msgid "Halftone B (Soft Tone)"
+msgstr "Demi-teinte B (ton doux)"
+
+#: entrée standard:131
+msgid "Halftone C (Net Screen)"
+msgstr "Demi-teinte C (écran fin)"
+
+#: entrée standard:5
+msgid "Halftoning"
+msgstr "Demi-teinte"
+
+#: entrée standard:173
+msgid "High"
+msgstr "Haut"
+
+#: entrée standard:14
+msgid "Horizontal Resolution"
+msgstr "Résolution horizontale"
+
+#: PreferencesView.hpp:180
+msgid "Image Formats"
+msgstr "Formats d'image"
+
+#: DeviceSelector.cpp:38
+msgid "Include Network Scanners"
+msgstr "Inclure les scanners réseau"
+
+#: entrée standard:89
+msgid "Indicates whether a button on the scanner has been pressed."
+msgstr "Indique si un bouton sur le scanner a été pressé."
+
+#: entrée standard:116
+msgid "Indicates whether the current scan area settings are valid."
+msgstr ""
+"Indique si les paramètres de zone de numérisation actuels sont valides."
+
+#: entrée standard:120
+msgid ""
+"Indicates whether the device's ADF duplex mode, if available, scans in the "
+"same direction for the front and back."
+msgstr ""
+"Indique si le mode recto-verso de l'AAD numérise dans la même direction pour "
+"le recto et le verso."
+
+#: entrée standard:91
+msgid "Indicates whether the scanner needs to poll."
+msgstr "Indique si le scanner doit interroger."
+
+#: PreferencesView.hpp:68
+msgid "JPEG Quality"
+msgstr "Qualité JPEG"
+
+#: PreferencesView.hpp:88
+msgid "JPEG Settings"
+msgstr "Paramètres JPEG"
+
+#: entrée standard:146 standard:154
+msgid "Letter"
+msgstr "Lettre"
+
+#: entrée standard:172
+msgid "Low"
+msgstr "Bas"
+
+#: entrée standard:92
+msgid "Matrix multiplication of RGB values."
+msgstr "Multiplication matricielle des valeurs RVB."
+
+#: entrée standard:141 standard:149
+msgid "Maximum"
+msgstr "Maximum"
+
+#: entrée standard:18
+msgid "Mirror image"
+msgstr "Image miroir"
+
+#: entrée standard:81
+msgid "Mirror the image."
+msgstr "Image miroir."
+
+#: entrée standard:27
+msgid "Monitor Button"
+msgstr "Surveiller le bouton"
+
+#: entrée standard:29
+msgid "Needs Polling"
+msgstr "Besoin d'interroger"
+
+#: entrée standard:160
+msgid "Negative Film"
+msgstr "Négatifs"
+
+#: DeviceSelector.cpp:27 DeviceSelector.cpp:162
+msgid "No Scanner Found"
+msgstr "Aucun scanner trouvé"
+
+#: DeviceSelector.cpp:158
+msgid "No scanner found."
+msgstr "Aucun scanner trouvé."
+
+#: DeviceSelector.cpp:107 entrée standard:128 standard:132 standard:171
+msgid "None"
+msgstr "Aucun"
+
+#: entrée standard:69
+msgid "Number of bits per sample."
+msgstr "Nombre de bits par échantillon."
+
+#: entrée standard:50
+msgid "Optional equipment"
+msgstr "Équipement optionnel"
+
+#: PreferencesView.hpp:75
+msgid "PNG Settings"
+msgstr "Paramètres PNG"
+
+#: entrée standard:123
+msgid ""
+"Performs color matching to make sure that the document's color tones are "
+"scanned correctly."
+msgstr ""
+"Effectue une concordance des couleurs pour s'assurer que les teintes de "
+"couleur du document sont numérisées correctement."
+
+#: entrée standard:28
+msgid "Polling Time"
+msgstr "Temps d'interrogation"
+
+#: entrée standard:159
+msgid "Positive Film"
+msgstr "Diapositives"
+
+#: App.cpp:137 entrée standard:40 standard:41
+msgid "Preview"
+msgstr "Aperçu"
+
+#: PreviewPanel.cpp:750
+msgid "Progress: "
+msgstr "Progrès: "
+
+#: PreferencesView.hpp:92
+msgid "Quality"
+msgstr "Qualité"
+
+#: entrée standard:49
+msgid "Quick format"
+msgstr "Format rapide"
+
+#: entrée standard:31 standard:133
+msgid "Red"
+msgstr "Rouge"
+
+#: entrée standard:23
+msgid "Red intensity"
+msgstr "Intensité du rouge"
+
+#: DeviceSelector.cpp:43
+msgid "Refresh Scanner List"
+msgstr "Rafraîchir la liste des scanners"
+
+#: entrée standard:102
+msgid "Request a preview-quality scan."
+msgstr "Demander un scan de qualité aperçu."
+
+#: entrée standard:13
+msgid "Resolution"
+msgstr "Résolution"
+
+#: entrée standard:121
+msgid "Rotate image so it appears upright."
+msgstr "Faire pivoter l'image pour qu'elle apparaisse droite."
+
+#: App.cpp:576
+msgid "Save Scan"
+msgstr "Enregistrer l'image"
+
+#: App.cpp:142
+msgid "Scan"
+msgstr "Numériser"
+
+#: DeviceOptionsPanel.cpp:422 entrée standard:44
+msgid "Scan Area"
+msgstr "Zone de numérisation"
+
+#: entrée standard:59
+msgid "Scan Area Is Valid"
+msgstr "Zone de numérisation valide"
+
+#: entrée standard:2 standard:3
+msgid "Scan Mode"
+msgstr "Méthode de numérisation"
+
+#: entrée standard:51
+msgid "Scan Source"
+msgstr "Source de numérisation"
+
+#: entrée standard:19
+msgid "Scan speed"
+msgstr "Vitesse de numérisation"
+
+#: App.cpp:193
+msgid "Select Device"
+msgstr "Sélectionner le périphérique"
+
+#: App.cpp:166
+msgid "Select Device..."
+msgstr "Sélectionner le périphérique..."
+
+#: DeviceSelector.cpp:31
+msgid "Select Scanner: "
+msgstr "Sélectionner le périphérique: "
+
+#: entrée standard:108
+msgid "Select an area to scan based on well-known media sizes. (DEPRECATED)"
+msgstr ""
+
+#: entrée standard:112
+msgid "Select bay to scan"
+msgstr "Sélectionner la baie à numériser"
+
+#: entrée standard:103
+msgid "Select the area to scan based on common media sizes."
+msgstr ""
+"Sélectionner la zone à numériser en fonction des tailles de support "
+"courantes."
+
+#: entrée standard:114
+msgid "Selects the ADF mode (simplex/duplex)"
+msgstr "Sélectionne le mode AAD (recto/recto-verso)"
+
+#: entrée standard:71
+msgid "Selects the dropout."
+msgstr "Sélectionne le dropout."
+
+#: entrée standard:75
+msgid "Selects the gamma correction value."
+msgstr "Sélectionne la valeur de correction gamma."
+
+#: entrée standard:70
+msgid "Selects the halftone."
+msgstr "Sélectionne a trame."
+
+#: entrée standard:72
+msgid "Selects the method to change the brightness of the acquired image."
+msgstr "Sélectionne la méthode pour changer la luminosité de l'image."
+
+#: entrée standard:68
+msgid "Selects the scan mode."
+msgstr "Sélectionne le mode de numérisation."
+
+#: entrée standard:109
+msgid "Selects the scan source."
+msgstr "Sélectionne la source de numérisation."
+
+#: entrée standard:76
+msgid "Sets the color correction table for the selected output device."
+msgstr ""
+"Définit la table de correction des couleurs pour le périphérique de sortie "
+"sélectionné."
+
+#: entrée standard:111
+msgid "Sets the focus position to either the glass or 2.5mm above the glass"
+msgstr ""
+"Définit la position de mise au point sur le verre ou 2,5 mm au-dessus du "
+"verre"
+
+#: entrée standard:78
+msgid "Sets the horizontal resolution of the scanned image."
+msgstr "Définit la résolution horizontale de l'image numérisée."
+
+#: entrée standard:80
+msgid "Sets the minimum brightness to get a white pixel."
+msgstr "Définit la luminosité minimale pour obtenir un pixel blanc."
+
+#: entrée standard:77
+msgid "Sets the resolution of the scanned image."
+msgstr "Définit la résolution de l'image numérisée."
+
+#: entrée standard:118
+msgid ""
+"Sets the sensitivity with which multi-sheet page feeds are detected and "
+"reported as errors."
+msgstr ""
+"Définit la sensibilité avec laquelle les alimentations de plusieurs feuilles "
+"sont détectées et signalées comme erreurs."
+
+#: entrée standard:79
+msgid "Sets the vertical resolution of the scanned image."
+msgstr "Définit la résolution verticale de l'image numérisée."
+
+#: App.cpp:217
+msgid "Settings"
+msgstr "Paramètres"
+
+#: App.cpp:173
+msgid "Settings..."
+msgstr "Paramètres..."
+
+#: entrée standard:10
+msgid "Sharpness"
+msgstr "Netteté"
+
+#: entrée standard:36
+msgid "Shift Blue to Green"
+msgstr "Pousser le bleu vers le vert"
+
+#: entrée standard:33
+msgid "Shift Blue to Red"
+msgstr "Pousser le bleu vers le rouge"
+
+#: entrée standard:38
+msgid "Shift Green to Blue"
+msgstr "Pousser le vert vers le bleu"
+
+#: entrée standard:32
+msgid "Shift Green to Red"
+msgstr "Pousser le vert vers le rouge"
+
+#: entrée standard:37
+msgid "Shift Red to Blue"
+msgstr "Pousser le rouge vers le bleu"
+
+#: entrée standard:34
+msgid "Shift Red to Green"
+msgstr "Pousser le rouge vers le vert"
+
+#: entrée standard:21
+msgid "Short resolution list"
+msgstr "Liste courte des résolutions"
+
+#: entrée standard:169
+msgid "Simplex"
+msgstr "Recto"
+
+#: entrée standard:117
+msgid "Skips per sheet device setup for faster throughput."
+msgstr ""
+"Sauter la configuration du périphérique par feuille pour un débit plus "
+"rapide."
+
+#: entrée standard:42
+msgid "Speed"
+msgstr "Vitesse"
+
+#: PreferencesView.hpp:44
+msgid "TIFF Settings"
+msgstr "Paramètres TIFF"
+
+#: entrée standard:16
+msgid "Threshold"
+msgstr "Seuil"
+
+#: entrée standard:90
+msgid "Time between queries when waiting for device state changes."
+msgstr ""
+"Temps entre les requêtes lors de l'attente des changements d'état du "
+"périphérique."
+
+#: entrée standard:45
+msgid "Top Left X"
+msgstr "Supérieur gauche X"
+
+#: entrée standard:46
+msgid "Top Left Y"
+msgstr "Supérieur gauche Y"
+
+#: entrée standard:104
+msgid "Top-left x position of scan area."
+msgstr "Coordonnée x du coin supérieur gauche de la zone de numérisation."
+
+#: entrée standard:105
+msgid "Top-left y position of scan area."
+msgstr "Coordonnée y du coin supérieur gauche de la zone de numérisation."
+
+#: entrée standard:158
+msgid "Transparency Unit"
+msgstr "Transparents"
+
+#: entrée standard:65
+msgid "Trim image to paper size"
+msgstr "Rogner l'image à la taille du papier"
+
+#: entrée standard:119
+msgid "Ugly kludge to provide additional status message strings to a frontend."
+msgstr ""
+
+#: App.cpp:502 App.cpp:659
+msgid "Unsupported depth"
+msgstr "Profondeur non prise en charge"
+
+#: App.cpp:710
+msgid "Unsupported file format"
+msgstr "Format de fichier non pris en charge"
+
+#: App.cpp:495 App.cpp:652
+msgid "Unsupported format"
+msgstr "Format non pris en charge"
+
+#: entrée standard:140
+msgid "User defined"
+msgstr "Défini par l'utilisateur"
+
+#: entrée standard:15
+msgid "Vertical Resolution"
+msgstr "Résolution verticale"
+
+#: entrée standard:26
+msgid "Wait for Button"
+msgstr "Attendre le bouton"
+
+#: PreferencesView.hpp:146
+msgid ""
+"When selecting a scanner, dump its SANE options to stdout. This is useful "
+"for creating scanner config files."
+msgstr ""
+"Lors de la sélection d'un scanner, imprimez ses options SANE sur stdout. "
+"Cela est utile pour créer des fichiers de configuration de scanner."
+
+#: entrée standard:22
+msgid "Zoom"
+msgstr "Zoom"
+
+#: PreviewPanel.cpp:44
+msgid "Zoom:"
+msgstr "Zoom:"
+
+#: DeviceOptionsPanel.cpp:24
+msgid "bit"
+msgstr "bit"
+
+#: entrée standard:137
+msgid "gimp"
+msgstr "gimp"
+
+#: entrée standard:136
+msgid "iscan"
+msgstr "iscan"
+
+#: DeviceOptionsPanel.cpp:26
+msgid "mm"
+msgstr "mm"
+
+#: DeviceOptionsPanel.cpp:22
+msgid "px"
+msgstr "px"
+
+#: DeviceOptionsPanel.cpp:32
+msgid "μs"
+msgstr "μs"

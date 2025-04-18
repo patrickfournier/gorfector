@@ -26,7 +26,6 @@ namespace ZooScan
         std::string Title;
         std::string Description;
         std::vector<std::string> StringStringList;
-        std::vector<const char *> StringList;
         uint32_t Flags;
     };
 
@@ -77,42 +76,63 @@ namespace ZooScan
 
         const char *GetTitle(int optionIndex, const char *defaultText)
         {
+            const char *text = defaultText;
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())
             {
-                return it->second.Title.c_str();
+                text = it->second.Title.c_str();
             }
-            return defaultText;
+
+            if (text == nullptr || *text == '\0')
+            {
+                return text;
+            }
+            return gettext(text);
         }
 
         const char *GetDescription(int optionIndex, const char *defaultText)
         {
+            const char *text = defaultText;
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())
             {
-                return it->second.Description.c_str();
+                text = it->second.Description.c_str();
             }
-            return defaultText;
+
+            if (text == nullptr || *text == '\0')
+            {
+                return text;
+            }
+            return gettext(text);
         }
 
-        const SANE_String_Const *GetStringList(int optionIndex, const SANE_String_Const *defaultList)
+        void
+        GetStringList(int optionIndex, const SANE_String_Const *defaultList, SANE_String_Const *rewrittenStringList)
         {
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())
             {
-                if (!it->second.StringStringList.empty() &&
-                    it->second.StringList.size() != it->second.StringStringList.size() + 1)
+                auto i = 0UZ;
+                for (; i < it->second.StringStringList.size(); ++i)
                 {
-                    it->second.StringList.clear();
-
-                    it->second.StringList.reserve(it->second.StringStringList.size() + 1);
-                    for (auto &str: it->second.StringStringList)
+                    auto text = it->second.StringStringList[i];
+                    if (text.empty())
                     {
-                        it->second.StringList.push_back(str.c_str());
+                        rewrittenStringList[i] = text.c_str();
                     }
-                    it->second.StringList.push_back(nullptr);
+                    else
+                    {
+                        rewrittenStringList[i] = gettext(text.c_str());
+                    }
                 }
-
-                return it->second.StringList.data();
+                rewrittenStringList[i] = nullptr;
             }
-            return defaultList;
+            else
+            {
+                auto i = 0UZ;
+                for (; defaultList[i] != nullptr; ++i)
+                {
+                    rewrittenStringList[i] = defaultList[i];
+                }
+                rewrittenStringList[i] = nullptr;
+            }
         }
 
         bool IsDisplayOnly(int optionIndex, bool defaultValue)

@@ -2,6 +2,8 @@
 
 #include <csignal>
 
+#include "Gettext.hpp"
+
 static ZooScan::App *app;
 
 void SignalHandler(int signal)
@@ -17,6 +19,11 @@ int main(int argc, char **argv)
     signal(SIGSEGV, SignalHandler);
     signal(SIGTERM, SignalHandler);
     signal(SIGKILL, SignalHandler);
+
+    setlocale(LC_ALL, "");
+    bind_textdomain_codeset("messages", "UTF-8");
+    bindtextdomain("messages", "../locale/");
+    textdomain("messages");
 
     app = new ZooScan::App(argc, argv);
     app->Initialize();
