@@ -127,7 +127,8 @@ namespace ZooScan
             return Error::None;
         }
 
-        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine) override
+        int32_t
+        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) override
         {
             if (m_LinePointers == nullptr || m_LinePointerSize < numberOfLines)
             {

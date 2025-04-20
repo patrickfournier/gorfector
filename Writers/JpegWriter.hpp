@@ -77,26 +77,47 @@ namespace ZooScan
             return Error::None;
         }
 
-        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine) override
+        int32_t
+        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) override
         {
             if (m_CompressStruct->image_height <= m_CompressStruct->next_scanline)
                 return 0;
 
-            JSAMPROW *rowPointer = new JSAMPROW[numberOfLines];
-
-            auto lineWritten = std::min(
+            auto numLinesToWrite = std::min(
                     static_cast<unsigned int>(numberOfLines),
                     m_CompressStruct->image_height - m_CompressStruct->next_scanline);
 
-            for (auto i = 0U; i < lineWritten; ++i)
+            auto rowPointer = new JSAMPROW[numLinesToWrite];
+
+            if (bitDepth == 8)
             {
-                rowPointer[i] = &bytes[i * bytesPerLine];
+                for (auto i = 0U; i < numLinesToWrite; ++i)
+                {
+                    rowPointer[i] = &bytes[i * bytesPerLine];
+                }
+            }
+            else if (bitDepth == 16)
+            {
+                constexpr auto offset = std::endian::native == std::endian::little ? 1 : 0;
+
+                for (auto j = 0U; j < numLinesToWrite; ++j)
+                {
+                    auto line = &bytes[j * bytesPerLine];
+                    for (auto i = 0; i < pixelsPerLine; ++i)
+                    {
+                        bytes[3 * (j * pixelsPerLine + i)] = line[6 * i + offset];
+                        bytes[3 * (j * pixelsPerLine + i) + 1] = line[6 * i + 2 + offset];
+                        bytes[3 * (j * pixelsPerLine + i) + 2] = line[6 * i + 4 + offset];
+                    }
+
+                    rowPointer[j] = &bytes[3 * j * pixelsPerLine];
+                }
             }
 
-            jpeg_write_scanlines(m_CompressStruct, rowPointer, lineWritten);
+            jpeg_write_scanlines(m_CompressStruct, rowPointer, numLinesToWrite);
 
             delete[] rowPointer;
-            return lineWritten * bytesPerLine;
+            return numLinesToWrite * bytesPerLine;
         }
 
         void CloseFile() override

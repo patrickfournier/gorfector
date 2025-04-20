@@ -724,7 +724,8 @@ void ZooScan::App::UpdateScan()
             auto dataEnd = m_WriteOffset + readLength;
             auto availableLines = dataEnd / m_ScanParameters.bytes_per_line;
             m_FileWriter->AppendBytes(
-                    m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line);
+                    m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line,
+                    m_ScanParameters.depth);
 
             StopScan();
 
@@ -735,7 +736,8 @@ void ZooScan::App::UpdateScan()
     auto availableBytes = m_WriteOffset + readLength;
     auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
     auto savedBytes = m_FileWriter->AppendBytes(
-            m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line);
+            m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line,
+            m_ScanParameters.depth);
     if (savedBytes < availableBytes)
     {
         memmove(m_Buffer, m_Buffer + savedBytes, availableBytes - savedBytes);
@@ -772,7 +774,7 @@ void ZooScan::App::StopScan()
     {
         if (m_FileWriter != nullptr)
         {
-            m_FileWriter->CancelFile();
+            m_FileWriter->CloseFile();
         }
 
         free(m_Buffer);
