@@ -141,7 +141,7 @@ namespace ZooLib
         {
             if (m_TempDirectoryPath.empty())
             {
-                auto xdgRuntimeDir = std::filesystem::path(g_get_user_runtime_dir()) / "zooscan_XXXXXX";
+                auto xdgRuntimeDir = std::filesystem::path(g_get_user_runtime_dir()) / (GetApplicationId() + "_XXXXXX");
                 auto homeTmpStr = strdup(xdgRuntimeDir.c_str());
                 m_TempDirectoryPath = std::filesystem::path(mkdtemp(homeTmpStr));
                 free(homeTmpStr);
