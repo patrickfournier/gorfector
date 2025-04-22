@@ -79,15 +79,17 @@ namespace ZooScan
 
         [[nodiscard]] int GetScanHeight() const;
 
+        void OnCancelClicked(GtkWidget *);
+
         void OnPreviewClicked(GtkWidget *widget);
         void UpdatePreview();
-        void OnCancelClicked(GtkWidget *);
         void RestoreScanOptions() const;
+        void StopPreview();
 
         bool CheckFileOutputOptions(const OutputOptionsState *scanOptions);
         void OnScanClicked(GtkWidget *widget);
         void UpdateScan();
-        void StopScan();
+        void StopScan(bool completed);
 
         [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 

@@ -91,6 +91,11 @@ namespace ZooScan
 
             png_set_compression_level(m_Png, m_StateComponent->GetCompressionLevel());
 
+            if (parameters.depth == 1)
+            {
+                png_set_invert_mono(m_Png);
+            }
+
             std::string appId = app.GetApplicationId();
             std::string creator = std::string(deviceOptions->GetDeviceMaker()) + " " + deviceOptions->GetDeviceModel();
 
@@ -127,8 +132,7 @@ namespace ZooScan
             return Error::None;
         }
 
-        int32_t
-        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) override
+        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
         {
             if (m_LinePointers == nullptr || m_LinePointerSize < numberOfLines)
             {
@@ -145,16 +149,16 @@ namespace ZooScan
 
             if (setjmp(png_jmpbuf(m_Png)))
             {
-                return i * bytesPerLine;
+                return i * parameters.bytes_per_line;
             }
 
             for (i = 0; i < numberOfLines; ++i)
             {
-                m_LinePointers[i] = bytes + i * bytesPerLine;
+                m_LinePointers[i] = bytes + i * parameters.bytes_per_line;
             }
             png_write_rows(m_Png, m_LinePointers, m_LinePointerSize);
 
-            return numberOfLines * bytesPerLine;
+            return numberOfLines * parameters.bytes_per_line;
         }
 
         void CloseFile() override

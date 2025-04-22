@@ -77,8 +77,7 @@ namespace ZooScan
             return Error::None;
         }
 
-        int32_t
-        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) override
+        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
         {
             if (m_CompressStruct->image_height <= m_CompressStruct->next_scanline)
                 return 0;
@@ -89,35 +88,67 @@ namespace ZooScan
 
             auto rowPointer = new JSAMPROW[numLinesToWrite];
 
-            if (bitDepth == 8)
+            if (parameters.depth == 1)
+            {
+                // Convert 1-bit grayscale to 8-bit grayscale
+                auto *auxBuffer = new SANE_Byte[numLinesToWrite * parameters.pixels_per_line];
+                for (auto i = 0U; i < numLinesToWrite; ++i)
+                {
+                    auto line = &bytes[i * parameters.bytes_per_line];
+                    for (auto j = 0; j < parameters.pixels_per_line; ++j)
+                    {
+                        // 0 is white
+                        auxBuffer[i * parameters.pixels_per_line + j] = line[j / 8] & (1 << (7 - (j % 8))) ? 0 : 255;
+                    }
+                    rowPointer[i] = &auxBuffer[i * parameters.pixels_per_line];
+                }
+                delete[] auxBuffer;
+            }
+            else if (parameters.depth == 8)
             {
                 for (auto i = 0U; i < numLinesToWrite; ++i)
                 {
-                    rowPointer[i] = &bytes[i * bytesPerLine];
+                    rowPointer[i] = &bytes[i * parameters.bytes_per_line];
                 }
             }
-            else if (bitDepth == 16)
+            else if (parameters.depth == 16)
             {
                 constexpr auto offset = std::endian::native == std::endian::little ? 1 : 0;
 
-                for (auto j = 0U; j < numLinesToWrite; ++j)
+                if (parameters.format == SANE_FRAME_GRAY)
                 {
-                    auto line = &bytes[j * bytesPerLine];
-                    for (auto i = 0; i < pixelsPerLine; ++i)
+                    for (auto j = 0U; j < numLinesToWrite; ++j)
                     {
-                        bytes[3 * (j * pixelsPerLine + i)] = line[6 * i + offset];
-                        bytes[3 * (j * pixelsPerLine + i) + 1] = line[6 * i + 2 + offset];
-                        bytes[3 * (j * pixelsPerLine + i) + 2] = line[6 * i + 4 + offset];
-                    }
+                        auto line = &bytes[j * parameters.bytes_per_line];
+                        for (auto i = 0; i < parameters.pixels_per_line; ++i)
+                        {
+                            bytes[j * parameters.pixels_per_line + i] = line[2 * i + offset];
+                        }
 
-                    rowPointer[j] = &bytes[3 * j * pixelsPerLine];
+                        rowPointer[j] = &bytes[j * parameters.pixels_per_line];
+                    }
+                }
+                else if (parameters.format == SANE_FRAME_RGB)
+                {
+                    for (auto j = 0U; j < numLinesToWrite; ++j)
+                    {
+                        auto line = &bytes[j * parameters.bytes_per_line];
+                        for (auto i = 0; i < parameters.pixels_per_line; ++i)
+                        {
+                            bytes[3 * (j * parameters.pixels_per_line + i)] = line[6 * i + offset];
+                            bytes[3 * (j * parameters.pixels_per_line + i) + 1] = line[6 * i + 2 + offset];
+                            bytes[3 * (j * parameters.pixels_per_line + i) + 2] = line[6 * i + 4 + offset];
+                        }
+
+                        rowPointer[j] = &bytes[3 * j * parameters.pixels_per_line];
+                    }
                 }
             }
 
             jpeg_write_scanlines(m_CompressStruct, rowPointer, numLinesToWrite);
 
             delete[] rowPointer;
-            return numLinesToWrite * bytesPerLine;
+            return numLinesToWrite * parameters.bytes_per_line;
         }
 
         void CloseFile() override

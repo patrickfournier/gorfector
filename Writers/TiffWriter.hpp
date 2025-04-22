@@ -82,11 +82,23 @@ namespace ZooScan
             TIFFSetField(m_File, TIFFTAG_IMAGELENGTH, parameters.lines);
             TIFFSetField(m_File, TIFFTAG_SAMPLESPERPIXEL, parameters.format == SANE_FRAME_RGB ? 3 : 1);
             TIFFSetField(m_File, TIFFTAG_BITSPERSAMPLE, parameters.depth);
-            TIFFSetField(m_File, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT); //
+            TIFFSetField(m_File, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
             TIFFSetField(m_File, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-            TIFFSetField(
-                    m_File, TIFFTAG_PHOTOMETRIC,
-                    parameters.format == SANE_FRAME_RGB ? PHOTOMETRIC_RGB : PHOTOMETRIC_MINISBLACK);
+            if (parameters.format == SANE_FRAME_RGB)
+            {
+                TIFFSetField(m_File, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+            }
+            else if (parameters.format == SANE_FRAME_GRAY)
+            {
+                if (parameters.depth == 1)
+                {
+                    TIFFSetField(m_File, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISWHITE);
+                }
+                else
+                {
+                    TIFFSetField(m_File, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+                }
+            }
 
             TIFFSetField(m_File, TIFFTAG_COMPRESSION, m_StateComponent->GetTiffCompression());
             if (m_StateComponent->GetTiffCompression() == COMPRESSION_JPEG)
@@ -108,15 +120,14 @@ namespace ZooScan
             return Error::None;
         }
 
-        int32_t
-        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) override
+        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
         {
             for (auto i = 0; i < numberOfLines; i++)
             {
-                TIFFWriteScanline(m_File, bytes + i * bytesPerLine, m_LineCounter++, 0);
+                TIFFWriteScanline(m_File, bytes + i * parameters.bytes_per_line, m_LineCounter++, 0);
             }
 
-            return numberOfLines * bytesPerLine;
+            return numberOfLines * parameters.bytes_per_line;
         }
 
         void CloseFile() override

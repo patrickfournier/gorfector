@@ -25,6 +25,7 @@ namespace ZooScan
 
     private:
         std::underlying_type_t<TypeFlag> m_ChangeType{};
+        int m_LastLine{-1};
 
     public:
         explicit PreviewStateChangeset(uint64_t stateInitialVersion)
@@ -35,11 +36,16 @@ namespace ZooScan
         void Clear()
         {
             m_ChangeType = static_cast<std::underlying_type_t<TypeFlag>>(TypeFlag::None);
+            m_LastLine = -1;
         }
 
-        void Set(TypeFlag typeFlag)
+        void Set(TypeFlag typeFlag, int lastLine = -1)
         {
             m_ChangeType |= static_cast<std::underlying_type_t<TypeFlag>>(typeFlag);
+            if (lastLine != -1)
+            {
+                m_LastLine = lastLine;
+            }
         }
 
         [[nodiscard]] bool HasAnyChange() const
@@ -52,11 +58,24 @@ namespace ZooScan
             return (m_ChangeType & static_cast<std::underlying_type_t<TypeFlag>>(typeFlag)) != 0;
         }
 
+        [[nodiscard]] int GetLastLine() const
+        {
+            return m_LastLine;
+        }
+
         void Aggregate(const PreviewStateChangeset &changeset)
         {
             ChangesetBase::Aggregate(changeset);
 
             m_ChangeType |= changeset.m_ChangeType;
+            if (changeset.m_LastLine == -1)
+            {
+                m_LastLine = -1;
+            }
+            else
+            {
+                m_LastLine = std::max(m_LastLine, changeset.m_LastLine);
+            }
         }
     };
 
@@ -82,6 +101,8 @@ namespace ZooScan
         int m_PixelsPerLine{};
         int m_BytesPerLine{};
         int m_ImageHeight{};
+        int m_BitDepth{};
+        SANE_Frame m_PixelFormat{};
 
         std::string m_ProgressText;
         uint64_t m_ProgressMin{};
@@ -160,6 +181,16 @@ namespace ZooScan
         [[nodiscard]] int GetScannedImageHeight() const
         {
             return m_ImageHeight;
+        }
+
+        [[nodiscard]] int GetScannedImageBitDepth() const
+        {
+            return m_BitDepth;
+        }
+
+        [[nodiscard]] SANE_Frame GetScannedImagePixelFormat() const
+        {
+            return m_PixelFormat;
         }
 
         [[nodiscard]] const SANE_Byte *GetScannedImage() const
@@ -311,11 +342,14 @@ namespace ZooScan
                 changeset->Set(PreviewStateChangeset::TypeFlag::ScanArea);
             }
 
-            void PrepareForScan(int pixelsPerLine, int bytesPerLine, int imageHeight)
+            void
+            PrepareForScan(int pixelsPerLine, int bytesPerLine, int imageHeight, int bitDepth, SANE_Frame pixelFormat)
             {
                 m_StateComponent->m_PixelsPerLine = pixelsPerLine;
                 m_StateComponent->m_BytesPerLine = bytesPerLine;
                 m_StateComponent->m_ImageHeight = imageHeight;
+                m_StateComponent->m_BitDepth = bitDepth;
+                m_StateComponent->m_PixelFormat = pixelFormat;
 
                 const uint64_t requestedSize = bytesPerLine * imageHeight;
                 if (m_StateComponent->m_Image != nullptr && m_StateComponent->m_ImageSize != requestedSize)
@@ -327,28 +361,31 @@ namespace ZooScan
                 if (m_StateComponent->m_Image == nullptr)
                 {
                     m_StateComponent->m_ImageSize = requestedSize;
-                    m_StateComponent->m_Image = static_cast<SANE_Byte *>(calloc(m_StateComponent->m_ImageSize, 1));
-
-                    auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
-                    changeset->Set(PreviewStateChangeset::TypeFlag::Image);
+                    m_StateComponent->m_Image =
+                            static_cast<SANE_Byte *>(calloc(m_StateComponent->m_ImageSize, sizeof(SANE_Byte)));
                 }
 
                 m_StateComponent->m_Offset = 0;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                changeset->Set(PreviewStateChangeset::TypeFlag::Image, -1);
             }
 
             void GetReadBuffer(SANE_Byte *&buffer, int &maxLength)
             {
                 buffer = m_StateComponent->m_Image + m_StateComponent->m_Offset;
-                maxLength = static_cast<int>(
-                        std::min(1024UL * 1024UL, m_StateComponent->m_ImageSize - m_StateComponent->m_Offset));
+                maxLength = static_cast<int>(m_StateComponent->m_ImageSize - m_StateComponent->m_Offset);
             }
 
             void CommitReadBuffer(int readLength)
             {
                 m_StateComponent->m_Offset += readLength;
 
+                int lastWrittenLine =
+                        static_cast<int>(m_StateComponent->m_Offset / m_StateComponent->m_BytesPerLine) - 1;
+
                 auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
-                changeset->Set(PreviewStateChangeset::TypeFlag::Image);
+                changeset->Set(PreviewStateChangeset::TypeFlag::Image, lastWrittenLine);
             }
 
             void ResetReadBuffer()

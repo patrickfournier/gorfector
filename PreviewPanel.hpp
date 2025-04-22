@@ -46,8 +46,17 @@ namespace ZooScan
         GtkWidget *m_ZoomDropDown{};
         GtkWidget *m_ProgressBar{};
         GdkPixbuf *m_ScannedImage{};
-        GdkPixbuf *m_PreviewPixBuf{};
+        // The whole preview image, including the checkerboard.
         GtkWidget *m_PreviewImage{};
+
+        // The scanned data
+        GdkPixbuf *m_PreviewPixBuf{};
+        // The source data for m_PreviewPixBuf
+        const unsigned char *m_UnderlyingBuffer{};
+        // Auxiliary buffer for the converted image, if scanned data is not in 8bit RGBA format.
+        unsigned char *m_ConvertedImage{};
+        int m_ConvertedImageSize{};
+        int m_LastLineConverted{-1};
 
         bool m_IsDragging{};
         double m_DragStartX{};

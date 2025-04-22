@@ -692,15 +692,139 @@ void ZooScan::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions
         if (const auto image = m_PreviewState->GetScannedImage(); image != nullptr)
         {
             auto width = m_PreviewState->GetScannedPixelsPerLine();
+            auto bytesPerLine = m_PreviewState->GetScannedBytesPerLine();
             auto height = m_PreviewState->GetScannedImageHeight();
-            if (m_ScannedImage != nullptr)
+
+            if (m_PreviewState->GetScannedImageBitDepth() == 8 &&
+                m_PreviewState->GetScannedImagePixelFormat() == SANE_FRAME_RGB)
             {
-                g_object_unref(m_ScannedImage);
-                m_ScannedImage = nullptr;
+                if (m_UnderlyingBuffer != m_PreviewState->GetScannedImage())
+                {
+                    m_UnderlyingBuffer = m_PreviewState->GetScannedImage();
+
+                    if (m_ScannedImage != nullptr)
+                    {
+                        g_object_unref(m_ScannedImage);
+                        m_ScannedImage = nullptr;
+                    }
+                }
+
+                if (m_ScannedImage == nullptr)
+                {
+                    m_ScannedImage = gdk_pixbuf_new_from_data(
+                            m_UnderlyingBuffer, GDK_COLORSPACE_RGB, false, 8, width, height, bytesPerLine, nullptr,
+                            nullptr);
+                }
+
+                delete[] m_ConvertedImage;
+                m_ConvertedImageSize = 0;
+                m_ConvertedImage = nullptr;
             }
-            m_ScannedImage = gdk_pixbuf_new_from_data(
-                    m_PreviewState->GetScannedImage(), GDK_COLORSPACE_RGB, false, 8, width, height,
-                    m_PreviewState->GetScannedBytesPerLine(), nullptr, nullptr);
+            else
+            {
+                int lastLineToConvert = changeset->GetLastLine();
+                if (lastLineToConvert < 0)
+                {
+                    m_LastLineConverted = -1;
+                    return;
+                }
+                if (lastLineToConvert < m_LastLineConverted || m_LastLineConverted >= height)
+                {
+                    // Assume this is a new image.
+                    m_LastLineConverted = -1;
+                }
+
+                if (m_ConvertedImage == nullptr || m_ConvertedImageSize != width * height * 3)
+                {
+                    if (m_ScannedImage != nullptr)
+                    {
+                        g_object_unref(m_ScannedImage);
+                        m_ScannedImage = nullptr;
+                    }
+
+                    delete[] m_ConvertedImage;
+                    m_ConvertedImageSize = width * height * 3;
+                    m_ConvertedImage = new unsigned char[m_ConvertedImageSize];
+                    m_UnderlyingBuffer = m_ConvertedImage;
+
+                    m_ScannedImage = gdk_pixbuf_new_from_data(
+                            m_UnderlyingBuffer, GDK_COLORSPACE_RGB, false, 8, width, height, 3 * width, nullptr,
+                            nullptr);
+                }
+
+                if (m_PreviewState->GetScannedImageBitDepth() == 1)
+                {
+                    // Convert 1-bit black and white (min is white) to 8-bit RGB
+                    for (int y = m_LastLineConverted + 1; y <= lastLineToConvert; ++y)
+                    {
+                        auto line = &image[y * bytesPerLine];
+                        for (int x = 0; x < width; ++x)
+                        {
+                            int dstPixelIndex = 3 * (y * width + x);
+                            unsigned char pixelValue = line[x / 8] & (1 << (7 - (x % 8)));
+                            m_ConvertedImage[dstPixelIndex] = pixelValue ? 0 : 255;
+                            m_ConvertedImage[dstPixelIndex + 1] = pixelValue ? 0 : 255;
+                            m_ConvertedImage[dstPixelIndex + 2] = pixelValue ? 0 : 255;
+                        }
+                    }
+                }
+                else if (
+                        m_PreviewState->GetScannedImageBitDepth() == 8 &&
+                        m_PreviewState->GetScannedImagePixelFormat() == SANE_FRAME_GRAY)
+                {
+                    // Convert 8-bit grayscale to 8-bit RGB
+                    for (int y = m_LastLineConverted + 1; y <= lastLineToConvert; ++y)
+                    {
+                        for (int x = 0; x < width; ++x)
+                        {
+                            int dstPixelIndex = 3 * (y * width + x);
+                            int srcPixelIndex = y * bytesPerLine + x;
+                            unsigned char pixelValue = image[srcPixelIndex];
+                            m_ConvertedImage[dstPixelIndex] = pixelValue;
+                            m_ConvertedImage[dstPixelIndex + 1] = pixelValue;
+                            m_ConvertedImage[dstPixelIndex + 2] = pixelValue;
+                        }
+                    }
+                }
+                else if (m_PreviewState->GetScannedImageBitDepth() == 16)
+                {
+                    constexpr auto offset = std::endian::native == std::endian::little ? 1 : 0;
+
+                    if (m_PreviewState->GetScannedImagePixelFormat() == SANE_FRAME_GRAY)
+                    {
+                        // Convert 16-bit grayscale to 8-bit RGB
+                        for (int y = m_LastLineConverted + 1; y <= lastLineToConvert; ++y)
+                        {
+                            auto line = &image[y * bytesPerLine];
+                            for (int x = 0; x < width; ++x)
+                            {
+                                int dstPixelIndex = 3 * (y * width + x);
+                                unsigned char pixelValue = line[2 * x + offset];
+                                m_ConvertedImage[dstPixelIndex] = pixelValue;
+                                m_ConvertedImage[dstPixelIndex + 1] = pixelValue;
+                                m_ConvertedImage[dstPixelIndex + 2] = pixelValue;
+                            }
+                        }
+                    }
+                    else if (m_PreviewState->GetScannedImagePixelFormat() == SANE_FRAME_RGB)
+                    {
+                        // Convert 16-bit RGB to 8-bit RGB
+                        for (int y = m_LastLineConverted + 1; y <= lastLineToConvert; ++y)
+                        {
+                            auto line = &image[y * bytesPerLine];
+                            for (int x = 0; x < width; ++x)
+                            {
+                                int dstPixelIndex = 3 * (y * width + x);
+                                m_ConvertedImage[dstPixelIndex] = line[6 * x + offset];
+                                m_ConvertedImage[dstPixelIndex + 1] = line[6 * x + 2 + offset];
+                                m_ConvertedImage[dstPixelIndex + 2] = line[6 * x + 4 + offset];
+                            }
+                        }
+                    }
+                }
+
+                m_LastLineConverted = lastLineToConvert;
+            }
         }
     }
 

@@ -336,27 +336,52 @@ void ZooScan::App::RestoreScanOptions() const
     SANE_Bool isPreview = SANE_FALSE;
     device->SetOptionValue(options->PreviewIndex(), &isPreview, nullptr);
 
-    if (options->ModeIndex() != std::numeric_limits<uint32_t>::max())
+    if (options->XResolutionIndex() == std::numeric_limits<uint32_t>::max())
     {
-        auto option = options->GetOption<std::string>(options->ModeIndex());
-        std::string value = option->GetValue();
-        std::unique_ptr<char[]> valueCString(new char[option->GetValueSize() + 1]);
-        strcpy(valueCString.get(), value.c_str());
-        device->SetOptionValue(options->ModeIndex(), valueCString.get(), nullptr);
+        if (options->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
+        {
+            auto option = options->GetOption<int>(options->ResolutionIndex());
+            int value = option->GetValue();
+            device->SetOptionValue(options->ResolutionIndex(), &value, nullptr);
+        }
+    }
+    else
+    {
+        auto option = options->GetOption<int>(options->XResolutionIndex());
+        int value = option->GetValue();
+        device->SetOptionValue(options->XResolutionIndex(), &value, nullptr);
     }
 
-    if (options->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
+    if (options->YResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = options->GetOption<int>(options->BitDepthIndex());
+        auto option = options->GetOption<int>(options->YResolutionIndex());
         int value = option->GetValue();
-        device->SetOptionValue(options->BitDepthIndex(), &value, nullptr);
+        device->SetOptionValue(options->YResolutionIndex(), &value, nullptr);
     }
 
-    if (options->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
+    if (options->TLXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = options->GetOption<int>(options->ResolutionIndex());
+        auto option = options->GetOption<int>(options->TLXIndex());
         int value = option->GetValue();
-        device->SetOptionValue(options->ResolutionIndex(), &value, nullptr);
+        device->SetOptionValue(options->TLXIndex(), &value, nullptr);
+    }
+    if (options->TLYIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto option = options->GetOption<int>(options->TLYIndex());
+        int value = option->GetValue();
+        device->SetOptionValue(options->TLYIndex(), &value, nullptr);
+    }
+    if (options->BRXIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto option = options->GetOption<int>(options->BRXIndex());
+        int value = option->GetValue();
+        device->SetOptionValue(options->BRXIndex(), &value, nullptr);
+    }
+    if (options->BRYIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto option = options->GetOption<int>(options->BRYIndex());
+        int value = option->GetValue();
+        device->SetOptionValue(options->BRYIndex(), &value, nullptr);
     }
 }
 
@@ -393,34 +418,6 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
 
     SANE_Bool isPreview = SANE_TRUE;
     device->SetOptionValue(options->PreviewIndex(), &isPreview, nullptr);
-
-    if (options->ModeIndex() != std::numeric_limits<uint32_t>::max())
-    {
-        auto settingDescription = device->GetOptionDescriptor(options->ModeIndex());
-        auto i = 0;
-        while (settingDescription->constraint.string_list[i] != nullptr &&
-               !strcasestr(settingDescription->constraint.string_list[i], "color"))
-        {
-            i++;
-        }
-        if (settingDescription->constraint.string_list[i] != nullptr)
-        {
-            std::string mode = settingDescription->constraint.string_list[i];
-            std::unique_ptr<char[]> modeCString(new char[mode.size() + 1]);
-            strcpy(modeCString.get(), mode.c_str());
-            device->SetOptionValue(options->ModeIndex(), modeCString.get(), nullptr);
-        }
-        else
-        {
-            device->SetOptionToDefault(options->ModeIndex());
-        }
-    }
-
-    SANE_Int bitDepth = 8;
-    if (options->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
-    {
-        device->SetOptionValue(options->BitDepthIndex(), &bitDepth, nullptr);
-    }
 
     if (options->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
@@ -484,7 +481,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     }
     catch (const std::runtime_error &e)
     {
-        StopScan();
+        StopPreview();
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), e.what());
         return;
     }
@@ -492,15 +489,8 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     device->GetParameters(&m_ScanParameters);
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
-        StopScan();
+        StopPreview();
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format"));
-        return;
-    }
-
-    if (m_ScanParameters.depth != 8)
-    {
-        StopScan();
-        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported depth"));
         return;
     }
 
@@ -508,7 +498,8 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     {
         auto previewPanelUpdater = PreviewState::Updater(m_PreviewPanel->GetState());
         previewPanelUpdater.PrepareForScan(
-                m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines);
+                m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines,
+                m_ScanParameters.depth, m_ScanParameters.format);
         previewPanelUpdater.InitProgress(std::string(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
 
         m_ScanCallbackId = gtk_widget_add_tick_callback(
@@ -543,7 +534,7 @@ void ZooScan::App::UpdatePreview()
 
     if (maxReadLength == 0 || !device->Read(readBuffer, maxReadLength, &readLength))
     {
-        StopScan();
+        StopPreview();
         previewPanelUpdater.SetProgressCompleted();
         return;
     }
@@ -554,7 +545,14 @@ void ZooScan::App::UpdatePreview()
 
 void ZooScan::App::OnCancelClicked(GtkWidget *)
 {
-    StopScan();
+    if (m_AppState->IsScanning())
+    {
+        StopScan(false);
+    }
+    else if (m_AppState->IsPreviewing())
+    {
+        StopPreview();
+    }
 }
 
 void IncrementPath(std::filesystem::path &path)
@@ -702,7 +700,7 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     auto destination = scanOptions->GetOutputDestination();
     if (destination == OutputOptionsState::OutputDestination::e_File)
     {
-        if (CheckFileOutputOptions(scanOptions))
+        if (!CheckFileOutputOptions(scanOptions))
         {
             return;
         }
@@ -728,7 +726,7 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     }
     catch (const std::runtime_error &e)
     {
-        StopScan();
+        StopScan(false);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), e.what());
         return;
     }
@@ -738,14 +736,14 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
 
     if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
     {
-        StopScan();
+        StopScan(false);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format"));
         return;
     }
 
-    if (m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
+    if (m_ScanParameters.depth != 1 && m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
     {
-        StopScan();
+        StopScan(false);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported depth"));
         return;
     }
@@ -753,7 +751,7 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     if (auto error = m_FileWriter->CreateFile(*this, m_ImageFilePath, GetDeviceOptions(), m_ScanParameters, nullptr);
         error != FileWriter::Error::None)
     {
-        StopScan();
+        StopScan(false);
         auto errorString = std::string(_("Failed to create file: ")) + m_FileWriter->GetError(error);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), errorString);
         return;
@@ -813,11 +811,9 @@ void ZooScan::App::UpdateScan()
 
             auto dataEnd = m_WriteOffset + readLength;
             auto availableLines = dataEnd / m_ScanParameters.bytes_per_line;
-            m_FileWriter->AppendBytes(
-                    m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line,
-                    m_ScanParameters.depth);
+            m_FileWriter->AppendBytes(m_Buffer, availableLines, m_ScanParameters);
 
-            StopScan();
+            StopScan(true);
 
             return;
         }
@@ -825,9 +821,7 @@ void ZooScan::App::UpdateScan()
 
     auto availableBytes = m_WriteOffset + readLength;
     auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
-    auto savedBytes = m_FileWriter->AppendBytes(
-            m_Buffer, availableLines, m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line,
-            m_ScanParameters.depth);
+    auto savedBytes = m_FileWriter->AppendBytes(m_Buffer, availableLines, m_ScanParameters);
     if (savedBytes < availableBytes)
     {
         memmove(m_Buffer, m_Buffer + savedBytes, availableBytes - savedBytes);
@@ -841,7 +835,7 @@ void ZooScan::App::UpdateScan()
     previewPanelUpdater.IncreaseProgress(readLength);
 }
 
-void ZooScan::App::StopScan()
+void ZooScan::App::StopPreview()
 {
     auto device = GetDevice();
     if (device != nullptr)
@@ -855,43 +849,55 @@ void ZooScan::App::StopScan()
         m_ScanCallbackId = 0;
     }
 
-    if (m_AppState->IsPreviewing())
+    RestoreScanOptions();
+
+    auto updater = AppState::Updater(m_AppState);
+    updater.SetIsPreviewing(false);
+}
+
+void ZooScan::App::StopScan(bool completed)
+{
+    auto device = GetDevice();
+    if (device != nullptr)
     {
-        RestoreScanOptions();
+        device->CancelScan();
     }
 
-    if (m_AppState->IsScanning())
+    if (m_ScanCallbackId != 0)
     {
-        if (m_FileWriter != nullptr)
+        gtk_widget_remove_tick_callback(GTK_WIDGET(m_MainWindow), m_ScanCallbackId);
+        m_ScanCallbackId = 0;
+    }
+
+    if (m_FileWriter != nullptr)
+    {
+        m_FileWriter->CloseFile();
+        m_FileWriter = nullptr;
+    }
+
+    free(m_Buffer);
+    m_Buffer = nullptr;
+    m_BufferSize = 0;
+    m_WriteOffset = 0;
+
+    if (completed && std::filesystem::exists(m_ImageFilePath))
+    {
+        auto scanOptions = m_ScanOptionsPanel->GetOutputOptionsState();
+        auto destination = scanOptions->GetOutputDestination();
+        if (destination == OutputOptionsState::OutputDestination::e_Email)
         {
-            m_FileWriter->CloseFile();
+            auto command = "xdg-email --attach " + m_ImageFilePath.string();
+            std::system(command.c_str());
         }
-
-        free(m_Buffer);
-        m_Buffer = nullptr;
-        m_BufferSize = 0;
-        m_WriteOffset = 0;
-
-        if (std::filesystem::exists(m_ImageFilePath))
+        else if (destination == OutputOptionsState::OutputDestination::e_Printer)
         {
-            auto scanOptions = m_ScanOptionsPanel->GetOutputOptionsState();
-            auto destination = scanOptions->GetOutputDestination();
-            if (destination == OutputOptionsState::OutputDestination::e_Email)
-            {
-                auto command = "xdg-email --attach " + m_ImageFilePath.string();
-                std::system(command.c_str());
-            }
-            else if (destination == OutputOptionsState::OutputDestination::e_Printer)
-            {
-                auto printDialog = gtk_print_dialog_new();
-                auto imageFile = g_file_new_for_path(m_ImageFilePath.c_str());
-                gtk_print_dialog_print_file(
-                        printDialog, GTK_WINDOW(m_MainWindow), nullptr, imageFile, nullptr, nullptr, nullptr);
-            }
+            auto printDialog = gtk_print_dialog_new();
+            auto imageFile = g_file_new_for_path(m_ImageFilePath.c_str());
+            gtk_print_dialog_print_file(
+                    printDialog, GTK_WINDOW(m_MainWindow), nullptr, imageFile, nullptr, nullptr, nullptr);
         }
     }
 
     auto updater = AppState::Updater(m_AppState);
-    updater.SetIsPreviewing(false);
     updater.SetIsScanning(false);
 }

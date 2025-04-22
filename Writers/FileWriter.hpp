@@ -125,8 +125,7 @@ namespace ZooScan
         virtual Error CreateFile(
                 const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
                 const SANE_Parameters &parameters, SANE_Byte *image) = 0;
-        virtual int32_t
-        AppendBytes(SANE_Byte *bytes, int numberOfLines, int pixelsPerLine, int bytesPerLine, int bitDepth) = 0;
+        virtual int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) = 0;
         virtual void CloseFile() = 0;
         virtual void CancelFile() = 0;
 
