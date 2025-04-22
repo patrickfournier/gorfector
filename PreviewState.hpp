@@ -250,7 +250,7 @@ namespace ZooScan
 
                 m_StateComponent->ApplyPanConstraints();
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
             }
 
@@ -264,7 +264,7 @@ namespace ZooScan
                 m_StateComponent->m_PanOffset = panOffsetDelta;
                 m_StateComponent->ApplyPanConstraints();
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
             }
 
@@ -293,7 +293,7 @@ namespace ZooScan
 
                 m_StateComponent->m_ZoomFactor = zoomFactor;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 m_StateComponent->ApplyPanConstraints();
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
                 changeset->Set(PreviewStateChangeset::TypeFlag::ZoomFactor);
@@ -307,7 +307,7 @@ namespace ZooScan
                 }
 
                 m_StateComponent->m_ScanArea = scanArea;
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::ScanArea);
             }
 
@@ -329,7 +329,7 @@ namespace ZooScan
                     m_StateComponent->m_ImageSize = requestedSize;
                     m_StateComponent->m_Image = static_cast<SANE_Byte *>(calloc(m_StateComponent->m_ImageSize, 1));
 
-                    auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                    auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                     changeset->Set(PreviewStateChangeset::TypeFlag::Image);
                 }
 
@@ -347,7 +347,7 @@ namespace ZooScan
             {
                 m_StateComponent->m_Offset += readLength;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::Image);
             }
 
@@ -363,7 +363,7 @@ namespace ZooScan
                 m_StateComponent->m_ProgressMax = max;
                 m_StateComponent->m_ProgressCurrent = min;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
@@ -371,7 +371,7 @@ namespace ZooScan
             {
                 m_StateComponent->m_ProgressCurrent += delta;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
@@ -382,7 +382,7 @@ namespace ZooScan
                 m_StateComponent->m_ProgressMax = 0UL;
                 m_StateComponent->m_ProgressCurrent = 0UL;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->Version());
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
         };

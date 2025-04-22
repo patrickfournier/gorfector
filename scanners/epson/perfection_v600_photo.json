@@ -367,7 +367,7 @@
     },
     {
       "comment": "scan-area ()",
-      "description": "Select the area to scan based on common media sizes.",
+      "description": "Sets the area to scan based on common media sizes.",
       "flags": [],
       "id": 43,
       "string_list": [

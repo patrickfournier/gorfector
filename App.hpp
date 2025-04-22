@@ -7,13 +7,14 @@
 #include "AppState.hpp"
 #include "DeviceOptionsState.hpp"
 #include "DeviceSelector.hpp"
+#include "OutputOptionsState.hpp"
 #include "ZooLib/Application.hpp"
 
 namespace ZooScan
 {
     class FileWriter;
     class DeviceOptionsObserver;
-    class DeviceOptionsPanel;
+    class ScanOptionsPanel;
     class DeviceSelectorObserver;
     class PreviewPanel;
 
@@ -30,7 +31,7 @@ namespace ZooScan
         DeviceSelectorObserver *m_DeviceSelectorObserver{};
         DeviceOptionsObserver *m_DeviceOptionsObserver{};
 
-        DeviceOptionsPanel *m_DeviceOptionsPanel{};
+        ScanOptionsPanel *m_ScanOptionsPanel{};
         PreviewPanel *m_PreviewPanel{};
 
         GtkWidget *m_SettingsBox{};
@@ -45,8 +46,8 @@ namespace ZooScan
         int32_t m_WriteOffset{};
         guint m_ScanCallbackId{};
 
-        std::filesystem::path m_ImageFilePath{};
         FileWriter *m_FileWriter{};
+        std::filesystem::path m_ImageFilePath{};
 
         [[nodiscard]] GApplicationFlags GetApplicationFlags() override
         {
@@ -83,6 +84,7 @@ namespace ZooScan
         void OnCancelClicked(GtkWidget *);
         void RestoreScanOptions() const;
 
+        bool CheckFileOutputOptions(const OutputOptionsState *scanOptions);
         void OnScanClicked(GtkWidget *widget);
         void UpdateScan();
         void StopScan();
@@ -128,7 +130,5 @@ namespace ZooScan
         }
 
         [[nodiscard]] const DeviceOptionsState *GetDeviceOptions() const;
-
-        void OnFileSave(GFile *file);
     };
 }

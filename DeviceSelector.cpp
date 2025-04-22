@@ -1,11 +1,11 @@
+#include <format>
 #include <memory>
 
 #include "Commands/DeviceSelectorCommands.hpp"
 #include "Commands/SelectDeviceCommand.hpp"
 #include "DeviceSelector.hpp"
-
-#include "Gettext.hpp"
 #include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 
@@ -44,9 +44,9 @@ ZooScan::DeviceSelector::DeviceSelector(
     ConnectGtkSignal(this, &DeviceSelector::OnRefreshDevicesClicked, refreshButton, "clicked");
     gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), refreshButton);
 
-    m_Dispatcher.RegisterHandler<SelectDeviceCommand, DeviceSelectorState>(SelectDeviceCommand::Execute, m_State);
-    m_Dispatcher.RegisterHandler<RefreshDeviceList, DeviceSelectorState>(RefreshDeviceList::Execute, m_State);
-    m_Dispatcher.RegisterHandler<ActivateNetworkScan, DeviceSelectorState>(ActivateNetworkScan::Execute, m_State);
+    m_Dispatcher.RegisterHandler(SelectDeviceCommand::Execute, m_State);
+    m_Dispatcher.RegisterHandler(RefreshDeviceList::Execute, m_State);
+    m_Dispatcher.RegisterHandler(ActivateNetworkScan::Execute, m_State);
 }
 
 ZooScan::DeviceSelector::~DeviceSelector()
@@ -149,7 +149,8 @@ void ZooScan::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVersio
         {
             const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
             ZooLib::ShowUserError(
-                    ADW_APPLICATION_WINDOW(parentWindow), _("Cannot open scanner %s."), deviceNamesCStr[0]);
+                    ADW_APPLICATION_WINDOW(parentWindow),
+                    std::vformat(_("Cannot open scanner {}."), std::make_format_args(deviceNamesCStr[0])));
         }
     }
     else

@@ -24,6 +24,8 @@ namespace ZooLib
         GtkWidget *m_MainWindow{};
         GtkWidget *m_MenuButton{};
 
+        std::filesystem::path m_TempDirectoryPath;
+
         [[nodiscard]] virtual GApplicationFlags GetApplicationFlags() = 0;
 
         [[nodiscard]] virtual std::string GetMainWindowTitle() = 0;
@@ -133,6 +135,19 @@ namespace ZooLib
         [[nodiscard]] ObserverManager *GetObserverManager()
         {
             return &m_ObserverManager;
+        }
+
+        [[nodiscard]] const std::filesystem::path &GetTemporaryDirectory()
+        {
+            if (m_TempDirectoryPath.empty())
+            {
+                auto xdgRuntimeDir = std::filesystem::path(g_get_user_runtime_dir()) / "zooscan_XXXXXX";
+                auto homeTmpStr = strdup(xdgRuntimeDir.c_str());
+                m_TempDirectoryPath = std::filesystem::path(mkdtemp(homeTmpStr));
+                free(homeTmpStr);
+            }
+
+            return m_TempDirectoryPath;
         }
     };
 }

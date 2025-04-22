@@ -69,7 +69,7 @@ namespace ZooScan
                 case Compression::JPEG:
                     return COMPRESSION_JPEG;
                 case Compression::Deflate:
-                    return COMPRESSION_DEFLATE;
+                    return COMPRESSION_ADOBE_DEFLATE;
                 case Compression::Packbits:
                     return COMPRESSION_PACKBITS;
             }

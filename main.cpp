@@ -2,7 +2,7 @@
 
 #include <csignal>
 
-#include "Gettext.hpp"
+#include "ZooLib/Gettext.hpp"
 
 static ZooScan::App *app;
 

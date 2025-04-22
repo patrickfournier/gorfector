@@ -1,21 +1,16 @@
 #include "ErrorDialog.hpp"
 
-#include "View.hpp"
+#include <string>
 
 namespace ZooLib
 {
-    void ShowUserError(AdwApplicationWindow *parentWindow, const char *format, ...)
+    void ShowUserError(AdwApplicationWindow *parentWindow, const std::string &message)
     {
         auto dialog = adw_alert_dialog_new("Error", nullptr);
-
-        va_list args;
-        va_start(args, format);
-        adw_alert_dialog_format_body(ADW_ALERT_DIALOG(dialog), format, args);
-        va_end(args);
-
+        adw_alert_dialog_set_body(ADW_ALERT_DIALOG(dialog), message.c_str());
         adw_alert_dialog_add_response(ADW_ALERT_DIALOG(dialog), "ok", "OK");
         adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(dialog), "ok");
 
-        adw_alert_dialog_choose(ADW_ALERT_DIALOG(dialog), GTK_WIDGET(parentWindow), nullptr, nullptr, nullptr);
+        adw_dialog_present(ADW_DIALOG(dialog), GTK_WIDGET(parentWindow));
     }
 }

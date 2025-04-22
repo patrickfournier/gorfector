@@ -128,7 +128,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        BuildOptions();
+        RebuildOptions();
         option = dynamic_cast<DeviceOptionValue<bool> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
@@ -215,7 +215,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        BuildOptions();
+        RebuildOptions();
         option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
@@ -268,7 +268,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        BuildOptions();
+        RebuildOptions();
         option = dynamic_cast<DeviceOptionValue<std::string> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {

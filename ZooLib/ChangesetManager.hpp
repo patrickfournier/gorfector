@@ -58,7 +58,7 @@ namespace ZooLib
 
             for (auto changeset: m_Changesets)
             {
-                if (changeset->StateInitialVersion() >= sinceVersion)
+                if (changeset->GetStateInitialVersion() >= sinceVersion)
                 {
                     aggregatedChangeset->Aggregate(*changeset);
                 }
@@ -79,7 +79,7 @@ namespace ZooLib
                 return std::numeric_limits<uint64_t>::max();
             }
 
-            return m_Changesets.front()->StateInitialVersion();
+            return m_Changesets.front()->GetStateInitialVersion();
         }
     };
 }

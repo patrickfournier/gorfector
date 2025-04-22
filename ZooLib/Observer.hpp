@@ -42,7 +42,7 @@ namespace ZooLib
             {
                 const auto *observedComponent = m_ObservedComponents[i];
                 auto &version = m_ObservedComponentVersions[i];
-                if (observedComponent->Version() != version)
+                if (observedComponent->GetVersion() != version)
                 {
                     UpdateImplementation();
                     break;
@@ -52,7 +52,7 @@ namespace ZooLib
             {
                 const auto *observedComponent = m_ObservedComponents[i];
                 auto &version = m_ObservedComponentVersions[i];
-                version = observedComponent->Version();
+                version = observedComponent->GetVersion();
             }
         }
     };

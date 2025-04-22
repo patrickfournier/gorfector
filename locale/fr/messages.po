@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-18 19:17-0400\n"
-"PO-Revision-Date: 2025-04-18 16:57-0400\n"
+"POT-Creation-Date: 2025-04-21 23:57-0400\n"
+"PO-Revision-Date: 2025-04-22 00:02-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -43,7 +43,7 @@ msgstr " 5 "
 msgid " 6 "
 msgstr " 6 "
 
-#: DeviceOptionsPanel.cpp:30
+#: ScanOptionsPanel.cpp:37
 #, c-format
 msgid "%%"
 msgstr "%%"
@@ -92,7 +92,7 @@ msgstr "Même direction"
 msgid "ADF Mode"
 msgstr "Mode AAD"
 
-#: App.cpp:174
+#: App.cpp:176
 msgid "About..."
 msgstr "À propos..."
 
@@ -128,7 +128,7 @@ msgstr "Ajoute au rouge en fonction du niveau de bleu"
 msgid "Adds to red based on green level"
 msgstr "Ajoute au rouge en fonction du niveau de vert"
 
-#: DeviceOptionsPanel.cpp:397 entrée standard:17
+#: ScanOptionsPanel.cpp:413 entrée standard:17
 msgid "Advanced"
 msgstr "Avancé"
 
@@ -140,11 +140,7 @@ msgstr ""
 "Après avoir demandé la numérisation, attendre que le bouton sur le scanner "
 "soit pressé pour commencer la numérisation."
 
-#: App.cpp:581
-msgid "All Files"
-msgstr "Tous les fichiers"
-
-#: App.cpp:231
+#: App.cpp:233
 msgid "An application to scan images."
 msgstr "Une application pour numériser des images."
 
@@ -164,7 +160,7 @@ msgstr "Segmentation automatique de l'image'"
 msgid "B5"
 msgstr "B5"
 
-#: DeviceOptionsPanel.cpp:393
+#: ScanOptionsPanel.cpp:409
 msgid "Basic"
 msgstr "Basique"
 
@@ -212,6 +208,10 @@ msgstr "Luminosité"
 msgid "Brightness Method"
 msgstr "Méthode de luminosité"
 
+#: ScanOptionsPanel.cpp:537
+msgid "Browse for a location."
+msgstr "Choisir un répertoire."
+
 #: entrée standard:148 standard:156
 msgid "CD"
 msgstr "CD"
@@ -220,18 +220,13 @@ msgstr "CD"
 msgid "Calibrate"
 msgstr "Calibrer"
 
-#: App.cpp:147
+#: App.cpp:149 OutputOptionsState.hpp:25
 msgid "Cancel Scan"
 msgstr "Annuler la numérisation"
 
-#: App.cpp:623
-msgid "Cannot determine image file format"
-msgstr "Impossible de déterminer le format de fichier image"
-
 #: DeviceSelector.cpp:152
-#, c-format
-msgid "Cannot open scanner %s."
-msgstr "Impossible d'ouvrir le scanner %s."
+msgid "Cannot open scanner {}."
+msgstr "Impossible d'ouvrir le scanner {}."
 
 #: entrée standard:67
 msgid "Clean"
@@ -253,7 +248,7 @@ msgstr "Coefficients de correction des couleurs"
 msgid "Color correction"
 msgstr "Correction des couleurs"
 
-#: DeviceOptionsPanel.cpp:406
+#: ScanOptionsPanel.cpp:438
 msgid "Common Options"
 msgstr "Options communes"
 
@@ -289,7 +284,15 @@ msgstr "Ajuste la luminosité de l'image acquise."
 msgid "Controls the contrast of the acquired image."
 msgstr "Ajuste le contraste de l'image acquise."
 
-#: DeviceOptionsPanel.cpp:28
+#: ScanOptionsPanel.cpp:543
+msgid "Create Missing Directories"
+msgstr "Créer les répertoires manquants"
+
+#: ScanOptionsPanel.cpp:544
+msgid "Create directories if they do not exist."
+msgstr "Créer les répertoires qui n'existent pas."
+
+#: ScanOptionsPanel.cpp:35
 msgid "DPI"
 msgstr "PPP"
 
@@ -305,6 +308,10 @@ msgstr "Niveau de compression Deflate"
 msgid "Deskew"
 msgstr "Correction de désalignement"
 
+#: ScanOptionsPanel.cpp:502 ScanOptionsPanel.cpp:507
+msgid "Destination"
+msgstr "Destination"
+
 #: entrée standard:122
 msgid ""
 "Determines empty margins in the scanned image and removes them.  This "
@@ -319,9 +326,13 @@ msgstr ""
 msgid "Determines the speed at which the scan proceeds."
 msgstr "Détermine la vitesse de numérisation."
 
-#: PreferencesView.hpp:188
+#: PreferencesView.hpp:182
 msgid "Developer"
 msgstr "Développeur"
+
+#: App.cpp:624
+msgid "Directory does not exists: {}."
+msgstr "Le répertoire '{}' n'existe pas."
 
 #: entrée standard:83
 msgid "Display short resolution list"
@@ -335,7 +346,7 @@ msgstr "Sensibilité de détection des doubles feuilles"
 msgid "Dropout"
 msgstr "Dropout"
 
-#: PreferencesView.hpp:144
+#: PreferencesView.hpp:139
 msgid "Dump SANE options"
 msgstr "Imprimer les options SANE"
 
@@ -355,6 +366,14 @@ msgstr "Éjecter le document après numérisation"
 msgid "Eject the sheet in the ADF"
 msgstr "Éjecter la feuille dans l'AAD"
 
+#: OutputOptionsState.hpp:17
+msgid "Email"
+msgstr "Courriel"
+
+#: App.cpp:611
+msgid "Enter a file name to save the image files."
+msgstr "Entrez le nom du fichier pour enregistrer l'image."
+
 #: entrée standard:147 standard:155
 msgid "Executive"
 msgstr "Exécutif"
@@ -363,9 +382,21 @@ msgstr "Exécutif"
 msgid "Extended SANE Status"
 msgstr "État SANE étendu"
 
-#: App.cpp:667
+#: App.cpp:747
 msgid "Failed to create file: "
 msgstr "Échec de la création du fichier: "
+
+#: OutputOptionsState.hpp:17
+msgid "File"
+msgstr "Fichier"
+
+#: App.cpp:655
+msgid "File '{}' already exists."
+msgstr "Le fichier '{}' existe déjà."
+
+#: ScanOptionsPanel.cpp:552
+msgid "File Name"
+msgstr "Nom du fichier"
 
 #: entrée standard:53
 msgid "Film Type"
@@ -403,7 +434,7 @@ msgstr "Table de correction gamma pour la bande verte."
 msgid "Gamma-correction table for the red band."
 msgstr "Table de correction gamma pour la bande rouge."
 
-#: PreferencesView.hpp:140 PreferencesView.hpp:175
+#: PreferencesView.hpp:135 PreferencesView.hpp:169
 msgid "General"
 msgstr "Général"
 
@@ -447,13 +478,21 @@ msgstr "Haut"
 msgid "Horizontal Resolution"
 msgstr "Résolution horizontale"
 
-#: PreferencesView.hpp:180
+#: ScanOptionsPanel.cpp:564
+msgid "If File Exists"
+msgstr "Si le fichier existe"
+
+#: PreferencesView.hpp:174
 msgid "Image Formats"
 msgstr "Formats d'image"
 
 #: DeviceSelector.cpp:38
 msgid "Include Network Scanners"
 msgstr "Inclure les scanners réseau"
+
+#: OutputOptionsState.hpp:25
+msgid "Increase Counter"
+msgstr "Incrémenter"
 
 #: entrée standard:89
 msgid "Indicates whether a button on the scanner has been pressed."
@@ -487,6 +526,10 @@ msgstr "Paramètres JPEG"
 #: entrée standard:146 standard:154
 msgid "Letter"
 msgstr "Lettre"
+
+#: ScanOptionsPanel.cpp:522
+msgid "Location"
+msgstr "Répertoire"
 
 #: entrée standard:172
 msgid "Low"
@@ -540,6 +583,14 @@ msgstr "Nombre de bits par échantillon."
 msgid "Optional equipment"
 msgstr "Équipement optionnel"
 
+#: ScanOptionsPanel.cpp:417
+msgid "Output"
+msgstr "Sortie"
+
+#: OutputOptionsState.hpp:25
+msgid "Overwrite"
+msgstr "Ecraser"
+
 #: PreferencesView.hpp:75
 msgid "PNG Settings"
 msgstr "Paramètres PNG"
@@ -560,9 +611,13 @@ msgstr "Temps d'interrogation"
 msgid "Positive Film"
 msgstr "Diapositives"
 
-#: App.cpp:137 entrée standard:40 standard:41
+#: App.cpp:139 entrée standard:40 standard:41
 msgid "Preview"
 msgstr "Aperçu"
+
+#: OutputOptionsState.hpp:17
+msgid "Printer"
+msgstr "Imprimante"
 
 #: PreviewPanel.cpp:750
 msgid "Progress: "
@@ -600,15 +655,11 @@ msgstr "Résolution"
 msgid "Rotate image so it appears upright."
 msgstr "Faire pivoter l'image pour qu'elle apparaisse droite."
 
-#: App.cpp:576
-msgid "Save Scan"
-msgstr "Enregistrer l'image"
-
-#: App.cpp:142
+#: App.cpp:144
 msgid "Scan"
 msgstr "Numériser"
 
-#: DeviceOptionsPanel.cpp:422 entrée standard:44
+#: ScanOptionsPanel.cpp:454 entrée standard:44
 msgid "Scan Area"
 msgstr "Zone de numérisation"
 
@@ -628,17 +679,25 @@ msgstr "Source de numérisation"
 msgid "Scan speed"
 msgstr "Vitesse de numérisation"
 
-#: App.cpp:193
+#: ScanOptionsPanel.cpp:598
+msgid "Select Destination"
+msgstr "Choisir la destination"
+
+#: App.cpp:195
 msgid "Select Device"
 msgstr "Sélectionner le périphérique"
 
-#: App.cpp:166
+#: App.cpp:168
 msgid "Select Device..."
 msgstr "Sélectionner le périphérique..."
 
 #: DeviceSelector.cpp:31
 msgid "Select Scanner: "
 msgstr "Sélectionner le périphérique: "
+
+#: App.cpp:604
+msgid "Select a directory where to save the image files."
+msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
 #: entrée standard:108
 msgid "Select an area to scan based on well-known media sizes. (DEPRECATED)"
@@ -647,12 +706,6 @@ msgstr ""
 #: entrée standard:112
 msgid "Select bay to scan"
 msgstr "Sélectionner la baie à numériser"
-
-#: entrée standard:103
-msgid "Select the area to scan based on common media sizes."
-msgstr ""
-"Sélectionner la zone à numériser en fonction des tailles de support "
-"courantes."
 
 #: entrée standard:114
 msgid "Selects the ADF mode (simplex/duplex)"
@@ -681,6 +734,10 @@ msgstr "Sélectionne le mode de numérisation."
 #: entrée standard:109
 msgid "Selects the scan source."
 msgstr "Sélectionne la source de numérisation."
+
+#: entrée standard:103
+msgid "Sets the area to scan based on common media sizes."
+msgstr "Définir la zone à numériser à une taille de support courantes."
 
 #: entrée standard:76
 msgid "Sets the color correction table for the selected output device."
@@ -718,11 +775,11 @@ msgstr ""
 msgid "Sets the vertical resolution of the scanned image."
 msgstr "Définit la résolution verticale de l'image numérisée."
 
-#: App.cpp:217
+#: App.cpp:219
 msgid "Settings"
 msgstr "Paramètres"
 
-#: App.cpp:173
+#: App.cpp:175
 msgid "Settings..."
 msgstr "Paramètres..."
 
@@ -776,6 +833,18 @@ msgstr "Vitesse"
 msgid "TIFF Settings"
 msgstr "Paramètres TIFF"
 
+#: ScanOptionsPanel.cpp:523
+msgid "The directory where the scanned files will be saved."
+msgstr "Le répertoire dans lequel les images seront enregistrées."
+
+#: App.cpp:671
+msgid ""
+"The file name must ends with an extension that specify the image format, "
+"like {}"
+msgstr ""
+"Le nom du fichier doit se terminer par une extension qui spécifie un format "
+"d'image, tel que {}"
+
 #: entrée standard:16
 msgid "Threshold"
 msgstr "Seuil"
@@ -814,15 +883,15 @@ msgstr "Rogner l'image à la taille du papier"
 msgid "Ugly kludge to provide additional status message strings to a frontend."
 msgstr ""
 
-#: App.cpp:502 App.cpp:659
+#: App.cpp:503 App.cpp:739
 msgid "Unsupported depth"
 msgstr "Profondeur non prise en charge"
 
-#: App.cpp:710
+#: App.cpp:790
 msgid "Unsupported file format"
 msgstr "Format de fichier non pris en charge"
 
-#: App.cpp:495 App.cpp:652
+#: App.cpp:496 App.cpp:732
 msgid "Unsupported format"
 msgstr "Format non pris en charge"
 
@@ -838,7 +907,7 @@ msgstr "Résolution verticale"
 msgid "Wait for Button"
 msgstr "Attendre le bouton"
 
-#: PreferencesView.hpp:146
+#: PreferencesView.hpp:141
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."
@@ -854,7 +923,7 @@ msgstr "Zoom"
 msgid "Zoom:"
 msgstr "Zoom:"
 
-#: DeviceOptionsPanel.cpp:24
+#: ScanOptionsPanel.cpp:31
 msgid "bit"
 msgstr "bit"
 
@@ -866,14 +935,41 @@ msgstr "gimp"
 msgid "iscan"
 msgstr "iscan"
 
-#: DeviceOptionsPanel.cpp:26
+#: ScanOptionsPanel.cpp:33
 msgid "mm"
 msgstr "mm"
 
-#: DeviceOptionsPanel.cpp:22
+#: ScanOptionsPanel.cpp:29
 msgid "px"
 msgstr "px"
 
-#: DeviceOptionsPanel.cpp:32
+#: ScanOptionsPanel.cpp:39
 msgid "μs"
 msgstr "μs"
+
+#~ msgid "All Files"
+#~ msgstr "Tous les fichiers"
+
+#~ msgid "Ask"
+#~ msgstr "Demander"
+
+#~ msgid "Cannot determine image file format"
+#~ msgstr "Impossible de déterminer le format de fichier image"
+
+#~ msgid "File Format"
+#~ msgstr "Format d'image"
+
+#~ msgid "JPEG"
+#~ msgstr "JPEG"
+
+#~ msgid "PNG"
+#~ msgstr "PNG"
+
+#~ msgid "Save Scan"
+#~ msgstr "Enregistrer l'image"
+
+#~ msgid "TIFF"
+#~ msgstr "TIFF"
+
+#~ msgid "Use Extension"
+#~ msgstr "Selon l'extension"

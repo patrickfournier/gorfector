@@ -1,26 +1,28 @@
 #include <adwaita.h>
+#include <format>
 #include <memory>
+#include <regex>
 #include <sane/sane.h>
 #include <stdexcept>
 
 #include "App.hpp"
-
 #include "AppState.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "Commands/SetScanMode.hpp"
 #include "DeviceOptionsObserver.hpp"
-#include "DeviceOptionsPanel.hpp"
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
-#include "Gettext.hpp"
+#include "OutputOptionsState.hpp"
 #include "PreferencesView.hpp"
 #include "PreviewPanel.hpp"
+#include "ScanOptionsPanel.hpp"
 #include "Writers/FileWriter.hpp"
 #include "Writers/JpegWriter.hpp"
 #include "Writers/PngWriter.hpp"
 #include "Writers/TiffWriter.hpp"
 #include "ZooLib/AppMenuBarBuilder.hpp"
 #include "ZooLib/ErrorDialog.hpp"
+#include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 ZooScan::App::App(int argc, char **argv)
@@ -257,8 +259,8 @@ int ZooScan::App::GetSelectorSaneInitId() const
 
 void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
-    if (m_DeviceOptionsPanel != nullptr && (m_DeviceOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
-                                            m_DeviceOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
+    if (m_ScanOptionsPanel != nullptr && (m_ScanOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
+                                          m_ScanOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
     {
         if (m_DeviceOptionsObserver != nullptr)
         {
@@ -266,24 +268,23 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
             delete m_DeviceOptionsObserver;
         }
 
-        gtk_box_remove(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
+        gtk_box_remove(GTK_BOX(m_SettingsBox), m_ScanOptionsPanel->GetRootWidget());
         // m_DeviceOptionsPanel is automatically deleted when its root widget is destroyed.
-        m_DeviceOptionsPanel = nullptr;
+        m_ScanOptionsPanel = nullptr;
         m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
     }
 
-    if (m_DeviceOptionsPanel == nullptr && m_SettingsBox != nullptr && !GetSelectorDeviceName().empty())
+    if (m_ScanOptionsPanel == nullptr && m_SettingsBox != nullptr && !GetSelectorDeviceName().empty())
     {
-        m_DeviceOptionsPanel = ZooLib::View::Create<DeviceOptionsPanel>(
+        m_ScanOptionsPanel = ZooLib::View::Create<ScanOptionsPanel>(
                 GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
-        gtk_box_prepend(GTK_BOX(m_SettingsBox), m_DeviceOptionsPanel->GetRootWidget());
-        m_Dispatcher.RegisterHandler<SetScanAreaCommand, DeviceOptionsState>(
-                SetScanAreaCommand::Execute, m_DeviceOptionsPanel->GetState());
+        gtk_box_prepend(GTK_BOX(m_SettingsBox), m_ScanOptionsPanel->GetRootWidget());
+        m_Dispatcher.RegisterHandler(SetScanAreaCommand::Execute, m_ScanOptionsPanel->GetDeviceOptionsState());
 
         if (m_PreviewPanel != nullptr)
         {
             m_DeviceOptionsObserver =
-                    new DeviceOptionsObserver(m_DeviceOptionsPanel->GetState(), m_PreviewPanel->GetState());
+                    new DeviceOptionsObserver(m_ScanOptionsPanel->GetDeviceOptionsState(), m_PreviewPanel->GetState());
             m_ObserverManager.AddObserver(m_DeviceOptionsObserver);
         }
     }
@@ -317,10 +318,10 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 
 const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
 {
-    if (m_DeviceOptionsPanel == nullptr)
+    if (m_ScanOptionsPanel == nullptr)
         return nullptr;
 
-    return m_DeviceOptionsPanel->GetState();
+    return m_ScanOptionsPanel->GetDeviceOptionsState();
 }
 
 void ZooScan::App::RestoreScanOptions() const
@@ -556,12 +557,132 @@ void ZooScan::App::OnCancelClicked(GtkWidget *)
     StopScan();
 }
 
-void OnFileSave(GObject *saveDialog, GAsyncResult *res, gpointer data)
+void IncrementPath(std::filesystem::path &path)
 {
-    auto app = static_cast<ZooScan::App *>(data);
-    GError *error;
-    auto file = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(saveDialog), res, &error);
-    app->OnFileSave(file);
+    if (!std::filesystem::exists(path))
+        return;
+
+    auto extension = path.extension();
+    auto filename = path.filename().replace_extension().string();
+    auto directory = path.parent_path();
+
+    int counter;
+    std::string fileNameFormat;
+
+    auto counterRegex = std::regex("(.+)([.-_])([0-9]+)$");
+    std::smatch match;
+    if (std::regex_match(filename, match, counterRegex) && match.size() == 4)
+    {
+        auto baseName = match[1].str();
+        auto separator = match[2].str();
+        counter = std::stoi(match[3].str());
+        fileNameFormat =
+                baseName + separator + "{:0" + std::to_string(match[3].str().length()) + "d}" + extension.string();
+    }
+    else
+    {
+        counter = 1;
+        fileNameFormat = filename + "_{:02d}" + extension.string();
+    }
+
+    auto newFilePath = directory / std::vformat(fileNameFormat, std::make_format_args(counter));
+    while (std::filesystem::exists(newFilePath))
+    {
+        counter++;
+        newFilePath = directory / std::vformat(fileNameFormat, std::make_format_args(counter));
+    }
+    path = newFilePath;
+}
+
+bool ZooScan::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions)
+{
+    const auto &dirPath = scanOptions->GetOutputDirectory();
+    const auto &fileName = scanOptions->GetOutputFileName();
+
+    if (dirPath.empty())
+    {
+        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+        ZooLib::ShowUserError(
+                ADW_APPLICATION_WINDOW(m_MainWindow), _("Select a directory where to save the image files."));
+        return false;
+    }
+
+    if (fileName.empty())
+    {
+        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Enter a file name to save the image files."));
+        return false;
+    }
+
+    if (!std::filesystem::exists(dirPath) && scanOptions->GetCreateMissingDirectories())
+    {
+        std::filesystem::create_directory(dirPath);
+    }
+
+    if (!std::filesystem::exists(dirPath))
+    {
+        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+        auto dirPathStr = dirPath.string();
+        ZooLib::ShowUserError(
+                ADW_APPLICATION_WINDOW(m_MainWindow),
+                std::vformat(_("Directory does not exists: {}."), std::make_format_args(dirPathStr)));
+        return false;
+    }
+
+    m_ImageFilePath = dirPath / fileName;
+    auto overwrite = false;
+    if (std::filesystem::exists(m_ImageFilePath))
+    {
+        switch (scanOptions->GetFileExistsAction())
+        {
+            case OutputOptionsState::FileExistsAction::e_Cancel:
+            {
+                break;
+            }
+            case OutputOptionsState::FileExistsAction::e_IncrementCounter:
+            {
+                IncrementPath(m_ImageFilePath);
+                break;
+            }
+            case OutputOptionsState::FileExistsAction::e_Overwrite:
+            {
+                overwrite = true;
+                break;
+            }
+        }
+    }
+
+    if (!overwrite && std::filesystem::exists(m_ImageFilePath))
+    {
+        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+        auto imageFilePathStr = m_ImageFilePath.string();
+        ZooLib::ShowUserError(
+                ADW_APPLICATION_WINDOW(m_MainWindow),
+                std::vformat(_("File '{}' already exists."), std::make_format_args(imageFilePathStr)));
+        return false;
+    }
+
+    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
+    if (m_FileWriter == nullptr)
+    {
+        auto extensionsStr = std::string();
+        for (auto format: FileWriter::GetFormats())
+        {
+            auto mainExt = format->GetExtensions()[0];
+            extensionsStr += extensionsStr.empty() ? mainExt : ", " + mainExt;
+        }
+
+        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+        auto imageFilePathStr = m_ImageFilePath.string();
+        ZooLib::ShowUserError(
+                ADW_APPLICATION_WINDOW(m_MainWindow),
+                std::vformat(
+                        _("The file name must ends with an extension that specify the image format, like {}"),
+                        std::make_format_args(extensionsStr)));
+        return false;
+    }
+
+    return true;
 }
 
 void ZooScan::App::OnScanClicked(GtkWidget *)
@@ -572,62 +693,31 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
         return;
     }
 
-    auto fileSaveDialog = gtk_file_dialog_new();
-    gtk_file_dialog_set_title(GTK_FILE_DIALOG(fileSaveDialog), _("Save Scan"));
-    gtk_file_dialog_set_initial_name(GTK_FILE_DIALOG(fileSaveDialog), FileWriter::DefaultFileName().c_str());
-
-    GListStore *filters = g_list_store_new(G_TYPE_OBJECT);
-    auto filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, _("All Files"));
-    gtk_file_filter_add_pattern(filter, "*");
-    g_list_store_append(filters, filter);
-
-    for (auto format: FileWriter::GetFormats())
+    if (m_ScanOptionsPanel == nullptr)
     {
-        filter = gtk_file_filter_new();
-        gtk_file_filter_set_name(filter, format->GetName().c_str());
+        return;
+    }
 
-        for (const auto &ext: format->GetExtensions())
+    auto scanOptions = m_ScanOptionsPanel->GetOutputOptionsState();
+    auto destination = scanOptions->GetOutputDestination();
+    if (destination == OutputOptionsState::OutputDestination::e_File)
+    {
+        if (CheckFileOutputOptions(scanOptions))
         {
-            gtk_file_filter_add_pattern(filter, ("*" + ext).c_str());
+            return;
         }
-        g_list_store_append(filters, filter);
     }
-    g_list_store_append(filters, filter);
-    gtk_file_dialog_set_filters(GTK_FILE_DIALOG(fileSaveDialog), G_LIST_MODEL(filters));
-
-    gtk_file_dialog_save(GTK_FILE_DIALOG(fileSaveDialog), GTK_WINDOW(m_MainWindow), nullptr, ::OnFileSave, this);
-}
-
-void ZooScan::App::OnFileSave(GFile *file)
-{
-    if (file == nullptr)
+    else if (destination == OutputOptionsState::OutputDestination::e_Email)
     {
-        m_ImageFilePath = std::filesystem::path();
-        return;
+        m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.jpg";
+        IncrementPath(m_ImageFilePath);
+        m_FileWriter = FileWriter::GetFormatByType<JpegWriter>();
     }
-
-    auto path = g_file_get_path(file);
-    if (path == nullptr)
+    else if (destination == OutputOptionsState::OutputDestination::e_Printer)
     {
-        m_ImageFilePath = std::filesystem::path();
-        return;
-    }
-
-    m_ImageFilePath = std::filesystem::path(path);
-    g_free(path);
-
-    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
-    if (m_FileWriter == nullptr)
-    {
-        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Cannot determine image file format"));
-        return;
-    }
-
-    const auto device = GetDevice();
-    if (device == nullptr)
-    {
-        return;
+        m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.tif";
+        IncrementPath(m_ImageFilePath);
+        m_FileWriter = FileWriter::GetFormatByType<TiffWriter>();
     }
 
     try
@@ -665,7 +755,7 @@ void ZooScan::App::OnFileSave(GFile *file)
     {
         StopScan();
         auto errorString = std::string(_("Failed to create file: ")) + m_FileWriter->GetError(error);
-        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), errorString.c_str());
+        ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), errorString);
         return;
     }
 
@@ -781,6 +871,24 @@ void ZooScan::App::StopScan()
         m_Buffer = nullptr;
         m_BufferSize = 0;
         m_WriteOffset = 0;
+
+        if (std::filesystem::exists(m_ImageFilePath))
+        {
+            auto scanOptions = m_ScanOptionsPanel->GetOutputOptionsState();
+            auto destination = scanOptions->GetOutputDestination();
+            if (destination == OutputOptionsState::OutputDestination::e_Email)
+            {
+                auto command = "xdg-email --attach " + m_ImageFilePath.string();
+                std::system(command.c_str());
+            }
+            else if (destination == OutputOptionsState::OutputDestination::e_Printer)
+            {
+                auto printDialog = gtk_print_dialog_new();
+                auto imageFile = g_file_new_for_path(m_ImageFilePath.c_str());
+                gtk_print_dialog_print_file(
+                        printDialog, GTK_WINDOW(m_MainWindow), nullptr, imageFile, nullptr, nullptr, nullptr);
+            }
+        }
     }
 
     auto updater = AppState::Updater(m_AppState);

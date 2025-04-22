@@ -8,11 +8,11 @@
 #include "Commands/SetTiffCompression.hpp"
 #include "Commands/SetTiffDeflateLevel.hpp"
 #include "Commands/SetTiffJpegQuality.hpp"
-#include "Gettext.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "Writers/JpegWriterState.hpp"
 #include "Writers/PngWriterState.hpp"
 #include "Writers/TiffWriterState.hpp"
+#include "ZooLib/Gettext.hpp"
 #include "ZooLib/View.hpp"
 
 namespace ZooScan
@@ -94,16 +94,11 @@ namespace ZooScan
             adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_JpegQuality);
             ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_JpegQuality, "notify::value");
 
-            m_Dispatcher.RegisterHandler<SetTiffCompression, TiffWriterState>(
-                    SetTiffCompression::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetTiffDeflateLevel, TiffWriterState>(
-                    SetTiffDeflateLevel::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetTiffJpegQuality, TiffWriterState>(
-                    SetTiffJpegQuality::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetPngCompressionLevel, PngWriterState>(
-                    SetPngCompressionLevel::Execute, m_PngWriterStateComponent);
-            m_Dispatcher.RegisterHandler<SetJpegQuality, JpegWriterState>(
-                    SetJpegQuality::Execute, m_JpegWriterStateComponent);
+            m_Dispatcher.RegisterHandler(SetTiffCompression::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler(SetTiffDeflateLevel::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler(SetTiffJpegQuality::Execute, m_TiffWriterStateComponent);
+            m_Dispatcher.RegisterHandler(SetPngCompressionLevel::Execute, m_PngWriterStateComponent);
+            m_Dispatcher.RegisterHandler(SetJpegQuality::Execute, m_JpegWriterStateComponent);
         }
 
         void OnCompressionAlgoSelected(GtkWidget *widget)
@@ -149,8 +144,7 @@ namespace ZooScan
             ZooLib::ConnectGtkSignalWithParamSpecs(
                     this, &PreferencesView::OnDumpSaneOptionsChanged, checkbox, "notify::active");
 
-            m_Dispatcher.RegisterHandler<SetDumpSaneOptions, DeviceSelectorState>(
-                    SetDumpSaneOptions::Execute, m_DeviceSelectorState);
+            m_Dispatcher.RegisterHandler(SetDumpSaneOptions::Execute, m_DeviceSelectorState);
         }
 
         void OnDumpSaneOptionsChanged(GtkWidget *widget)

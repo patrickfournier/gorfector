@@ -56,11 +56,11 @@ set(SOURCE_FILES
 
         App.cpp
         DeviceSelector.cpp
-        DeviceOptionsPanel.cpp
         DeviceOptionsState.cpp
         DeviceSelectorState.cpp
         OptionRewriter.cpp
         PreviewPanel.cpp
+        ScanOptionsPanel.cpp
 
         Writers/FileWriter.cpp
         Writers/JpegWriter.cpp
@@ -75,7 +75,12 @@ set(GETTEXT_SOURCE_FILES
         Commands/DeviceSelectorCommands.hpp
         Commands/DevMode/SetDumpSaneOptions.hpp
         Commands/SelectDeviceCommand.hpp
+        Commands/SetCreateMissingDirectoriesCommand.hpp
+        Commands/SetFileExistsActionCommand.hpp
         Commands/SetJpegQuality.hpp
+        Commands/SetOutputDestinationCommand.hpp
+        Commands/SetOutputDirectoryCommand.hpp
+        Commands/SetOutputFileNameCommand.hpp
         Commands/SetPanCommand.hpp
         Commands/SetPngCompressionLevel.hpp
         Commands/SetScanAreaCommand.hpp
@@ -100,6 +105,7 @@ set(GETTEXT_SOURCE_FILES
         ZooLib/Command.hpp
         ZooLib/CommandDispatcher.hpp
         ZooLib/ErrorDialog.hpp
+        ZooLib/Gettext.hpp
         ZooLib/Observer.hpp
         ZooLib/ObserverManager.hpp
         ZooLib/SignalSupport.hpp
@@ -110,15 +116,13 @@ set(GETTEXT_SOURCE_FILES
         App.hpp
         AppState.hpp
         DeviceOptionsObserver.hpp
-        DeviceOptionsPanel.hpp
-        DeviceOptionsState.hpp
         DeviceOptionValueBase.hpp
         DeviceOptionValue.hpp
         DeviceSelector.hpp
         DeviceSelectorObserver.hpp
         DeviceSelectorState.hpp
-        Gettext.hpp
         OptionRewriter.hpp
+        OutputOptionsState.hpp
         Point.hpp
         PreferencesView.hpp
         PreviewPanel.hpp
@@ -126,6 +130,7 @@ set(GETTEXT_SOURCE_FILES
         Rect.hpp
         SaneDevice.hpp
         SaneException.hpp
+        ScanOptionsPanel.hpp
         ViewUpdateObserver.hpp
 )
 

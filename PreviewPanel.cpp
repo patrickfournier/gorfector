@@ -4,7 +4,7 @@
 #include "Commands/SetPanCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "Commands/SetZoomCommand.hpp"
-#include "Gettext.hpp"
+#include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 enum class ScanAreaCursorRegions
@@ -80,8 +80,8 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_PreviewState);
     m_App->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
 
-    m_Dispatcher.RegisterHandler<SetPanCommand, PreviewState>(SetPanCommand::Execute, m_PreviewState);
-    m_Dispatcher.RegisterHandler<SetZoomCommand, PreviewState>(SetZoomCommand::Execute, m_PreviewState);
+    m_Dispatcher.RegisterHandler(SetPanCommand::Execute, m_PreviewState);
+    m_Dispatcher.RegisterHandler(SetZoomCommand::Execute, m_PreviewState);
 }
 
 ZooScan::PreviewPanel::~PreviewPanel()

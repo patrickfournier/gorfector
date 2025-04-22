@@ -52,13 +52,13 @@ namespace ZooScan
         }
     };
 
-    class Changeset : public ZooLib::ChangesetBase
+    class DeviceOptionsStateChangeset : public ZooLib::ChangesetBase
     {
         std::vector<WidgetIndex> m_ChangedIndices;
         bool m_ReloadOptions{};
 
     public:
-        explicit Changeset(uint64_t stateInitialVersion)
+        explicit DeviceOptionsStateChangeset(uint64_t stateInitialVersion)
             : ChangesetBase(stateInitialVersion)
         {
         }
@@ -68,7 +68,7 @@ namespace ZooScan
             m_ChangedIndices.push_back(index);
         }
 
-        [[nodiscard]] const std::vector<WidgetIndex> &ChangedIndices() const
+        [[nodiscard]] const std::vector<WidgetIndex> &GetChangedIndices() const
         {
             return m_ChangedIndices;
         }
@@ -83,7 +83,7 @@ namespace ZooScan
             return m_ReloadOptions;
         }
 
-        void Aggregate(const Changeset &changeset)
+        void Aggregate(const DeviceOptionsStateChangeset &changeset)
         {
             ChangesetBase::Aggregate(changeset);
 
@@ -99,7 +99,8 @@ namespace ZooScan
         }
     };
 
-    class DeviceOptionsState : public ZooLib::StateComponent, public ZooLib::ChangesetManager<Changeset>
+    class DeviceOptionsState : public ZooLib::StateComponent,
+                               public ZooLib::ChangesetManager<DeviceOptionsStateChangeset>
     {
     public:
         static constexpr uint32_t k_InvalidIndex = std::numeric_limits<uint32_t>::max();
@@ -119,9 +120,9 @@ namespace ZooScan
         uint32_t m_YResolutionIndex;
         uint32_t m_BitDepthIndex;
 
-        [[nodiscard]] Changeset *GetCurrentChangeset()
+        [[nodiscard]] DeviceOptionsStateChangeset *GetCurrentChangeset()
         {
-            return ChangesetManager::GetCurrentChangeset(Version());
+            return ChangesetManager::GetCurrentChangeset(GetVersion());
         }
 
         [[nodiscard]] SaneDevice *GetDevice() const
@@ -200,7 +201,6 @@ namespace ZooScan
                 delete optionValue;
             }
             m_OptionValues.clear();
-            GetCurrentChangeset()->SetReloadOptions(true);
         }
 
 
@@ -224,10 +224,7 @@ namespace ZooScan
 
         ~DeviceOptionsState() override
         {
-            for (auto optionValue: m_OptionValues)
-            {
-                delete optionValue;
-            }
+            Clear();
         }
 
         class Updater : public StateComponent::Updater<DeviceOptionsState>
@@ -243,9 +240,11 @@ namespace ZooScan
                 m_StateComponent->PushCurrentChangeset();
             }
 
-            void BuildOptions() const
+            void RebuildOptions() const
             {
+                m_StateComponent->Clear();
                 m_StateComponent->BuildOptions();
+                m_StateComponent->GetCurrentChangeset()->SetReloadOptions(true);
             }
 
             void SetOptionValue(uint32_t optionIndex, uint32_t valueIndex, bool requestedValue) const;

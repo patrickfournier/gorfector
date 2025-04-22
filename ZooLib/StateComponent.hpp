@@ -27,7 +27,7 @@ namespace ZooLib
             m_State->RemoveStateComponent(this);
         };
 
-        [[nodiscard]] uint64_t Version() const
+        [[nodiscard]] uint64_t GetVersion() const
         {
             return m_StateVersion;
         }

@@ -15,7 +15,7 @@ namespace ZooLib
             m_StateInitialVersion = stateInitialVersion;
         }
 
-        [[nodiscard]] uint64_t StateInitialVersion() const
+        [[nodiscard]] uint64_t GetStateInitialVersion() const
         {
             return m_StateInitialVersion;
         }
