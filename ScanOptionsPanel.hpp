@@ -116,7 +116,7 @@ namespace ZooScan
 
         void SelectPage(Page page);
 
-        void OnDirectorySelected(GFile *file) const;
+        void OnDirectorySelected(GFile *file);
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };
 }

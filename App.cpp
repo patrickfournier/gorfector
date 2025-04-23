@@ -1,6 +1,5 @@
 #include <adwaita.h>
 #include <format>
-#include <memory>
 #include <regex>
 #include <sane/sane.h>
 #include <stdexcept>
@@ -40,7 +39,7 @@ ZooScan::App::App(int argc, char **argv)
         std::filesystem::create_directories(prefDir);
     }
     auto prefFilePath = prefDir / "preferences.json";
-    m_State.SetFilePath(prefFilePath);
+    m_State.SetPreferenceFilePath(prefFilePath);
 
     bool devMode{};
     for (int i = 1; i < argc; ++i)

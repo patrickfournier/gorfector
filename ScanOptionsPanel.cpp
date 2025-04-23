@@ -333,6 +333,7 @@ ZooScan::ScanOptionsPanel::ScanOptionsPanel(
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
     m_OutputOptions = new OutputOptionsState(m_App->GetState());
+    m_App->GetState()->LoadFromPreferenceFile(m_OutputOptions);
 
     m_OptionUpdateObserver = new ViewUpdateObserver(this, m_DeviceOptions, m_OutputOptions);
     m_App->GetObserverManager()->AddObserver(m_OptionUpdateObserver);
@@ -611,7 +612,7 @@ void ZooScan::ScanOptionsPanel::OnBrowseButtonClicked(GtkWidget *widget)
             GTK_FILE_DIALOG(selectDirDialog), GTK_WINDOW(m_App->GetMainWindow()), nullptr, ::OnDirectorySelected, this);
 }
 
-void ZooScan::ScanOptionsPanel::OnDirectorySelected(GFile *file) const
+void ZooScan::ScanOptionsPanel::OnDirectorySelected(GFile *file)
 {
     std::filesystem::path destinationDirectory;
     if (file != nullptr)
@@ -623,6 +624,7 @@ void ZooScan::ScanOptionsPanel::OnDirectorySelected(GFile *file) const
             g_free(path);
 
             gtk_editable_set_text(GTK_EDITABLE(m_LocationEntryRow), destinationDirectory.c_str());
+            m_Dispatcher.Dispatch(SetOutputDirectoryCommand(destinationDirectory.string()));
         }
     }
 }

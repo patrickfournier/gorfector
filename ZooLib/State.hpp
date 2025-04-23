@@ -12,7 +12,7 @@ namespace ZooLib
 
     class State
     {
-        std::filesystem::path m_FilePath{};
+        std::filesystem::path m_PreferencesFilePath{};
         std::vector<StateComponent *> m_StateComponents;
 
     public:
@@ -49,13 +49,13 @@ namespace ZooLib
             return nullptr;
         }
 
-        void SetFilePath(const std::filesystem::path &filePath)
+        void SetPreferenceFilePath(const std::filesystem::path &filePath)
         {
-            m_FilePath = filePath;
+            m_PreferencesFilePath = filePath;
         }
 
         template<typename TStateComponent>
-        void LoadFromFile(TStateComponent *stateComponent)
+        void LoadFromPreferenceFile(TStateComponent *stateComponent)
         {
             if (stateComponent == nullptr)
             {
@@ -68,7 +68,7 @@ namespace ZooLib
                 return;
             }
 
-            std::ifstream f(m_FilePath);
+            std::ifstream f(m_PreferencesFilePath);
             if (!f.good())
             {
                 return;
@@ -104,7 +104,7 @@ namespace ZooLib
                 return;
             }
 
-            std::ifstream f(m_FilePath);
+            std::ifstream f(m_PreferencesFilePath);
             nlohmann::json jsonData;
             if (f.good())
             {
@@ -123,10 +123,10 @@ namespace ZooLib
             to_json(componentJson, *stateComponent);
             jsonData[key] = componentJson;
 
-            auto dirs = m_FilePath.parent_path();
+            auto dirs = m_PreferencesFilePath.parent_path();
             create_directories(dirs);
 
-            std::ofstream outFile(m_FilePath);
+            std::ofstream outFile(m_PreferencesFilePath);
             outFile << jsonData.dump(4);
             outFile.close();
         }

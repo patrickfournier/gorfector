@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZooLib/Gettext.hpp"
+#include "ZooLib/State.hpp"
 #include "ZooLib/StateComponent.hpp"
 
 namespace ZooScan
@@ -32,10 +33,23 @@ namespace ZooScan
         std::string m_OutputFileName{};
         FileExistsAction m_FileExistsAction{};
 
+        friend void to_json(nlohmann::json &j, const OutputOptionsState &p);
+        friend void from_json(const nlohmann::json &j, OutputOptionsState &p);
+
     public:
         explicit OutputOptionsState(ZooLib::State *state)
             : StateComponent(state)
         {
+        }
+
+        ~OutputOptionsState() override
+        {
+            m_State->SaveToFile(this);
+        }
+
+        [[nodiscard]] std::string GetSerializationKey() const override
+        {
+            return "OutputOptionsState";
         }
 
         [[nodiscard]] OutputDestination GetOutputDestination() const
@@ -94,4 +108,23 @@ namespace ZooScan
         };
     };
 
+    inline void to_json(nlohmann::json &j, const OutputOptionsState &p)
+    {
+        auto outputDir = p.m_OutputDirectory.string();
+        j = nlohmann::json{
+                {"OutputDestination", p.m_OutputDestination},
+                {"OutputDirectory", outputDir},
+                {"CreateMissingDirectories", p.m_CreateMissingDirectories},
+                {"OutputFileName", p.m_OutputFileName},
+                {"FileExistsAction", p.m_FileExistsAction}};
+    }
+
+    inline void from_json(const nlohmann::json &j, OutputOptionsState &p)
+    {
+        j.at("OutputDestination").get_to(p.m_OutputDestination);
+        j.at("OutputDirectory").get_to(p.m_OutputDirectory);
+        j.at("CreateMissingDirectories").get_to(p.m_CreateMissingDirectories);
+        j.at("OutputFileName").get_to(p.m_OutputFileName);
+        j.at("FileExistsAction").get_to(p.m_FileExistsAction);
+    }
 }

@@ -41,7 +41,7 @@ namespace ZooScan
             }
 
             auto f = new TFileFormat(state);
-            state->LoadFromFile(f->GetStateComponent());
+            state->LoadFromPreferenceFile(f->GetStateComponent());
             s_Formats.push_back(f);
         }
 
