@@ -42,7 +42,7 @@ namespace ZooScan
             parentObject[GetName()] = values;
         }
 
-        bool Deserialize(const nlohmann::json &parentObject) override
+        void Deserialize(const nlohmann::json &parentObject) override
         {
             bool updated = false;
             if (parentObject.contains(GetName()))
@@ -68,16 +68,12 @@ namespace ZooScan
                     if (updated)
                     {
                         delete[] m_RequestedValue;
-                        delete[] m_Value;
 
                         m_Size = values.size();
-                        m_Value = new ValueType[m_Size];
                         m_RequestedValue = newValues.release();
                     }
                 }
             }
-
-            return updated;
         }
 
         void SetRequestedValue(uint32_t valueIndex, const ValueType &value)

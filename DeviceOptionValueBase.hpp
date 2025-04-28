@@ -20,7 +20,7 @@ namespace ZooScan
         virtual ~DeviceOptionValueBase() = default;
 
         virtual void Serialize(nlohmann::json &parent) const = 0;
-        virtual bool Deserialize(const nlohmann::json &json) = 0;
+        virtual void Deserialize(const nlohmann::json &json) = 0;
 
         [[nodiscard]] const char *GetName() const
         {

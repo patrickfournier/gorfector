@@ -140,6 +140,7 @@ namespace ZooScan
             return deviceSelectorState->GetDeviceByName(m_DeviceName);
         }
 
+        void ReloadOptions() const;
         void BuildOptions();
 
         void AddOptionValue(uint32_t index, DeviceOptionValueBase *optionValue)
@@ -230,10 +231,9 @@ namespace ZooScan
 
         class Updater : public StateComponent::Updater<DeviceOptionsState>
         {
-            std::vector<size_t> SetRequestedValuesFromJson(const nlohmann::json &json);
             void ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices);
             void FindRequestMismatches(const std::vector<size_t> &indicesToCheck, std::vector<size_t> &mismatches);
-            void ApplyOptionsFromJson(const nlohmann::json &json);
+            void ApplyPreset(const nlohmann::json &json);
 
         public:
             explicit Updater(DeviceOptionsState *state)
@@ -254,13 +254,12 @@ namespace ZooScan
 
             void ApplyScanArea(const nlohmann::json &json)
             {
-                ApplyOptionsFromJson(json);
+                ApplyPreset(json);
             }
 
-            void RebuildOptions() const
+            void ReloadOptions() const
             {
-                m_StateComponent->Clear();
-                m_StateComponent->BuildOptions();
+                m_StateComponent->ReloadOptions();
                 m_StateComponent->GetCurrentChangeset()->SetReloadOptions(true);
             }
 
@@ -281,7 +280,7 @@ namespace ZooScan
             return saneDevice->GetModel();
         }
 
-        [[nodiscard]] const char *GetDeviceMaker() const
+        [[nodiscard]] const char *GetDeviceVendor() const
         {
             auto saneDevice = GetDevice();
             if (saneDevice == nullptr)

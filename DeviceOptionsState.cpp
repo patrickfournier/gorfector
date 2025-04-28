@@ -24,6 +24,104 @@ static int EnsureBufferSize(std::unique_ptr<char8_t[]> &buffer, int currentSize,
     return currentSize;
 }
 
+void ZooScan::DeviceOptionsState::ReloadOptions() const
+{
+    auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
+
+    int optionCount;
+    device->GetOptionValue(0, &optionCount);
+
+    int valueBufferSize = sizeof(SANE_Word) * 512;
+    std::unique_ptr<char8_t[]> value(new char8_t[valueBufferSize]);
+
+    for (auto optionIndex = 1; optionIndex < optionCount; optionIndex++)
+    {
+        const SANE_Option_Descriptor *optionDescriptor = device->GetOptionDescriptor(optionIndex);
+        if (optionDescriptor == nullptr)
+        {
+            continue;
+        }
+
+        if (optionDescriptor->type != SANE_TYPE_GROUP && optionDescriptor->type != SANE_TYPE_BUTTON)
+        {
+            valueBufferSize = EnsureBufferSize(value, valueBufferSize, optionDescriptor->size);
+            if (valueBufferSize < optionDescriptor->size)
+            {
+                throw SaneException(
+                        std::string(optionDescriptor->name) + ": Failed to allocate buffer for option value.");
+            }
+
+            device->GetOptionValue(optionIndex, value.get());
+        }
+
+        switch (optionDescriptor->type)
+        {
+            case SANE_TYPE_BOOL:
+            {
+                auto *settingValue = dynamic_cast<DeviceOptionValue<bool> *>(m_OptionValues[optionIndex]);
+                if (settingValue != nullptr)
+                {
+                    settingValue->SetDeviceValue(0, (*reinterpret_cast<SANE_Bool *>(value.get())));
+                }
+                else
+                {
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") +
+                            m_OptionValues[optionIndex]->GetTitle());
+                }
+                break;
+            }
+
+            case SANE_TYPE_INT:
+            case SANE_TYPE_FIXED:
+            {
+                int numberOfElements = static_cast<int>(optionDescriptor->size / sizeof(SANE_Word));
+                if (numberOfElements > 4)
+                    break;
+
+                auto *intValue = dynamic_cast<DeviceOptionValue<int> *>(m_OptionValues[optionIndex]);
+                if (intValue != nullptr)
+                {
+                    for (auto i = 0; i < numberOfElements; i++)
+                    {
+                        intValue->SetDeviceValue(i, reinterpret_cast<SANE_Int *>(value.get())[i]);
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") +
+                            m_OptionValues[optionIndex]->GetTitle());
+                }
+                break;
+            }
+
+            case SANE_TYPE_STRING:
+            {
+                auto *strValue = dynamic_cast<DeviceOptionValue<std::string> *>(m_OptionValues[optionIndex]);
+                if (strValue != nullptr)
+                {
+                    strValue->SetDeviceValue(0, std::string(reinterpret_cast<SANE_String>(value.get())));
+                }
+                else
+                {
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") +
+                            m_OptionValues[optionIndex]->GetTitle());
+                }
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+}
+
 void ZooScan::DeviceOptionsState::BuildOptions()
 {
     Clear();
@@ -117,8 +215,9 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
                 m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
     }
 
-    if (option->GetRequestedValue(valueIndex) == requestedValue)
+    if (option->GetValue(valueIndex) == requestedValue)
     {
+        option->SetRequestedValue(valueIndex, requestedValue);
         return;
     }
 
@@ -131,7 +230,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        RebuildOptions();
+        ReloadOptions();
         option = dynamic_cast<DeviceOptionValue<bool> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
@@ -186,10 +285,9 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
                 m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
     }
 
-    // TODO: apply SANE constraints
-
-    if (option->GetRequestedValue(valueIndex) == requestedValue)
+    if (option->GetValue(valueIndex) == requestedValue)
     {
+        option->SetRequestedValue(valueIndex, requestedValue);
         return;
     }
 
@@ -218,7 +316,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        RebuildOptions();
+        ReloadOptions();
         option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
@@ -249,10 +347,9 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
                 m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
     }
 
-    // TODO: apply SANE constraints
-
-    if (option->GetRequestedValue(valueIndex) == requestedValue)
+    if (option->GetValue(valueIndex) == requestedValue)
     {
+        option->SetRequestedValue(valueIndex, requestedValue);
         return;
     }
 
@@ -271,7 +368,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
-        RebuildOptions();
+        ReloadOptions();
         option = dynamic_cast<DeviceOptionValue<std::string> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
@@ -291,30 +388,6 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-std::vector<size_t> ZooScan::DeviceOptionsState::Updater::SetRequestedValuesFromJson(const nlohmann::json &json)
-{
-    std::vector<size_t> changedIndices;
-    for (auto optionIndex = 0UL; optionIndex < m_StateComponent->m_OptionValues.size(); optionIndex++)
-    {
-        auto optionValue = m_StateComponent->m_OptionValues[optionIndex];
-        if (optionValue == nullptr)
-        {
-            continue;
-        }
-
-        if (optionValue->Deserialize(json))
-        {
-            changedIndices.push_back(optionIndex);
-            for (auto valueIndex = 0U; valueIndex < optionValue->GetValueCount(); valueIndex++)
-            {
-                m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
-            }
-        }
-    }
-
-    return changedIndices;
-}
-
 void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
 {
     auto saneDevice = m_StateComponent->GetDevice();
@@ -322,6 +395,8 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
     {
         return;
     }
+
+    bool needReload = false;
 
     for (unsigned long changedIndex: changedIndices)
     {
@@ -345,6 +420,7 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
 
                 SANE_Bool saneValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
                 saneDevice->SetOptionValue(changedIndex, &saneValue, &optionInfo);
+                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
                 option->SetDeviceValue(0, saneValue == SANE_TRUE);
                 break;
             }
@@ -367,6 +443,7 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
                 }
 
                 saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
+                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
 
                 for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
                 {
@@ -387,6 +464,7 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
                 std::unique_ptr<char[]> saneValue(new char[option->GetValueSize() + 1]);
                 strcpy(saneValue.get(), option->GetRequestedValue(0).c_str());
                 saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
+                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
                 option->SetDeviceValue(0, std::string(saneValue.get()));
                 break;
             }
@@ -394,6 +472,11 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
             default:
                 break;
         }
+    }
+
+    if (needReload)
+    {
+        ReloadOptions();
     }
 }
 
@@ -416,7 +499,7 @@ void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
                 if (option == nullptr)
                 {
                     throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
                 }
 
                 SANE_Bool expectedValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
@@ -435,7 +518,7 @@ void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
                 if (option == nullptr)
                 {
                     throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
                 }
 
                 auto valueCount = option->GetValueCount();
@@ -459,7 +542,7 @@ void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
                 if (option == nullptr)
                 {
                     throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
                 }
 
                 std::string expectedValue = option->GetRequestedValue(0);
@@ -477,13 +560,37 @@ void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::ApplyOptionsFromJson(const nlohmann::json &json)
+void ZooScan::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &json)
 {
-    std::vector<size_t> changedIndices = SetRequestedValuesFromJson(json);
-    ApplyRequestedValuesToDevice(changedIndices);
+    // Load the preset in m_OptionValues requested values.
+    std::vector<size_t> indicesToApply;
+    for (auto optionIndex = 0UL; optionIndex < m_StateComponent->m_OptionValues.size(); optionIndex++)
+    {
+        auto optionValue = m_StateComponent->m_OptionValues[optionIndex];
+        if (optionValue == nullptr)
+        {
+            continue;
+        }
 
-    std::vector<size_t> indiceSetA(changedIndices);
-    std::vector<size_t> indiceSetB(changedIndices.size());
+        if (json.contains(optionValue->GetName()))
+        {
+            optionValue->Deserialize(json);
+            indicesToApply.push_back(optionIndex);
+            for (auto valueIndex = 0U; valueIndex < optionValue->GetValueCount(); valueIndex++)
+            {
+                m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
+            }
+        }
+    }
+
+    ApplyRequestedValuesToDevice(indicesToApply);
+
+    // When applying the requested values to the device, the device may decide to change the value
+    // of some other options (for example, setting the source to transparent may change the resolution).
+    // In this case, we need to check if the requested values are still valid and reapply them if necessary.
+    // This is done until all requested values are set or until we reach a maximum number of iterations.
+    std::vector indiceSetA(indicesToApply);
+    std::vector<size_t> indiceSetB(indicesToApply.size());
 
     auto currentIndiceSet = &indiceSetA;
     auto nextIndiceSet = &indiceSetB;
@@ -543,7 +650,7 @@ void ZooScan::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &js
         return;
     }
 
-    ApplyOptionsFromJson(json["Options"]);
+    ApplyPreset(json["Options"]);
 }
 
 bool ZooScan::DeviceOptionsState::IsPreview() const

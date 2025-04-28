@@ -72,7 +72,7 @@ namespace ZooScan
 
             if (deviceOptions != nullptr)
             {
-                TIFFSetField(m_File, TIFFTAG_MAKE, deviceOptions->GetDeviceMaker());
+                TIFFSetField(m_File, TIFFTAG_MAKE, deviceOptions->GetDeviceVendor());
                 TIFFSetField(m_File, TIFFTAG_MODEL, deviceOptions->GetDeviceModel());
             }
 

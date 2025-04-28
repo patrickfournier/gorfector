@@ -97,7 +97,7 @@ namespace ZooScan
             }
 
             std::string appId = app.GetApplicationId();
-            std::string creator = std::string(deviceOptions->GetDeviceMaker()) + " " + deviceOptions->GetDeviceModel();
+            std::string creator = std::string(deviceOptions->GetDeviceVendor()) + " " + deviceOptions->GetDeviceModel();
 
             constexpr int numTexts = 2;
             png_text textData[numTexts];
