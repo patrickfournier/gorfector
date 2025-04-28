@@ -16,7 +16,7 @@ namespace ZooScan
     private:
         const bool m_DevMode;
 
-        std::string m_OptionPanelDeviceName{};
+        std::string m_CurrentDeviceName{};
         AppMode m_AppMode{};
 
         bool m_IsScanning{};
@@ -29,13 +29,11 @@ namespace ZooScan
         {
         }
 
-        ~AppState() override
-        {
-        }
+        ~AppState() override = default;
 
-        [[nodiscard]] const std::string &GetOptionPanelDeviceName() const
+        [[nodiscard]] const std::string &GetCurrentDeviceName() const
         {
-            return m_OptionPanelDeviceName;
+            return m_CurrentDeviceName;
         }
 
         [[nodiscard]] AppMode GetAppMode() const
@@ -66,9 +64,13 @@ namespace ZooScan
             {
             }
 
-            void UpdateOptionPanelDeviceName(const std::string &deviceName) const
+            void LoadFromJson(const nlohmann::json &json) override
             {
-                m_StateComponent->m_OptionPanelDeviceName = deviceName;
+            }
+
+            void SetCurrentDevice(const std::string &deviceName) const
+            {
+                m_StateComponent->m_CurrentDeviceName = deviceName;
             }
 
             void SetAppMode(AppMode scanMode) const

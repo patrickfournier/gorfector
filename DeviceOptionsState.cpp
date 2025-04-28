@@ -2,6 +2,9 @@
 #include <memory>
 
 #include "DeviceOptionsState.hpp"
+
+#include <glib.h>
+
 #include "SaneDevice.hpp"
 #include "SaneException.hpp"
 
@@ -288,39 +291,8 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::DeserializeAndApply(const nlohmann::json &json) const
+std::vector<size_t> ZooScan::DeviceOptionsState::Updater::SetRequestedValuesFromJson(const nlohmann::json &json)
 {
-    if (m_StateComponent->m_State == nullptr)
-    {
-        return;
-    }
-
-    auto saneDevice = m_StateComponent->GetDevice();
-    if (saneDevice == nullptr)
-    {
-        return;
-    }
-
-    if (json.contains("device"))
-    {
-        auto device = json["device"];
-        if (device.contains("name"))
-        {
-            if (strcmp(saneDevice->GetName(), device["name"].get<std::string>().c_str()) != 0)
-            {
-                return;
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
-    else
-    {
-        return;
-    }
-
     std::vector<size_t> changedIndices;
     for (auto optionIndex = 0UL; optionIndex < m_StateComponent->m_OptionValues.size(); optionIndex++)
     {
@@ -330,24 +302,27 @@ void ZooScan::DeviceOptionsState::Updater::DeserializeAndApply(const nlohmann::j
             continue;
         }
 
-        if (json.contains("options"))
+        if (optionValue->Deserialize(json))
         {
-            auto options = json["options"];
-            if (options.contains(optionValue->GetName()))
+            changedIndices.push_back(optionIndex);
+            for (auto valueIndex = 0U; valueIndex < optionValue->GetValueCount(); valueIndex++)
             {
-                if (optionValue->Deserialize(options[optionValue->GetName()]))
-                {
-                    changedIndices.push_back(optionIndex);
-                    for (auto valueIndex = 0U; valueIndex < optionValue->GetValueCount(); valueIndex++)
-                    {
-                        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
-                    }
-                }
+                m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
             }
         }
     }
 
-    // Initial set of options
+    return changedIndices;
+}
+
+void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
+{
+    auto saneDevice = m_StateComponent->GetDevice();
+    if (saneDevice == nullptr)
+    {
+        return;
+    }
+
     for (unsigned long changedIndex: changedIndices)
     {
         int optionInfo;
@@ -420,119 +395,155 @@ void ZooScan::DeviceOptionsState::Updater::DeserializeAndApply(const nlohmann::j
                 break;
         }
     }
+}
 
-    // Check that the requested values were not changed by another option. Reapply if necessary.
-    bool repeat = true;
-    int maxRepeatCount = 10;
-    while (repeat && maxRepeatCount > 0)
+void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
+        const std::vector<size_t> &indicesToCheck, std::vector<size_t> &mismatches)
+{
+    for (unsigned long changedIndex: indicesToCheck)
     {
-        repeat = false;
-        maxRepeatCount--;
-
-        for (unsigned long changedIndex: changedIndices)
+        auto optionValue = m_StateComponent->m_OptionValues[changedIndex];
+        if (optionValue == nullptr)
         {
-            int optionInfo;
-            auto optionValue = m_StateComponent->m_OptionValues[changedIndex];
-            if (optionValue == nullptr)
+            continue;
+        }
+
+        switch (optionValue->GetValueType())
+        {
+            case SANE_TYPE_BOOL:
             {
-                continue;
+                auto *option = dynamic_cast<DeviceOptionValue<bool> *>(optionValue);
+                if (option == nullptr)
+                {
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                }
+
+                SANE_Bool expectedValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
+                SANE_Bool currentValue = option->GetValue(0) ? SANE_TRUE : SANE_FALSE;
+                if (currentValue != expectedValue)
+                {
+                    mismatches.push_back(changedIndex);
+                }
+                break;
             }
 
-            switch (optionValue->GetValueType())
+            case SANE_TYPE_INT:
+            case SANE_TYPE_FIXED:
             {
-                case SANE_TYPE_BOOL:
+                auto *option = dynamic_cast<DeviceOptionValue<int> *>(optionValue);
+                if (option == nullptr)
                 {
-                    auto *option = dynamic_cast<DeviceOptionValue<bool> *>(optionValue);
-                    if (option == nullptr)
-                    {
-                        throw std::runtime_error(
-                                std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
-                    }
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                }
 
-                    SANE_Bool expectedValue = option->GetValue(0) ? SANE_TRUE : SANE_FALSE;
-                    SANE_Bool currentValue;
-                    saneDevice->GetOptionValue(changedIndex, &currentValue);
+                auto valueCount = option->GetValueCount();
+                for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
+                {
+                    SANE_Word expectedValue = option->GetRequestedValue(valueIndex);
+                    SANE_Word currentValue = option->GetValue(valueIndex);
+
                     if (currentValue != expectedValue)
                     {
-                        SANE_Bool saneValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
-                        saneDevice->SetOptionValue(changedIndex, &saneValue, &optionInfo);
-                        option->SetDeviceValue(0, saneValue == SANE_TRUE);
-                        repeat = true;
+                        mismatches.push_back(changedIndex);
+                        break;
                     }
-                    break;
                 }
-
-                case SANE_TYPE_INT:
-                case SANE_TYPE_FIXED:
-                {
-                    auto *option = dynamic_cast<DeviceOptionValue<int> *>(optionValue);
-                    if (option == nullptr)
-                    {
-                        throw std::runtime_error(
-                                std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
-                    }
-
-                    auto valueCount = option->GetValueCount();
-                    std::unique_ptr<SANE_Word[]> currentValue(new SANE_Word[valueCount]);
-                    saneDevice->GetOptionValue(changedIndex, currentValue.get());
-                    bool asExpected = true;
-                    for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                    {
-                        if (currentValue[valueIndex] != option->GetValue(valueIndex))
-                        {
-                            asExpected = false;
-                            break;
-                        }
-                    }
-
-                    if (!asExpected)
-                    {
-                        std::unique_ptr<SANE_Word[]> saneValue(new SANE_Word[valueCount]);
-                        for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                        {
-                            saneValue[valueIndex] = option->GetRequestedValue(valueIndex);
-                        }
-
-                        saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
-
-                        for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                        {
-                            option->SetDeviceValue(valueIndex, saneValue[valueIndex]);
-                        }
-                        repeat = true;
-                    }
-                    break;
-                }
-
-                case SANE_TYPE_STRING:
-                {
-                    auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(optionValue);
-                    if (option == nullptr)
-                    {
-                        throw std::runtime_error(
-                                std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
-                    }
-
-                    std::string expectedValue = option->GetValue(0);
-                    std::unique_ptr<char[]> currentValue(new char[option->GetValueSize() + 1]);
-                    saneDevice->GetOptionValue(changedIndex, currentValue.get());
-
-                    if (strcmp(expectedValue.c_str(), currentValue.get()) != 0)
-                    {
-                        std::unique_ptr<char[]> saneValue(new char[option->GetValueSize() + 1]);
-                        strcpy(saneValue.get(), option->GetRequestedValue(0).c_str());
-                        saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
-                        option->SetDeviceValue(0, std::string(saneValue.get()));
-                        repeat = true;
-                    }
-                    break;
-                }
-
-                default:
-                    break;
+                break;
             }
+
+            case SANE_TYPE_STRING:
+            {
+                auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(optionValue);
+                if (option == nullptr)
+                {
+                    throw std::runtime_error(
+                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                }
+
+                std::string expectedValue = option->GetRequestedValue(0);
+                std::string currentValue = option->GetValue(0);
+                if (currentValue != expectedValue)
+                {
+                    mismatches.push_back(changedIndex);
+                }
+                break;
+            }
+
+            default:
+                break;
         }
     }
+}
+
+void ZooScan::DeviceOptionsState::Updater::ApplyOptionsFromJson(const nlohmann::json &json)
+{
+    std::vector<size_t> changedIndices = SetRequestedValuesFromJson(json);
+    ApplyRequestedValuesToDevice(changedIndices);
+
+    std::vector<size_t> indiceSetA(changedIndices);
+    std::vector<size_t> indiceSetB(changedIndices.size());
+
+    auto currentIndiceSet = &indiceSetA;
+    auto nextIndiceSet = &indiceSetB;
+    int maxRepeatCount = 10;
+    while (!currentIndiceSet->empty() && maxRepeatCount > 0)
+    {
+        maxRepeatCount--;
+
+        nextIndiceSet->clear();
+        FindRequestMismatches(*currentIndiceSet, *nextIndiceSet);
+        ApplyRequestedValuesToDevice(*nextIndiceSet);
+
+        std::swap(currentIndiceSet, nextIndiceSet);
+    }
+
+    if (!currentIndiceSet->empty())
+    {
+        g_warning("Failed to set all requested values on the device.");
+    }
+}
+
+void ZooScan::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &json)
+{
+    if (m_StateComponent->m_State == nullptr)
+    {
+        return;
+    }
+
+    auto saneDevice = m_StateComponent->GetDevice();
+    if (saneDevice == nullptr)
+    {
+        return;
+    }
+
+    if (!json.contains("Device"))
+    {
+        return;
+    }
+
+    auto device = json["Device"];
+    if (!device.contains("Model") || !device.contains("Vendor"))
+    {
+        return;
+    }
+
+    if (strcmp(saneDevice->GetVendor(), device["Vendor"].get<std::string>().c_str()) != 0)
+    {
+        return;
+    }
+    if (strcmp(saneDevice->GetModel(), device["Model"].get<std::string>().c_str()) != 0)
+    {
+        return;
+    }
+
+    if (!json.contains("Options"))
+    {
+        return;
+    }
+
+    ApplyOptionsFromJson(json["Options"]);
 }
 
 bool ZooScan::DeviceOptionsState::IsPreview() const
@@ -714,37 +725,4 @@ int ZooScan::DeviceOptionsState::GetBitDepth() const
     }
 
     return 8;
-}
-
-nlohmann::json *ZooScan::DeviceOptionsState::Serialize() const
-{
-    auto device = GetDevice();
-    if (device == nullptr)
-    {
-        return nullptr;
-    }
-
-    auto json = new nlohmann::json();
-
-    (*json)["device"]["name"] = device->GetName();
-    (*json)["device"]["vendor"] = device->GetVendor();
-    (*json)["device"]["model"] = device->GetModel();
-    (*json)["device"]["type"] = device->GetType();
-
-    (*json)["options"] = nlohmann::json::object();
-    for (auto optionValue: m_OptionValues)
-    {
-        if (optionValue == nullptr)
-        {
-            continue;
-        }
-        if (!optionValue->IsSoftwareSettable())
-        {
-            continue;
-        }
-
-        optionValue->Serialize((*json)["options"]);
-    }
-
-    return json;
 }

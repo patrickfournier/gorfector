@@ -80,7 +80,8 @@ namespace ZooLib
 
                 if (jsonData.contains(key))
                 {
-                    from_json(jsonData[key], *stateComponent);
+                    auto updater = typename TStateComponent::Updater(stateComponent);
+                    updater.LoadFromJson(jsonData[key]);
                 }
             }
             catch (const std::exception &e)

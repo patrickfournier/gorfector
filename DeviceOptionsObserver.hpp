@@ -6,6 +6,13 @@
 
 namespace ZooScan
 {
+    /**
+     * @class DeviceOptionsObserver
+     * @brief A class responsible for observing changes in device options and responding to updates.
+     *
+     * The DeviceOptionsObserver class monitors the device options and updates the preview whenever the
+     * scan area is modified.
+     */
     class DeviceOptionsObserver final : public ZooLib::Observer
     {
     protected:
@@ -14,7 +21,7 @@ namespace ZooScan
             const auto deviceOptionsState = dynamic_cast<const DeviceOptionsState *>(m_ObservedComponents[0]);
             auto appState = dynamic_cast<PreviewState *>(m_ModifiedComponents[0]);
             auto updater = PreviewState::Updater(appState);
-            updater.UpdatePreviewRectangle(deviceOptionsState->GetScanArea());
+            updater.UpdateScanArea(deviceOptionsState->GetScanArea());
         }
 
     public:

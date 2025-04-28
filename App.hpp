@@ -12,6 +12,7 @@
 
 namespace ZooScan
 {
+    class PresetPanel;
     class FileWriter;
     class DeviceOptionsObserver;
     class ScanOptionsPanel;
@@ -33,6 +34,7 @@ namespace ZooScan
 
         ScanOptionsPanel *m_ScanOptionsPanel{};
         PreviewPanel *m_PreviewPanel{};
+        PresetPanel *m_PresetPanel{};
 
         GtkWidget *m_SettingsBox{};
 
@@ -74,7 +76,7 @@ namespace ZooScan
             {
                 return nullptr;
             }
-            return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetOptionPanelDeviceName());
+            return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetCurrentDeviceName());
         }
 
         [[nodiscard]] int GetScanHeight() const;
@@ -83,7 +85,7 @@ namespace ZooScan
 
         void OnPreviewClicked(GtkWidget *widget);
         void UpdatePreview();
-        void RestoreScanOptions() const;
+        void RestoreScanOptions();
         void StopPreview();
 
         bool CheckFileOutputOptions(const OutputOptionsState *scanOptions);
@@ -114,9 +116,9 @@ namespace ZooScan
             return m_AppState;
         }
 
-        [[nodiscard]] AppState *GetAppState()
+        [[nodiscard]] const DeviceSelectorState *GetDeviceSelectorState() const
         {
-            return m_AppState;
+            return m_DeviceSelectorState;
         }
 
         void Update(const std::vector<uint64_t> &lastSeenVersions);
@@ -131,6 +133,7 @@ namespace ZooScan
             return m_DeviceSelectorState->GetDeviceByName(deviceName);
         }
 
-        [[nodiscard]] const DeviceOptionsState *GetDeviceOptions() const;
+        [[nodiscard]] DeviceOptionsState *GetDeviceOptions() const;
+        [[nodiscard]] OutputOptionsState *GetOutputOptions();
     };
 }

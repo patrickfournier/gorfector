@@ -5,7 +5,6 @@
 
 namespace ZooLib
 {
-
     class View
     {
         static void DestroyView(GtkWidget *widget, gpointer data)
@@ -37,5 +36,4 @@ namespace ZooLib
 
         virtual void Update(const std::vector<uint64_t> &lastSeenVersions) = 0;
     };
-
 }

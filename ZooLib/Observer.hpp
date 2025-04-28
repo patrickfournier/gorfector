@@ -5,6 +5,15 @@
 
 namespace ZooLib
 {
+    /**
+     * @class Observer
+     * @brief A class responsible for observing changes in state components and responding to updates.
+     *
+     * The Observer class monitors some state components and executes UpdateImplementation() when a change is detected.
+     * It is a base class for creating observers that can respond to changes in state components.
+     * If the observer modifies any state components, they should be passed in the constructor to ensure that
+     * observers are executed in the correct order.
+     */
     class Observer
     {
     protected:

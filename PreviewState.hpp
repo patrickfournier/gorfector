@@ -268,6 +268,10 @@ namespace ZooScan
             {
             }
 
+            void LoadFromJson(const nlohmann::json &json) override
+            {
+            }
+
             void SetPreviewWindowSize(int width, int height)
             {
                 if (m_StateComponent->m_PreviewWindowWidth == width &&
@@ -330,7 +334,7 @@ namespace ZooScan
                 changeset->Set(PreviewStateChangeset::TypeFlag::ZoomFactor);
             }
 
-            void UpdatePreviewRectangle(const Rect<double> &scanArea)
+            void UpdateScanArea(const Rect<double> &scanArea)
             {
                 if (m_StateComponent->m_ScanArea == scanArea)
                 {

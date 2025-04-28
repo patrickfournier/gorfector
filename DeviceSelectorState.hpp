@@ -156,6 +156,10 @@ namespace ZooScan
             {
             }
 
+            void LoadFromJson(const nlohmann::json &json) override
+            {
+            }
+
             void UpdateDeviceList() const
             {
                 m_StateComponent->GetDevicesFromSANE();

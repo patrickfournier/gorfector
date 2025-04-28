@@ -3,7 +3,10 @@
     <gresource prefix="/com/patrickfournier/zooscan">
         <file>resources/zooscan.css</file>
     </gresource>
-    <gresource prefix="/org/gtk/example/icons/scalable/actions/">
+    <gresource prefix="/com/patrickfournier/zooscan">
         <file preprocess="xml-stripblanks">resources/decode-symbolic.svg</file>
+    </gresource>
+    <gresource prefix="/com/patrickfournier/zooscan">
+        <file preprocess="xml-stripblanks">resources/arrow3-down-symbolic.svg</file>
     </gresource>
 </gresources>

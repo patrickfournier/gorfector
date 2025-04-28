@@ -3,3 +3,11 @@
     border-color: #000;
     border-style: solid;
 }
+
+.no-bottom {
+    margin-bottom: -10px;
+}
+
+.entry-hint {
+    font-size: 0.8em;
+}

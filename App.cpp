@@ -13,6 +13,7 @@
 #include "DeviceSelectorObserver.hpp"
 #include "OutputOptionsState.hpp"
 #include "PreferencesView.hpp"
+#include "PresetPanel.hpp"
 #include "PreviewPanel.hpp"
 #include "ScanOptionsPanel.hpp"
 #include "Writers/FileWriter.hpp"
@@ -113,7 +114,7 @@ GtkWidget *ZooScan::App::CreateContent()
     auto deviceSelected = !GetSelectorDeviceName().empty();
 
     auto *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_widget_set_margin_bottom(paned, 15);
+    gtk_widget_set_margin_bottom(paned, 0);
     gtk_widget_set_margin_top(paned, 0);
     gtk_widget_set_margin_start(paned, 10);
     gtk_widget_set_margin_end(paned, 10);
@@ -128,31 +129,53 @@ GtkWidget *ZooScan::App::CreateContent()
     gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
     gtk_paned_set_start_child(GTK_PANED(paned), clamp);
 
-    m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+    m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_bottom(m_SettingsBox, 0);
     gtk_widget_set_margin_top(m_SettingsBox, 0);
     gtk_widget_set_margin_start(m_SettingsBox, 0);
     gtk_widget_set_margin_end(m_SettingsBox, 10);
     adw_clamp_set_child(ADW_CLAMP(clamp), m_SettingsBox);
 
+    auto buttonBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+    gtk_widget_set_margin_bottom(buttonBox, 20);
+    gtk_widget_set_margin_top(buttonBox, 20);
+    gtk_widget_set_margin_start(buttonBox, 0);
+    gtk_widget_set_margin_end(buttonBox, 0);
+    gtk_box_append(GTK_BOX(m_SettingsBox), buttonBox);
+
     m_PreviewButton = gtk_button_new_with_label(_("Preview"));
     ConnectGtkSignal(this, &App::OnPreviewClicked, m_PreviewButton, "clicked");
     gtk_widget_set_sensitive(m_PreviewButton, deviceSelected);
-    gtk_box_append(GTK_BOX(m_SettingsBox), m_PreviewButton);
+    gtk_box_append(GTK_BOX(buttonBox), m_PreviewButton);
 
     m_ScanButton = gtk_button_new_with_label(_("Scan"));
     ConnectGtkSignal(this, &App::OnScanClicked, m_ScanButton, "clicked");
     gtk_widget_set_sensitive(m_ScanButton, deviceSelected);
-    gtk_box_append(GTK_BOX(m_SettingsBox), m_ScanButton);
+    gtk_box_append(GTK_BOX(buttonBox), m_ScanButton);
 
     m_CancelButton = gtk_button_new_with_label(_("Cancel Scan"));
     ConnectGtkSignal(this, &App::OnCancelClicked, m_CancelButton, "clicked");
     gtk_widget_set_sensitive(m_CancelButton, false);
-    gtk_box_append(GTK_BOX(m_SettingsBox), m_CancelButton);
+    gtk_box_append(GTK_BOX(buttonBox), m_CancelButton);
+
+    auto bottomAlignedSection = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_hexpand(bottomAlignedSection, true);
+    gtk_widget_set_vexpand(bottomAlignedSection, true);
+    gtk_widget_set_valign(bottomAlignedSection, GTK_ALIGN_END);
+    gtk_box_append(GTK_BOX(m_SettingsBox), bottomAlignedSection);
+
+    m_PresetPanel = ZooLib::View::Create<PresetPanel>(&m_Dispatcher, this);
+    auto presetsBox = m_PresetPanel->GetRootWidget();
+    gtk_widget_set_margin_bottom(presetsBox, 0);
+    gtk_widget_set_margin_top(presetsBox, 0);
+    gtk_widget_set_margin_start(presetsBox, 0);
+    gtk_widget_set_margin_end(presetsBox, 0);
+    gtk_box_append(GTK_BOX(bottomAlignedSection), presetsBox);
+    gtk_widget_set_hexpand(presetsBox, true);
 
     m_PreviewPanel = ZooLib::View::Create<PreviewPanel>(&m_Dispatcher, this);
     auto previewBox = m_PreviewPanel->GetRootWidget();
-    gtk_widget_set_margin_bottom(previewBox, 0);
+    gtk_widget_set_margin_bottom(previewBox, 10);
     gtk_widget_set_margin_top(previewBox, 0);
     gtk_widget_set_margin_start(previewBox, 10);
     gtk_widget_set_margin_end(previewBox, 0);
@@ -268,7 +291,7 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
         }
 
         gtk_box_remove(GTK_BOX(m_SettingsBox), m_ScanOptionsPanel->GetRootWidget());
-        // m_DeviceOptionsPanel is automatically deleted when its root widget is destroyed.
+        // m_ScanOptionsPanel is automatically deleted when its root widget is destroyed.
         m_ScanOptionsPanel = nullptr;
         m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
     }
@@ -315,7 +338,7 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
     }
 }
 
-const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
+ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
 {
     if (m_ScanOptionsPanel == nullptr)
         return nullptr;
@@ -323,10 +346,18 @@ const ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
     return m_ScanOptionsPanel->GetDeviceOptionsState();
 }
 
-void ZooScan::App::RestoreScanOptions() const
+ZooScan::OutputOptionsState *ZooScan::App::GetOutputOptions()
+{
+    if (m_ScanOptionsPanel == nullptr)
+        return nullptr;
+
+    return m_ScanOptionsPanel->GetOutputOptionsState();
+}
+
+void ZooScan::App::RestoreScanOptions()
 {
     auto device = GetDevice();
-    const auto options = GetDeviceOptions();
+    auto options = GetDeviceOptions();
     if (device == nullptr || options == nullptr)
     {
         return;

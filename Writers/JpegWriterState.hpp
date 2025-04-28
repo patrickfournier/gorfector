@@ -41,6 +41,11 @@ namespace ZooScan
             {
             }
 
+            void LoadFromJson(const nlohmann::json &json) override
+            {
+                from_json(json, *m_StateComponent);
+            }
+
             void SetQuality(int quality)
             {
                 m_StateComponent->m_Quality = quality;

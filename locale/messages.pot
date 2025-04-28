@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-22 19:30-0400\n"
+"POT-Creation-Date: 2025-04-27 20:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,7 @@ msgstr ""
 msgid "ADF Mode"
 msgstr ""
 
-#: App.cpp:176
+#: App.cpp:198
 msgid "About..."
 msgstr ""
 
@@ -122,7 +122,7 @@ msgstr ""
 msgid "Adds to red based on green level"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:419 entrée standard:17
+#: ScanOptionsPanel.cpp:420 entrée standard:17
 msgid "Advanced"
 msgstr ""
 
@@ -132,8 +132,17 @@ msgid ""
 "pressed to actually start the scan process."
 msgstr ""
 
-#: App.cpp:233
+#: App.cpp:255
 msgid "An application to scan images."
+msgstr ""
+
+#: PresetPanel.cpp:147
+msgid "Apply this preset"
+msgstr ""
+
+#: PresetPanel.cpp:103
+#, c-format
+msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr ""
 
 #: entrée standard:52
@@ -152,7 +161,7 @@ msgstr ""
 msgid "B5"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:415
+#: ScanOptionsPanel.cpp:416
 msgid "Basic"
 msgstr ""
 
@@ -200,7 +209,7 @@ msgstr ""
 msgid "Brightness Method"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:545
+#: ScanOptionsPanel.cpp:546
 msgid "Browse for a location."
 msgstr ""
 
@@ -212,11 +221,15 @@ msgstr ""
 msgid "Calibrate"
 msgstr ""
 
-#: App.cpp:149 OutputOptionsState.hpp:26
+#: PresetPanel.cpp:104
+msgid "Cancel"
+msgstr ""
+
+#: App.cpp:156 OutputOptionsState.hpp:27
 msgid "Cancel Scan"
 msgstr ""
 
-#: DeviceSelector.cpp:153
+#: DeviceSelector.cpp:159
 msgid "Cannot open scanner {}."
 msgstr ""
 
@@ -240,7 +253,7 @@ msgstr ""
 msgid "Color correction"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:445
+#: ScanOptionsPanel.cpp:446
 msgid "Common Options"
 msgstr ""
 
@@ -276,11 +289,19 @@ msgstr ""
 msgid "Controls the contrast of the acquired image."
 msgstr ""
 
-#: ScanOptionsPanel.cpp:551
-msgid "Create Missing Directories"
+#: PresetCreateDialog.cpp:169
+msgid "Create"
 msgstr ""
 
 #: ScanOptionsPanel.cpp:552
+msgid "Create Missing Directories"
+msgstr ""
+
+#: PresetCreateDialog.cpp:110
+msgid "Create a new preset"
+msgstr ""
+
+#: ScanOptionsPanel.cpp:553
 msgid "Create directories if they do not exist."
 msgstr ""
 
@@ -296,11 +317,23 @@ msgstr ""
 msgid "Deflate Compression Level"
 msgstr ""
 
+#: PresetPanel.cpp:104
+msgid "Delete"
+msgstr ""
+
+#: PresetPanel.cpp:101
+msgid "Delete Preset"
+msgstr ""
+
+#: PresetPanel.cpp:189
+msgid "Delete this preset"
+msgstr ""
+
 #: entrée standard:64
 msgid "Deskew"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:509 ScanOptionsPanel.cpp:514
+#: ScanOptionsPanel.cpp:510 ScanOptionsPanel.cpp:515
 msgid "Destination"
 msgstr ""
 
@@ -319,7 +352,7 @@ msgstr ""
 msgid "Developer"
 msgstr ""
 
-#: App.cpp:626
+#: App.cpp:656
 msgid "Directory does not exists: {}."
 msgstr ""
 
@@ -355,12 +388,20 @@ msgstr ""
 msgid "Eject the sheet in the ADF"
 msgstr ""
 
-#: OutputOptionsState.hpp:18
+#: OutputOptionsState.hpp:19
 msgid "Email"
 msgstr ""
 
-#: App.cpp:611
+#: App.cpp:641
 msgid "Enter a file name to save the image files."
+msgstr ""
+
+#: PresetCreateDialog.cpp:125
+msgid "Enter a name for the new preset:"
+msgstr ""
+
+#: PresetRenameDialog.cpp:108
+msgid "Enter a new name for the preset:"
 msgstr ""
 
 #: entrée standard:147 entrée standard:155
@@ -371,19 +412,19 @@ msgstr ""
 msgid "Extended SANE Status"
 msgstr ""
 
-#: App.cpp:755
+#: App.cpp:785
 msgid "Failed to create file: "
 msgstr ""
 
-#: OutputOptionsState.hpp:18
+#: OutputOptionsState.hpp:19
 msgid "File"
 msgstr ""
 
-#: App.cpp:659
+#: App.cpp:689
 msgid "File '{}' already exists."
 msgstr ""
 
-#: ScanOptionsPanel.cpp:561
+#: ScanOptionsPanel.cpp:562
 msgid "File Name"
 msgstr ""
 
@@ -467,7 +508,7 @@ msgstr ""
 msgid "Horizontal Resolution"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:574
+#: ScanOptionsPanel.cpp:575
 msgid "If File Exists"
 msgstr ""
 
@@ -475,11 +516,11 @@ msgstr ""
 msgid "Image Formats"
 msgstr ""
 
-#: DeviceSelector.cpp:38
+#: DeviceSelector.cpp:43
 msgid "Include Network Scanners"
 msgstr ""
 
-#: OutputOptionsState.hpp:26
+#: OutputOptionsState.hpp:27
 msgid "Increase Counter"
 msgstr ""
 
@@ -501,6 +542,14 @@ msgstr ""
 msgid "Indicates whether the scanner needs to poll."
 msgstr ""
 
+#: PresetViewDialog.cpp:25
+msgid "Inspect Preset"
+msgstr ""
+
+#: PresetPanel.cpp:161
+msgid "Inspect this preset"
+msgstr ""
+
 #: PreferencesView.hpp:68
 msgid "JPEG Quality"
 msgstr ""
@@ -513,7 +562,7 @@ msgstr ""
 msgid "Letter"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:529
+#: ScanOptionsPanel.cpp:530
 msgid "Location"
 msgstr ""
 
@@ -549,15 +598,19 @@ msgstr ""
 msgid "Negative Film"
 msgstr ""
 
-#: DeviceSelector.cpp:27 DeviceSelector.cpp:163
+#: PresetPanel.cpp:49
+msgid "New preset"
+msgstr ""
+
+#: DeviceSelector.cpp:31 DeviceSelector.cpp:169
 msgid "No Scanner Found"
 msgstr ""
 
-#: DeviceSelector.cpp:159
+#: DeviceSelector.cpp:165
 msgid "No scanner found."
 msgstr ""
 
-#: DeviceSelector.cpp:107 entrée standard:128 entrée standard:132
+#: DeviceSelector.cpp:113 entrée standard:128 entrée standard:132
 #: entrée standard:171
 msgid "None"
 msgstr ""
@@ -570,11 +623,15 @@ msgstr ""
 msgid "Optional equipment"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:424
+#: ScanOptionsPanel.cpp:425
 msgid "Output"
 msgstr ""
 
-#: OutputOptionsState.hpp:26
+#: PresetCreateDialog.cpp:151
+msgid "Output Settings"
+msgstr ""
+
+#: OutputOptionsState.hpp:27
 msgid "Overwrite"
 msgstr ""
 
@@ -596,11 +653,15 @@ msgstr ""
 msgid "Positive Film"
 msgstr ""
 
-#: App.cpp:139 entrée standard:40 entrée standard:41
+#: PresetPanel.cpp:41
+msgid "Presets"
+msgstr ""
+
+#: App.cpp:146 entrée standard:40 entrée standard:41
 msgid "Preview"
 msgstr ""
 
-#: OutputOptionsState.hpp:18
+#: OutputOptionsState.hpp:19
 msgid "Printer"
 msgstr ""
 
@@ -624,8 +685,20 @@ msgstr ""
 msgid "Red intensity"
 msgstr ""
 
-#: DeviceSelector.cpp:43
+#: DeviceSelector.cpp:48
 msgid "Refresh Scanner List"
+msgstr ""
+
+#: PresetRenameDialog.cpp:132
+msgid "Rename"
+msgstr ""
+
+#: PresetRenameDialog.cpp:93
+msgid "Rename Preset"
+msgstr ""
+
+#: PresetPanel.cpp:175
+msgid "Rename this preset"
 msgstr ""
 
 #: entrée standard:102
@@ -640,11 +713,11 @@ msgstr ""
 msgid "Rotate image so it appears upright."
 msgstr ""
 
-#: App.cpp:144
+#: App.cpp:151
 msgid "Scan"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:461 entrée standard:44
+#: PresetCreateDialog.cpp:146 ScanOptionsPanel.cpp:462 entrée standard:44
 msgid "Scan Area"
 msgstr ""
 
@@ -664,23 +737,27 @@ msgstr ""
 msgid "Scan speed"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:609
+#: PresetCreateDialog.cpp:141
+msgid "Scanners Settings"
+msgstr ""
+
+#: ScanOptionsPanel.cpp:610
 msgid "Select Destination"
 msgstr ""
 
-#: App.cpp:195
+#: App.cpp:217
 msgid "Select Device"
 msgstr ""
 
-#: App.cpp:168
+#: App.cpp:190
 msgid "Select Device..."
 msgstr ""
 
-#: DeviceSelector.cpp:31
+#: DeviceSelector.cpp:36
 msgid "Select Scanner: "
 msgstr ""
 
-#: App.cpp:604
+#: App.cpp:634
 msgid "Select a directory where to save the image files."
 msgstr ""
 
@@ -754,11 +831,11 @@ msgstr ""
 msgid "Sets the vertical resolution of the scanned image."
 msgstr ""
 
-#: App.cpp:219
+#: App.cpp:241
 msgid "Settings"
 msgstr ""
 
-#: App.cpp:175
+#: App.cpp:197
 msgid "Settings..."
 msgstr ""
 
@@ -810,11 +887,11 @@ msgstr ""
 msgid "TIFF Settings"
 msgstr ""
 
-#: ScanOptionsPanel.cpp:530
+#: ScanOptionsPanel.cpp:531
 msgid "The directory where the scanned files will be saved."
 msgstr ""
 
-#: App.cpp:678
+#: App.cpp:708
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -856,15 +933,15 @@ msgstr ""
 msgid "Ugly kludge to provide additional status message strings to a frontend."
 msgstr ""
 
-#: App.cpp:747
+#: App.cpp:777
 msgid "Unsupported depth"
 msgstr ""
 
-#: App.cpp:798
+#: App.cpp:828
 msgid "Unsupported file format"
 msgstr ""
 
-#: App.cpp:493 App.cpp:740
+#: App.cpp:523 App.cpp:770
 msgid "Unsupported format"
 msgstr ""
 

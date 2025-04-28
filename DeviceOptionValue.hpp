@@ -54,7 +54,7 @@ namespace ZooScan
 
                     for (auto i = 0UL; i < values.size(); i++)
                     {
-                        if (m_RequestedValue[i] == values[i].template get<ValueType>())
+                        if (m_RequestedValue[i] != values[i].template get<ValueType>())
                         {
                             newValues[i] = values[i];
                             updated = true;
@@ -78,7 +78,6 @@ namespace ZooScan
             }
 
             return updated;
-            ;
         }
 
         void SetRequestedValue(uint32_t valueIndex, const ValueType &value)

@@ -14,19 +14,24 @@ ZooScan::DeviceSelector::DeviceSelector(
     : m_App(app)
     , m_Dispatcher(parent)
 {
+    const char *listBoxClasses[] = {"boxed-list", nullptr};
+    const char *buttonClasses[] = {"flat", nullptr};
+
     m_State = deviceSelectorState;
     m_Observer = new ViewUpdateObserver(this, m_State);
     m_App->GetObserverManager()->AddObserver(m_Observer);
 
     m_DeviceSelectorRoot = gtk_list_box_new();
-    gtk_widget_set_margin_top(m_DeviceSelectorRoot, 10);
-    gtk_widget_set_margin_bottom(m_DeviceSelectorRoot, 15);
-    gtk_widget_set_margin_start(m_DeviceSelectorRoot, 10);
-    gtk_widget_set_margin_end(m_DeviceSelectorRoot, 10);
+    gtk_widget_set_margin_top(m_DeviceSelectorRoot, 20);
+    gtk_widget_set_margin_bottom(m_DeviceSelectorRoot, 20);
+    gtk_widget_set_margin_start(m_DeviceSelectorRoot, 20);
+    gtk_widget_set_margin_end(m_DeviceSelectorRoot, 20);
+    gtk_widget_set_css_classes(GTK_WIDGET(m_DeviceSelectorRoot), listBoxClasses);
 
     const char *deviceListNames[] = {_("No Scanner Found"), nullptr};
     auto *deviceList = gtk_string_list_new(deviceListNames);
 
+    /* TODO add button with icon view-refresh-symbolic */
     m_DeviceSelectorList = adw_combo_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_DeviceSelectorList), _("Select Scanner: "));
     adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceList));
@@ -41,6 +46,7 @@ ZooScan::DeviceSelector::DeviceSelector(
     gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), networkScan);
 
     auto refreshButton = gtk_button_new_with_label(_("Refresh Scanner List"));
+    gtk_widget_set_css_classes(GTK_WIDGET(refreshButton), buttonClasses);
     ConnectGtkSignal(this, &DeviceSelector::OnRefreshDevicesClicked, refreshButton, "clicked");
     gtk_list_box_append(GTK_LIST_BOX(m_DeviceSelectorRoot), refreshButton);
 

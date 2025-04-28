@@ -95,6 +95,11 @@ namespace ZooScan
             {
             }
 
+            void LoadFromJson(const nlohmann::json &json) override
+            {
+                from_json(json, *m_StateComponent);
+            }
+
             void SetCompression(Compression compression)
             {
                 m_StateComponent->m_Compression = compression;

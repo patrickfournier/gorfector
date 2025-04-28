@@ -81,6 +81,11 @@ namespace ZooScan
             {
             }
 
+            void LoadFromJson(const nlohmann::json &json) override
+            {
+                from_json(json, *m_StateComponent);
+            }
+
             void SetOutputDestination(OutputDestination destination)
             {
                 m_StateComponent->m_OutputDestination = destination;

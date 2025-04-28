@@ -8,6 +8,13 @@
 
 namespace ZooScan
 {
+    /**
+     * @class DeviceSelectorObserver
+     * @brief A class responsible for observing which device is selected and responding to updates.
+     *
+     * The DeviceSelectorObserver observing which device is selected and notifies the AppState
+     * about the change.
+     */
     class DeviceSelectorObserver final : public ZooLib::Observer
     {
     protected:
@@ -16,7 +23,7 @@ namespace ZooScan
             const auto deviceSelectorState = dynamic_cast<const DeviceSelectorState *>(m_ObservedComponents[0]);
             auto appState = dynamic_cast<AppState *>(m_ModifiedComponents[0]);
             auto updater = AppState::Updater(appState);
-            updater.UpdateOptionPanelDeviceName(deviceSelectorState->GetSelectedDeviceName());
+            updater.SetCurrentDevice(deviceSelectorState->GetSelectedDeviceName());
         }
 
     public:

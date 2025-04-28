@@ -59,6 +59,9 @@ set(SOURCE_FILES
         DeviceOptionsState.cpp
         DeviceSelectorState.cpp
         OptionRewriter.cpp
+        PresetCreateDialog.cpp
+        PresetPanel.cpp
+        PresetPanelState.cpp
         PreviewPanel.cpp
         ScanOptionsPanel.cpp
 
@@ -66,18 +69,25 @@ set(SOURCE_FILES
         Writers/JpegWriter.cpp
         Writers/PngWriter.cpp
         Writers/TiffWriter.cpp
+        PresetRenameDialog.cpp
+        PresetViewDialog.cpp
 )
 
 set(GETTEXT_SOURCE_FILES
         ${SOURCE_FILES}
 
+        Commands/ApplyPresetCommand.hpp
         Commands/ChangeOptionCommand.hpp
+        Commands/CreatePresetCommand.hpp
+        Commands/DeletePresetCommand.hpp
         Commands/DeviceSelectorCommands.hpp
         Commands/DevMode/SetDumpSaneOptions.hpp
+        Commands/RenamePresetCommand.hpp
         Commands/SelectDeviceCommand.hpp
         Commands/SetCreateMissingDirectoriesCommand.hpp
         Commands/SetFileExistsActionCommand.hpp
         Commands/SetJpegQuality.hpp
+        Commands/SetPresetExpanded.hpp
         Commands/SetOutputDestinationCommand.hpp
         Commands/SetOutputDirectoryCommand.hpp
         Commands/SetOutputFileNameCommand.hpp
@@ -106,16 +116,20 @@ set(GETTEXT_SOURCE_FILES
         ZooLib/CommandDispatcher.hpp
         ZooLib/ErrorDialog.hpp
         ZooLib/Gettext.hpp
+        ZooLib/GtkUtils.hpp
         ZooLib/Observer.hpp
         ZooLib/ObserverManager.hpp
         ZooLib/SignalSupport.hpp
         ZooLib/State.hpp
         ZooLib/StateComponent.hpp
+        ZooLib/StringUtils.hpp
         ZooLib/View.hpp
 
         App.hpp
         AppState.hpp
+        CurrentDeviceObserver.hpp
         DeviceOptionsObserver.hpp
+        DeviceOptionsState.hpp
         DeviceOptionValueBase.hpp
         DeviceOptionValue.hpp
         DeviceSelector.hpp
@@ -125,6 +139,9 @@ set(GETTEXT_SOURCE_FILES
         OutputOptionsState.hpp
         Point.hpp
         PreferencesView.hpp
+        PresetPanel.hpp
+        PresetPanelDialogs.hpp
+        PresetPanelState.hpp
         PreviewPanel.hpp
         PreviewState.hpp
         Rect.hpp
@@ -135,6 +152,21 @@ set(GETTEXT_SOURCE_FILES
 )
 
 if (GETTEXT_XGETTEXT_EXECUTABLE)
+
+    # Check that the GETTEXT_SOURCE_FILES are up to date with the files in the project.
+    file(GLOB_RECURSE GETTEXT_SOURCE_FILES_FROM_GLOB RELATIVE ${CMAKE_SOURCE_DIR} *.cpp *.hpp)
+    file(GLOB_RECURSE GETTEXT_EXCLUDED_SOURCE_FILES_FROM_GLOB RELATIVE ${CMAKE_SOURCE_DIR} Tests/* ZooLib/json/* cmake-*/*)
+    list(REMOVE_ITEM GETTEXT_SOURCE_FILES_FROM_GLOB ${GETTEXT_EXCLUDED_SOURCE_FILES_FROM_GLOB})
+
+    list(APPEND GETTEXT_SOURCE_FILES_DIFF ${GETTEXT_SOURCE_FILES_FROM_GLOB})
+    list(REMOVE_ITEM GETTEXT_SOURCE_FILES_DIFF ${GETTEXT_SOURCE_FILES})
+    list(LENGTH GETTEXT_SOURCE_FILES_DIFF GETTEXT_SOURCE_FILES_DIFF_LENGTH)
+    if (GETTEXT_SOURCE_FILES_DIFF_LENGTH GREATER 0)
+        message(STATUS "These files are missing from the GETTEXT_SOURCE_FILES:")
+        foreach (item IN LISTS GETTEXT_SOURCE_FILES_DIFF)
+            message(STATUS " ${item}")
+        endforeach()
+    endif()
 
     # Extract strings from JSON files: title, description and string_list. Make a list of them and remove empty strings.
     set(JQ_FILTER '[.options[].title,.options[].description,.options[].string_list[]] | map(select((. | length) > 0))')
@@ -199,7 +231,6 @@ if (GETTEXT_MSGMERGE_EXECUTABLE)
     message(TRACE " PO_FILES: ${PO_FILES}")
 
     foreach(PO_FILE IN ITEMS ${PO_FILES})
-        message(STATUS " Adding msgmerge for: ${PO_FILE}")
         add_custom_command(
                 TARGET pot-merge
                 PRE_BUILD
@@ -227,7 +258,6 @@ if (GETTEXT_MSGFMT_EXECUTABLE)
 
     foreach(PO_LANG IN ITEMS ${PO_LANGS})
         if(IS_DIRECTORY ${PO_LANG})
-            message(STATUS " Adding msgfmt for: ${PO_LANG}")
             add_custom_command(
                     TARGET po-compile
                     PRE_BUILD

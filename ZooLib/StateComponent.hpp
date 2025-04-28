@@ -56,6 +56,8 @@ namespace ZooLib
             {
                 ++m_StateComponent->m_StateVersion;
             }
+
+            virtual void LoadFromJson(const nlohmann::json &json) = 0;
         };
     };
 

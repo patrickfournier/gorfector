@@ -203,6 +203,7 @@ namespace ZooScan
             m_OptionValues.clear();
         }
 
+        friend void to_json(nlohmann::json &j, const DeviceOptionsState &p);
 
     public:
         DeviceOptionsState(ZooLib::State *state, std::string deviceName)
@@ -229,6 +230,11 @@ namespace ZooScan
 
         class Updater : public StateComponent::Updater<DeviceOptionsState>
         {
+            std::vector<size_t> SetRequestedValuesFromJson(const nlohmann::json &json);
+            void ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices);
+            void FindRequestMismatches(const std::vector<size_t> &indicesToCheck, std::vector<size_t> &mismatches);
+            void ApplyOptionsFromJson(const nlohmann::json &json);
+
         public:
             explicit Updater(DeviceOptionsState *state)
                 : StateComponent::Updater<DeviceOptionsState>(state)
@@ -238,6 +244,17 @@ namespace ZooScan
             ~Updater() override
             {
                 m_StateComponent->PushCurrentChangeset();
+            }
+
+            void LoadFromJson(const nlohmann::json &json) override;
+            void ApplySettings(const nlohmann::json &json)
+            {
+                LoadFromJson(json);
+            }
+
+            void ApplyScanArea(const nlohmann::json &json)
+            {
+                ApplyOptionsFromJson(json);
             }
 
             void RebuildOptions() const
@@ -251,8 +268,6 @@ namespace ZooScan
             void SetOptionValue(uint32_t optionIndex, uint32_t valueIndex, double requestedValue) const;
             void SetOptionValue(uint32_t optionIndex, uint32_t valueIndex, int requestedValue) const;
             void SetOptionValue(uint32_t optionIndex, uint32_t valueIndex, const std::string &requestedValue) const;
-
-            void DeserializeAndApply(const nlohmann::json &json) const;
         };
 
         [[nodiscard]] const char *GetDeviceModel() const
@@ -360,7 +375,35 @@ namespace ZooScan
         {
             return m_BitDepthIndex;
         }
-
-        [[nodiscard]] nlohmann::json *Serialize() const;
     };
+
+    inline void to_json(nlohmann::json &j, const DeviceOptionsState &p)
+    {
+        auto device = p.GetDevice();
+        if (device == nullptr)
+        {
+            return;
+        }
+
+        j = nlohmann::json::object();
+        j["Device"]["Name"] = device->GetName();
+        j["Device"]["Vendor"] = device->GetVendor();
+        j["Device"]["Model"] = device->GetModel();
+        j["Device"]["Type"] = device->GetType();
+
+        j["Options"] = nlohmann::json::object();
+        for (auto optionValue: p.m_OptionValues)
+        {
+            if (optionValue == nullptr)
+            {
+                continue;
+            }
+            if (!optionValue->IsSoftwareSettable())
+            {
+                continue;
+            }
+
+            optionValue->Serialize(j["Options"]);
+        }
+    }
 }
