@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-27 20:56-0400\n"
-"PO-Revision-Date: 2025-04-27 20:36-0400\n"
+"POT-Creation-Date: 2025-04-29 13:47-0400\n"
+"PO-Revision-Date: 2025-04-29 13:51-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -229,7 +229,7 @@ msgstr "CD"
 msgid "Calibrate"
 msgstr "Calibrer"
 
-#: PresetPanel.cpp:104
+#: App.cpp:749 PresetPanel.cpp:104
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -363,7 +363,7 @@ msgstr "Détermine la vitesse de numérisation."
 msgid "Developer"
 msgstr "Développeur"
 
-#: App.cpp:656
+#: App.cpp:701
 msgid "Directory does not exists: {}."
 msgstr "Le répertoire '{}' n'existe pas."
 
@@ -403,7 +403,7 @@ msgstr "Éjecter la feuille dans l'AAD"
 msgid "Email"
 msgstr "Courriel"
 
-#: App.cpp:641
+#: App.cpp:686
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
@@ -423,7 +423,7 @@ msgstr "Exécutif"
 msgid "Extended SANE Status"
 msgstr "État SANE étendu"
 
-#: App.cpp:785
+#: App.cpp:874
 msgid "Failed to create file: "
 msgstr "Échec de la création du fichier: "
 
@@ -431,13 +431,17 @@ msgstr "Échec de la création du fichier: "
 msgid "File"
 msgstr "Fichier"
 
-#: App.cpp:689
+#: App.cpp:716
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
 #: ScanOptionsPanel.cpp:562
 msgid "File Name"
 msgstr "Nom du fichier"
+
+#: App.cpp:744
+msgid "File already exists"
+msgstr "Le fichier existe déjà"
 
 #: entrée standard:53
 msgid "Film Type"
@@ -534,6 +538,10 @@ msgstr "Inclure les scanners réseau"
 #: OutputOptionsState.hpp:27
 msgid "Increase Counter"
 msgstr "Incrémenter"
+
+#: App.cpp:729
+msgid "Incrementing file name '{}' failed to produce a unique name."
+msgstr "Impossible de trouver un nom unique en incrémentant '{}'."
 
 #: entrée standard:89
 msgid "Indicates whether a button on the scanner has been pressed."
@@ -644,7 +652,7 @@ msgstr "Sortie"
 msgid "Output Settings"
 msgstr "Paramètres de sortie"
 
-#: OutputOptionsState.hpp:27
+#: App.cpp:749 OutputOptionsState.hpp:27
 msgid "Overwrite"
 msgstr "Ecraser"
 
@@ -772,7 +780,7 @@ msgstr "Sélectionner le périphérique..."
 msgid "Select Scanner: "
 msgstr "Sélectionner le périphérique: "
 
-#: App.cpp:634
+#: App.cpp:679
 msgid "Select a directory where to save the image files."
 msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
@@ -914,7 +922,12 @@ msgstr "Paramètres TIFF"
 msgid "The directory where the scanned files will be saved."
 msgstr "Le répertoire dans lequel les images seront enregistrées."
 
-#: App.cpp:708
+#: App.cpp:746
+#, c-format
+msgid "The file \"%s\" already exists. Really overwrite it?"
+msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
+
+#: App.cpp:795
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -960,15 +973,15 @@ msgstr "Rogner l'image à la taille du papier"
 msgid "Ugly kludge to provide additional status message strings to a frontend."
 msgstr ""
 
-#: App.cpp:777
+#: App.cpp:866
 msgid "Unsupported depth"
 msgstr "Profondeur non prise en charge"
 
-#: App.cpp:828
+#: App.cpp:917
 msgid "Unsupported file format"
 msgstr "Format de fichier non pris en charge"
 
-#: App.cpp:523 App.cpp:770
+#: App.cpp:568 App.cpp:859
 msgid "Unsupported format"
 msgstr "Format non pris en charge"
 

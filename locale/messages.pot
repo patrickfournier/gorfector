@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-27 20:56-0400\n"
+"POT-Creation-Date: 2025-04-29 13:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,7 +221,7 @@ msgstr ""
 msgid "Calibrate"
 msgstr ""
 
-#: PresetPanel.cpp:104
+#: App.cpp:749 PresetPanel.cpp:104
 msgid "Cancel"
 msgstr ""
 
@@ -352,7 +352,7 @@ msgstr ""
 msgid "Developer"
 msgstr ""
 
-#: App.cpp:656
+#: App.cpp:701
 msgid "Directory does not exists: {}."
 msgstr ""
 
@@ -392,7 +392,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: App.cpp:641
+#: App.cpp:686
 msgid "Enter a file name to save the image files."
 msgstr ""
 
@@ -412,7 +412,7 @@ msgstr ""
 msgid "Extended SANE Status"
 msgstr ""
 
-#: App.cpp:785
+#: App.cpp:874
 msgid "Failed to create file: "
 msgstr ""
 
@@ -420,12 +420,16 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: App.cpp:689
+#: App.cpp:716
 msgid "File '{}' already exists."
 msgstr ""
 
 #: ScanOptionsPanel.cpp:562
 msgid "File Name"
+msgstr ""
+
+#: App.cpp:744
+msgid "File already exists"
 msgstr ""
 
 #: entrée standard:53
@@ -522,6 +526,10 @@ msgstr ""
 
 #: OutputOptionsState.hpp:27
 msgid "Increase Counter"
+msgstr ""
+
+#: App.cpp:729
+msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
 #: entrée standard:89
@@ -631,7 +639,7 @@ msgstr ""
 msgid "Output Settings"
 msgstr ""
 
-#: OutputOptionsState.hpp:27
+#: App.cpp:749 OutputOptionsState.hpp:27
 msgid "Overwrite"
 msgstr ""
 
@@ -757,7 +765,7 @@ msgstr ""
 msgid "Select Scanner: "
 msgstr ""
 
-#: App.cpp:634
+#: App.cpp:679
 msgid "Select a directory where to save the image files."
 msgstr ""
 
@@ -891,7 +899,12 @@ msgstr ""
 msgid "The directory where the scanned files will be saved."
 msgstr ""
 
-#: App.cpp:708
+#: App.cpp:746
+#, c-format
+msgid "The file \"%s\" already exists. Really overwrite it?"
+msgstr ""
+
+#: App.cpp:795
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -933,15 +946,15 @@ msgstr ""
 msgid "Ugly kludge to provide additional status message strings to a frontend."
 msgstr ""
 
-#: App.cpp:777
+#: App.cpp:866
 msgid "Unsupported depth"
 msgstr ""
 
-#: App.cpp:828
+#: App.cpp:917
 msgid "Unsupported file format"
 msgstr ""
 
-#: App.cpp:523 App.cpp:770
+#: App.cpp:568 App.cpp:859
 msgid "Unsupported format"
 msgstr ""
 
