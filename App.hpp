@@ -23,6 +23,7 @@ namespace ZooScan
     {
     public:
         static constexpr auto k_ApplicationId = "com.patrickfournier.zooscan";
+        static constexpr auto k_ApplicationName = "ZooScan";
 
     private:
         AppState *m_AppState{};
@@ -58,7 +59,7 @@ namespace ZooScan
 
         [[nodiscard]] std::string GetMainWindowTitle() override
         {
-            return "ZooScan";
+            return k_ApplicationName;
         }
 
         [[nodiscard]] std::tuple<int, int> GetMainWindowSize() override
@@ -85,7 +86,7 @@ namespace ZooScan
 
         void OnPreviewClicked(GtkWidget *widget);
         void UpdatePreview();
-        void RestoreScanOptions();
+        void RestoreOptionsAfterPreview();
         void StopPreview();
 
         void CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions);
@@ -112,6 +113,11 @@ namespace ZooScan
         [[nodiscard]] std::string GetApplicationId() const override
         {
             return k_ApplicationId;
+        }
+
+        [[nodiscard]] std::string GetApplicationName() const override
+        {
+            return k_ApplicationName;
         }
 
         [[nodiscard]] const AppState *GetAppState() const

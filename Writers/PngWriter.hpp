@@ -96,7 +96,7 @@ namespace ZooScan
                 png_set_invert_mono(m_Png);
             }
 
-            std::string appId = app.GetApplicationId();
+            std::string appId = app.GetApplicationName();
             std::string creator = std::string(deviceOptions->GetDeviceVendor()) + " " + deviceOptions->GetDeviceModel();
 
             constexpr int numTexts = 2;

@@ -121,6 +121,7 @@ namespace ZooLib
         }
 
         [[nodiscard]] virtual std::string GetApplicationId() const = 0;
+        [[nodiscard]] virtual std::string GetApplicationName() const = 0;
 
         [[nodiscard]] AdwApplicationWindow *GetMainWindow() const
         {

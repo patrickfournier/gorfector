@@ -76,7 +76,7 @@ namespace ZooScan
                 TIFFSetField(m_File, TIFFTAG_MODEL, deviceOptions->GetDeviceModel());
             }
 
-            TIFFSetField(m_File, TIFFTAG_SOFTWARE, app.GetApplicationId().c_str());
+            TIFFSetField(m_File, TIFFTAG_SOFTWARE, app.GetApplicationName().c_str());
 
             TIFFSetField(m_File, TIFFTAG_IMAGEWIDTH, parameters.pixels_per_line);
             TIFFSetField(m_File, TIFFTAG_IMAGELENGTH, parameters.lines);

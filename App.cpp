@@ -354,7 +354,7 @@ ZooScan::OutputOptionsState *ZooScan::App::GetOutputOptions()
     return m_ScanOptionsPanel->GetOutputOptionsState();
 }
 
-void ZooScan::App::RestoreScanOptions()
+void ZooScan::App::RestoreOptionsAfterPreview()
 {
     auto device = GetDevice();
     auto options = GetDeviceOptions();
@@ -387,6 +387,13 @@ void ZooScan::App::RestoreScanOptions()
         auto option = options->GetOption<int>(options->YResolutionIndex());
         int value = option->GetValue();
         device->SetOptionValue(options->YResolutionIndex(), &value, nullptr);
+    }
+
+    if (options->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto option = options->GetOption<int>(options->BitDepthIndex());
+        int value = option->GetValue();
+        device->SetOptionValue(options->BitDepthIndex(), &value, nullptr);
     }
 
     if (options->TLXIndex() != std::numeric_limits<uint32_t>::max())
@@ -452,25 +459,63 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     if (options->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
         auto resolutionDescription = device->GetOptionDescriptor(options->ResolutionIndex());
-        SANE_Int resolution;
+        SANE_Int resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
         if (resolutionDescription->constraint_type == SANE_CONSTRAINT_RANGE)
         {
-            resolution = resolutionDescription->constraint.range->min;
+            resolution = std::clamp(
+                    resolution, resolutionDescription->constraint.range->min,
+                    resolutionDescription->constraint.range->max);
         }
         else if (resolutionDescription->constraint_type == SANE_CONSTRAINT_WORD_LIST)
         {
             auto count = resolutionDescription->constraint.word_list[0];
-            resolution = std::numeric_limits<int>::max();
-            for (auto i = 0; i < count; i++)
+            int nearestResolutionIndex = 1;
+            SANE_Int smallestDiff = std::abs(resolution - resolutionDescription->constraint.word_list[1]);
+            for (auto i = 2; i <= count; i++)
             {
-                resolution = std::min(resolution, resolutionDescription->constraint.word_list[i]);
+                auto diff = std::abs(resolution - resolutionDescription->constraint.word_list[1]);
+                if (diff < smallestDiff)
+                {
+                    nearestResolutionIndex = i;
+                    smallestDiff = diff;
+                }
             }
+            resolution = resolutionDescription->constraint.word_list[nearestResolutionIndex];
         }
-        else
-        {
-            resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
-        }
+
         device->SetOptionValue(options->ResolutionIndex(), &resolution, nullptr);
+    }
+
+    if (options->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
+    {
+        auto depthDescription = device->GetOptionDescriptor(options->BitDepthIndex());
+
+        if (!(depthDescription->cap & SANE_CAP_INACTIVE))
+        {
+            SANE_Int depth = depthDescription->type == SANE_TYPE_FIXED ? SANE_FIX(8) : 8;
+            if (depthDescription->constraint_type == SANE_CONSTRAINT_RANGE)
+            {
+                depth = std::clamp(
+                        depth, depthDescription->constraint.range->min, depthDescription->constraint.range->max);
+            }
+            else if (depthDescription->constraint_type == SANE_CONSTRAINT_WORD_LIST)
+            {
+                auto count = depthDescription->constraint.word_list[0];
+                SANE_Int minDepth = depthDescription->constraint.word_list[1];
+                for (auto i = 1; i <= count; i++)
+                {
+                    if (depthDescription->constraint.word_list[i] == depth)
+                    {
+                        // If 8 bits is there, we take it.
+                        break;
+                    }
+
+                    minDepth = std::min(minDepth, depthDescription->constraint.word_list[i]);
+                }
+            }
+
+            device->SetOptionValue(options->BitDepthIndex(), &depth, nullptr);
+        }
     }
 
     auto maxScanArea = options->GetMaxScanArea();
@@ -923,7 +968,7 @@ void ZooScan::App::StopPreview()
         m_ScanCallbackId = 0;
     }
 
-    RestoreScanOptions();
+    RestoreOptionsAfterPreview();
 
     auto updater = AppState::Updater(m_AppState);
     updater.SetIsPreviewing(false);
