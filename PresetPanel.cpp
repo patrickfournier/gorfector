@@ -134,11 +134,14 @@ GtkWidget *ZooScan::PresetPanel::CreatePresetListItem(const char *itemName)
     const char *buttonClasses[] = {"flat", nullptr};
 
     auto itemBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    auto labelItem = gtk_editable_label_new(itemName);
+    auto labelItem = gtk_label_new(itemName);
     gtk_widget_set_margin_top(labelItem, 10);
     gtk_widget_set_margin_bottom(labelItem, 10);
     gtk_widget_set_margin_start(labelItem, 10);
     gtk_widget_set_margin_end(labelItem, 10);
+    gtk_widget_set_hexpand(labelItem, true);
+    gtk_widget_set_halign(labelItem, GTK_ALIGN_START);
+    gtk_widget_set_vexpand(labelItem, true);
     gtk_box_append(GTK_BOX(itemBox), labelItem);
 
     auto applyButton = gtk_button_new();
@@ -197,11 +200,6 @@ GtkWidget *ZooScan::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_box_append(GTK_BOX(itemBox), deleteButton);
     g_object_set_data(G_OBJECT(deleteButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_Delete));
     ZooLib::ConnectGtkSignal(this, &PresetPanel::OnDeletePresetButtonPressed, deleteButton, "clicked");
-
-    gtk_widget_set_hexpand(labelItem, true);
-    gtk_widget_set_vexpand(labelItem, true);
-    gtk_widget_set_sensitive(labelItem, false);
-    gtk_widget_set_visible(labelItem, true);
 
     return itemBox;
 }
