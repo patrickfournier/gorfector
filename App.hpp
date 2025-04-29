@@ -88,8 +88,11 @@ namespace ZooScan
         void RestoreScanOptions();
         void StopPreview();
 
-        bool CheckFileOutputOptions(const OutputOptionsState *scanOptions);
+        void CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions);
+        void OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response);
+        bool SelectFileWriter();
         void OnScanClicked(GtkWidget *widget);
+        void StartScan();
         void UpdateScan();
         void StopScan(bool completed);
 

@@ -622,7 +622,7 @@ void IncrementPath(std::filesystem::path &path)
     path = newFilePath;
 }
 
-bool ZooScan::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions)
+void ZooScan::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions)
 {
     const auto &dirPath = scanOptions->GetOutputDirectory();
     const auto &fileName = scanOptions->GetOutputFileName();
@@ -632,14 +632,14 @@ bool ZooScan::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions)
         m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
         ZooLib::ShowUserError(
                 ADW_APPLICATION_WINDOW(m_MainWindow), _("Select a directory where to save the image files."));
-        return false;
+        return;
     }
 
     if (fileName.empty())
     {
         m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Enter a file name to save the image files."));
-        return false;
+        return;
     }
 
     if (!std::filesystem::exists(dirPath) && scanOptions->GetCreateMissingDirectories())
@@ -654,42 +654,84 @@ bool ZooScan::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions)
         ZooLib::ShowUserError(
                 ADW_APPLICATION_WINDOW(m_MainWindow),
                 std::vformat(_("Directory does not exists: {}."), std::make_format_args(dirPathStr)));
-        return false;
+        return;
     }
 
     m_ImageFilePath = dirPath / fileName;
-    auto overwrite = false;
     if (std::filesystem::exists(m_ImageFilePath))
     {
         switch (scanOptions->GetFileExistsAction())
         {
             case OutputOptionsState::FileExistsAction::e_Cancel:
             {
-                break;
+                m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+                auto imageFilePathStr = m_ImageFilePath.string();
+                ZooLib::ShowUserError(
+                        ADW_APPLICATION_WINDOW(m_MainWindow),
+                        std::vformat(_("File '{}' already exists."), std::make_format_args(imageFilePathStr)));
+                return;
             }
             case OutputOptionsState::FileExistsAction::e_IncrementCounter:
             {
                 IncrementPath(m_ImageFilePath);
+                if (std::filesystem::exists(m_ImageFilePath))
+                {
+                    m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
+                    auto imageFilePathStr = m_ImageFilePath.string();
+                    ZooLib::ShowUserError(
+                            ADW_APPLICATION_WINDOW(m_MainWindow),
+                            std::vformat(
+                                    _("Incrementing file name '{}' failed to produce a unique name."),
+                                    std::make_format_args(imageFilePathStr)));
+                    return;
+                }
+
+                if (SelectFileWriter())
+                {
+                    StartScan();
+                }
                 break;
             }
             case OutputOptionsState::FileExistsAction::e_Overwrite:
             {
-                overwrite = true;
+                if (SelectFileWriter())
+                {
+                    auto alert = adw_alert_dialog_new(_("File already exists"), nullptr);
+                    adw_alert_dialog_format_body(
+                            ADW_ALERT_DIALOG(alert), _("The file \"%s\" already exists. Really overwrite it?"),
+                            m_ImageFilePath.c_str());
+                    adw_alert_dialog_add_responses(
+                            ADW_ALERT_DIALOG(alert), "cancel", _("Cancel"), "overwrite", _("Overwrite"), NULL);
+                    adw_alert_dialog_set_response_appearance(
+                            ADW_ALERT_DIALOG(alert), "overwrite", ADW_RESPONSE_DESTRUCTIVE);
+                    adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(alert), "cancel");
+                    adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(alert), "cancel");
+                    ZooLib::ConnectGtkSignal(this, &App::OnOverwriteAlertResponse, alert, "response");
+                    adw_dialog_present(alert, GTK_WIDGET(GetMainWindow()));
+                }
                 break;
             }
         }
     }
-
-    if (!overwrite && std::filesystem::exists(m_ImageFilePath))
+    else
     {
-        m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
-        auto imageFilePathStr = m_ImageFilePath.string();
-        ZooLib::ShowUserError(
-                ADW_APPLICATION_WINDOW(m_MainWindow),
-                std::vformat(_("File '{}' already exists."), std::make_format_args(imageFilePathStr)));
-        return false;
+        if (SelectFileWriter())
+        {
+            StartScan();
+        }
     }
+}
 
+void ZooScan::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response)
+{
+    if (strcmp(response, "overwrite") == 0)
+    {
+        StartScan();
+    }
+}
+
+bool ZooScan::App::SelectFileWriter()
+{
     m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
     if (m_FileWriter == nullptr)
     {
@@ -715,12 +757,6 @@ bool ZooScan::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions)
 
 void ZooScan::App::OnScanClicked(GtkWidget *)
 {
-    const auto device = GetDevice();
-    if (device == nullptr)
-    {
-        return;
-    }
-
     if (m_ScanOptionsPanel == nullptr)
     {
         return;
@@ -730,22 +766,30 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     auto destination = scanOptions->GetOutputDestination();
     if (destination == OutputOptionsState::OutputDestination::e_File)
     {
-        if (!CheckFileOutputOptions(scanOptions))
-        {
-            return;
-        }
+        CheckFileOutputOptionsAndScan(scanOptions);
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Email)
     {
         m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.jpg";
         IncrementPath(m_ImageFilePath);
         m_FileWriter = FileWriter::GetFormatByType<JpegWriter>();
+        StartScan();
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Printer)
     {
         m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.tif";
         IncrementPath(m_ImageFilePath);
         m_FileWriter = FileWriter::GetFormatByType<TiffWriter>();
+        StartScan();
+    }
+}
+
+void ZooScan::App::StartScan()
+{
+    const auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
     }
 
     try
