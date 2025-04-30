@@ -1,0 +1,206 @@
+#include "ScanListPanel.hpp"
+
+#include <format>
+
+#include "Commands/DeleteScanItemCommand.hpp"
+#include "Commands/LoadScanItemCommand.hpp"
+
+void Gorfector::ScanListPanel::BuildUI()
+{
+    m_RootWidget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_margin_bottom(m_RootWidget, 10);
+    gtk_widget_set_margin_top(m_RootWidget, 0);
+    gtk_widget_set_margin_start(m_RootWidget, 10);
+    gtk_widget_set_margin_end(m_RootWidget, 10);
+    gtk_widget_set_hexpand(m_RootWidget, TRUE);
+    gtk_widget_set_vexpand(m_RootWidget, TRUE);
+
+    const char *headingClasses[] = {"heading", nullptr};
+    auto label = gtk_label_new(_("Scan List"));
+    gtk_widget_set_margin_bottom(label, 10);
+    gtk_widget_set_margin_top(label, 0);
+    gtk_widget_set_margin_start(label, 0);
+    gtk_widget_set_margin_end(label, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_CENTER);
+    gtk_widget_set_css_classes(label, headingClasses);
+    gtk_box_append(GTK_BOX(m_RootWidget), label);
+
+    auto scroller = gtk_scrolled_window_new();
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(scroller), TRUE);
+    gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(scroller), TRUE);
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(scroller), FALSE);
+    gtk_scrolled_window_set_overlay_scrolling(GTK_SCROLLED_WINDOW(scroller), FALSE);
+    gtk_widget_set_size_request(scroller, 200, -1);
+    gtk_box_append(GTK_BOX(m_RootWidget), scroller);
+
+    auto viewport = gtk_viewport_new(gtk_adjustment_new(0, 0, 0, 0, 0, 0), gtk_adjustment_new(0, 0, 0, 0, 0, 0));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroller), viewport);
+
+    const char *scanListClasses[] = {"boxed-list", nullptr};
+    m_ListBox = gtk_list_box_new();
+    gtk_widget_set_margin_bottom(m_ListBox, 3);
+    gtk_widget_set_margin_top(m_ListBox, 3);
+    gtk_widget_set_margin_start(m_ListBox, 3);
+    gtk_widget_set_margin_end(m_ListBox, 3);
+    gtk_widget_set_hexpand(m_ListBox, TRUE);
+    gtk_widget_set_vexpand(m_ListBox, FALSE);
+    gtk_widget_set_valign(m_ListBox, GTK_ALIGN_START);
+    gtk_widget_set_css_classes(m_ListBox, scanListClasses);
+    gtk_viewport_set_child(GTK_VIEWPORT(viewport), m_ListBox);
+
+    auto buttonBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+    gtk_widget_set_margin_bottom(buttonBox, 20);
+    gtk_widget_set_margin_top(buttonBox, 20);
+    gtk_widget_set_margin_start(buttonBox, 0);
+    gtk_widget_set_margin_end(buttonBox, 0);
+    gtk_box_append(GTK_BOX(m_RootWidget), buttonBox);
+
+    m_ScanListButton = gtk_button_new_with_label(_("Scan All"));
+    ConnectGtkSignal(this, &ScanListPanel::OnScanClicked, m_ScanListButton, "clicked");
+    gtk_box_append(GTK_BOX(buttonBox), m_ScanListButton);
+
+    m_CancelListButton = gtk_button_new_with_label(_("Cancel Scan"));
+    // ConnectGtkSignal(this, &App::OnCancelClicked, m_CancelListButton, "clicked");
+    gtk_box_append(GTK_BOX(buttonBox), m_CancelListButton);
+}
+
+void Gorfector::ScanListPanel::OnScanClicked(GtkWidget *widget)
+{
+    for (auto i = 0UZ; i < m_PanelState->GetScanListSize(); ++i)
+    {
+        // auto item = m_PanelState->GetScanItemAt(i);
+    }
+}
+
+namespace Gorfector
+{
+    GtkWidget *CreateScanListItem(gpointer item, gpointer userData)
+    {
+        auto panel = static_cast<ScanListPanel *>(userData);
+        return panel->CreateScanListItem(gtk_string_object_get_string(GTK_STRING_OBJECT(item)));
+    }
+}
+
+GtkWidget *Gorfector::ScanListPanel::CreateScanListItem(const char *itemName)
+{
+    if (itemName == nullptr)
+        return nullptr;
+
+    const char *buttonClasses[] = {"flat", nullptr};
+
+    auto itemBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    auto labelItem = gtk_label_new(nullptr);
+    gtk_label_set_markup(GTK_LABEL(labelItem), itemName);
+    gtk_widget_set_margin_top(labelItem, 10);
+    gtk_widget_set_margin_bottom(labelItem, 10);
+    gtk_widget_set_margin_start(labelItem, 10);
+    gtk_widget_set_margin_end(labelItem, 10);
+    gtk_widget_set_hexpand(labelItem, true);
+    gtk_widget_set_halign(labelItem, GTK_ALIGN_START);
+    gtk_widget_set_vexpand(labelItem, true);
+    gtk_box_append(GTK_BOX(itemBox), labelItem);
+
+    auto loadButton = gtk_button_new();
+    gtk_button_set_icon_name(GTK_BUTTON(loadButton), "playlist-symbolic");
+    gtk_widget_set_name(loadButton, "apply-button");
+    gtk_widget_set_tooltip_text(loadButton, _("Load"));
+    gtk_widget_set_halign(loadButton, GTK_ALIGN_END);
+    gtk_widget_set_css_classes(GTK_WIDGET(loadButton), buttonClasses);
+    gtk_widget_set_margin_top(loadButton, 3);
+    gtk_widget_set_margin_bottom(loadButton, 3);
+    gtk_widget_set_margin_start(loadButton, 3);
+    gtk_widget_set_margin_end(loadButton, 3);
+    gtk_widget_set_size_request(loadButton, 32, 32);
+    gtk_box_append(GTK_BOX(itemBox), loadButton);
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnLoadButtonPressed, loadButton, "clicked");
+
+    auto deleteButton = gtk_button_new();
+    gtk_button_set_icon_name(GTK_BUTTON(deleteButton), "list-remove-symbolic");
+    gtk_widget_set_tooltip_text(deleteButton, _("Delete"));
+    gtk_widget_set_halign(deleteButton, GTK_ALIGN_END);
+    gtk_widget_set_css_classes(GTK_WIDGET(deleteButton), buttonClasses);
+    gtk_widget_set_margin_top(deleteButton, 3);
+    gtk_widget_set_margin_bottom(deleteButton, 3);
+    gtk_widget_set_margin_start(deleteButton, 3);
+    gtk_widget_set_margin_end(deleteButton, 3);
+    gtk_widget_set_size_request(deleteButton, 32, 32);
+    gtk_box_append(GTK_BOX(itemBox), deleteButton);
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeletePresetButtonPressed, deleteButton, "clicked");
+
+    return itemBox;
+}
+
+void Gorfector::ScanListPanel::OnLoadButtonPressed(GtkButton *button)
+{
+    auto listBoxRow = ZooLib::GetParentOfType(GTK_WIDGET(button), GTK_TYPE_LIST_BOX_ROW);
+    auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
+    auto scannerSettings = m_PanelState->GetScannerSettings(rowId);
+    auto outputSettings = m_PanelState->GetOutputSettings(rowId);
+    m_Dispatcher.Dispatch(LoadScanItemCommand(scannerSettings, outputSettings));
+}
+
+void Gorfector::ScanListPanel::OnDeletePresetButtonPressed(GtkButton *button)
+{
+    auto listBoxRow = ZooLib::GetParentOfType(GTK_WIDGET(button), GTK_TYPE_LIST_BOX_ROW);
+    auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
+    auto itemId = m_PanelState->GetScanItemId(rowId);
+
+    auto alert = adw_alert_dialog_new(_("Delete Scan"), nullptr);
+    adw_alert_dialog_format_body(
+            ADW_ALERT_DIALOG(alert), _("Are you sure you want to delete the scan item #%03d ?"), itemId);
+    adw_alert_dialog_add_responses(ADW_ALERT_DIALOG(alert), "cancel", _("Cancel"), "delete", _("Delete"), NULL);
+    adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(alert), "delete", ADW_RESPONSE_DESTRUCTIVE);
+    adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(alert), "cancel");
+    adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(alert), "cancel");
+    g_object_set_data(G_OBJECT(alert), "ScanItemIndex", GINT_TO_POINTER(rowId));
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeleteAlertResponse, alert, "response");
+    adw_dialog_present(alert, GTK_WIDGET(m_App->GetMainWindow()));
+}
+
+void Gorfector::ScanListPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response)
+{
+    if (strcmp(response, "delete") == 0)
+    {
+        auto scanItemIndex = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(alert), "ScanItemIndex"));
+        m_Dispatcher.Dispatch(DeleteScanItemCommand(scanItemIndex));
+    }
+}
+
+void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
+{
+    if (m_PanelState == nullptr)
+        return;
+
+    m_Dispatcher.UnregisterHandler<LoadScanItemCommand>();
+    m_Dispatcher.RegisterHandler(LoadScanItemCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
+
+    m_ScanListItemNames.clear();
+
+    auto scanCount = m_PanelState->GetScanListSize();
+    const char **names = new const char *[scanCount + 1];
+    std::string units{};
+    int itemId;
+    double tlx{}, tly{}, brx{}, bry{};
+    std::string filePath{};
+    m_ScanListItemNames.clear();
+    for (size_t i = 0; i < scanCount; ++i)
+    {
+        m_PanelState->GetScanItemInfos(i, itemId, units, tlx, tly, brx, bry, filePath);
+        auto labelText = std::format(
+                "<b>#{:03}</b> <small>({:.2f}; {:.2f}) - ({:.2f}; {:.2f}) {}</small>", itemId, tlx, tly, brx, bry,
+                units);
+        m_ScanListItemNames.push_back(labelText);
+    }
+    for (size_t i = 0; i < scanCount; ++i)
+    {
+        names[i] = m_ScanListItemNames[i].c_str();
+    }
+    names[scanCount] = nullptr;
+
+    auto scanListModel = gtk_string_list_new(names);
+    delete[] names;
+
+    gtk_list_box_bind_model(
+            GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
+}

@@ -625,32 +625,32 @@ void Gorfector::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &
         return;
     }
 
-    if (!json.contains("Device"))
+    if (!json.contains(k_DeviceKey))
     {
         return;
     }
 
-    auto device = json["Device"];
-    if (!device.contains("Model") || !device.contains("Vendor"))
+    auto device = json[k_DeviceKey];
+    if (!device.contains(k_DeviceModelKey) || !device.contains(k_DeviceVendorKey))
     {
         return;
     }
 
-    if (strcmp(saneDevice->GetVendor(), device["Vendor"].get<std::string>().c_str()) != 0)
+    if (strcmp(saneDevice->GetVendor(), device[k_DeviceVendorKey].get<std::string>().c_str()) != 0)
     {
         return;
     }
-    if (strcmp(saneDevice->GetModel(), device["Model"].get<std::string>().c_str()) != 0)
-    {
-        return;
-    }
-
-    if (!json.contains("Options"))
+    if (strcmp(saneDevice->GetModel(), device[k_DeviceModelKey].get<std::string>().c_str()) != 0)
     {
         return;
     }
 
-    ApplyPreset(json["Options"]);
+    if (!json.contains(k_OptionsKey))
+    {
+        return;
+    }
+
+    ApplyPreset(json[k_OptionsKey]);
 }
 
 bool Gorfector::DeviceOptionsState::IsPreview() const

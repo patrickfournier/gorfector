@@ -5,14 +5,6 @@
 #include "Commands/ApplyPresetCommand.hpp"
 #include "ZooLib/GtkUtils.hpp"
 
-enum class ItemButtons
-{
-    e_Apply = 1,
-    e_View,
-    e_Rename,
-    e_Delete
-};
-
 void Gorfector::PresetPanel::BuildUI()
 {
     const char *buttonClasses[] = {"flat", nullptr};
@@ -68,19 +60,18 @@ void Gorfector::PresetPanel::BuildUI()
     gtk_expander_set_child(GTK_EXPANDER(m_Expander), scroller);
 
     m_ListBox = gtk_list_box_new();
+    gtk_widget_set_margin_bottom(m_ListBox, 20);
+    gtk_widget_set_margin_top(m_ListBox, 3);
+    gtk_widget_set_margin_start(m_ListBox, 3);
+    gtk_widget_set_margin_end(m_ListBox, 3);
     gtk_list_box_set_selection_mode(GTK_LIST_BOX(m_ListBox), GTK_SELECTION_NONE);
     gtk_widget_set_css_classes(GTK_WIDGET(m_ListBox), listBoxClasses);
-    gtk_widget_set_margin_bottom(m_ListBox, 20);
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroller), m_ListBox);
 }
 
 void Gorfector::PresetPanel::OnApplyPresetButtonPressed(GtkButton *button)
 {
-    auto listBoxRow = gtk_widget_get_parent(GTK_WIDGET(button));
-    while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
-    {
-        listBoxRow = gtk_widget_get_parent(listBoxRow);
-    }
+    auto listBoxRow = ZooLib::GetParentOfType(GTK_WIDGET(button), GTK_TYPE_LIST_BOX_ROW);
     auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
     auto presetName = m_DisplayedPresetNames[rowId];
     auto preset = m_PresetPanelState->GetPreset(presetName);
@@ -89,12 +80,7 @@ void Gorfector::PresetPanel::OnApplyPresetButtonPressed(GtkButton *button)
 
 void Gorfector::PresetPanel::OnDeletePresetButtonPressed(GtkButton *button)
 {
-    auto listBoxRow = gtk_widget_get_parent(GTK_WIDGET(button));
-    while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
-    {
-        listBoxRow = gtk_widget_get_parent(listBoxRow);
-    }
-
+    auto listBoxRow = ZooLib::GetParentOfType(GTK_WIDGET(button), GTK_TYPE_LIST_BOX_ROW);
     auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
     auto presetName = m_DisplayedPresetNames[rowId];
 
@@ -120,10 +106,13 @@ void Gorfector::PresetPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar 
     }
 }
 
-GtkWidget *Gorfector::CreatePresetListItem(gpointer item, gpointer userData)
+namespace Gorfector
 {
-    auto presetPanel = static_cast<PresetPanel *>(userData);
-    return presetPanel->CreatePresetListItem(gtk_string_object_get_string(GTK_STRING_OBJECT(item)));
+    GtkWidget *CreatePresetListItem(gpointer item, gpointer userData)
+    {
+        auto presetPanel = static_cast<PresetPanel *>(userData);
+        return presetPanel->CreatePresetListItem(gtk_string_object_get_string(GTK_STRING_OBJECT(item)));
+    }
 }
 
 GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
@@ -145,18 +134,17 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_box_append(GTK_BOX(itemBox), labelItem);
 
     auto applyButton = gtk_button_new();
-    gtk_button_set_icon_name(GTK_BUTTON(applyButton), "org.gnome.Lollypop-play-queue-symbolic");
+    gtk_button_set_icon_name(GTK_BUTTON(applyButton), "playlist-symbolic");
     gtk_widget_set_name(applyButton, "apply-button");
     gtk_widget_set_tooltip_text(applyButton, _("Apply this preset"));
     gtk_widget_set_halign(applyButton, GTK_ALIGN_END);
     gtk_widget_set_css_classes(GTK_WIDGET(applyButton), buttonClasses);
-    gtk_widget_set_margin_top(labelItem, 3);
-    gtk_widget_set_margin_bottom(labelItem, 3);
-    gtk_widget_set_margin_start(labelItem, 3);
-    gtk_widget_set_margin_end(labelItem, 3);
+    gtk_widget_set_margin_top(applyButton, 3);
+    gtk_widget_set_margin_bottom(applyButton, 3);
+    gtk_widget_set_margin_start(applyButton, 3);
+    gtk_widget_set_margin_end(applyButton, 3);
     gtk_widget_set_size_request(applyButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), applyButton);
-    g_object_set_data(G_OBJECT(applyButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_Apply));
     ZooLib::ConnectGtkSignal(this, &PresetPanel::OnApplyPresetButtonPressed, applyButton, "clicked");
 
     auto viewButton = gtk_button_new();
@@ -170,7 +158,6 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_margin_end(viewButton, 3);
     gtk_widget_set_size_request(viewButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), viewButton);
-    g_object_set_data(G_OBJECT(viewButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_View));
     g_signal_connect(viewButton, "clicked", G_CALLBACK(Gorfector::ShowViewPresetDialog), this);
 
     auto renameButton = gtk_button_new();
@@ -184,7 +171,6 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_margin_end(renameButton, 3);
     gtk_widget_set_size_request(renameButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), renameButton);
-    g_object_set_data(G_OBJECT(renameButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_Rename));
     g_signal_connect(renameButton, "clicked", G_CALLBACK(Gorfector::ShowRenamePresetDialog), this);
 
     auto deleteButton = gtk_button_new();
@@ -198,8 +184,53 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_margin_end(deleteButton, 3);
     gtk_widget_set_size_request(deleteButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), deleteButton);
-    g_object_set_data(G_OBJECT(deleteButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_Delete));
     ZooLib::ConnectGtkSignal(this, &PresetPanel::OnDeletePresetButtonPressed, deleteButton, "clicked");
 
     return itemBox;
+}
+
+void Gorfector::PresetPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
+{
+    gtk_expander_set_expanded(GTK_EXPANDER(m_Expander), m_PresetPanelState->IsExpanded());
+
+    m_CurrentDeviceModel = m_PresetPanelState->GetCurrentDeviceModel();
+    m_CurrentDeviceVendor = m_PresetPanelState->GetCurrentDeviceVendor();
+
+    m_Dispatcher.UnregisterHandler<ApplyPresetCommand>();
+    m_Dispatcher.RegisterHandler(ApplyPresetCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
+
+    bool canCreateOrApplyPreset = m_PresetPanelState->CanCreateOrApplyPreset();
+    gtk_widget_set_sensitive(m_CreatePresetButton, canCreateOrApplyPreset);
+
+    m_DisplayedPresetNames.clear();
+    for (const auto &preset: m_PresetPanelState->GetPresetsForScanner(
+                 m_PresetPanelState->GetCurrentDeviceVendor(), m_PresetPanelState->GetCurrentDeviceModel()))
+    {
+        m_DisplayedPresetNames.push_back(preset[PresetPanelState::k_PresetNameKey].get<std::string>());
+    }
+
+    // FIXME leaks
+    const char **names = new const char *[m_DisplayedPresetNames.size() + 1];
+    for (size_t i = 0; i < m_DisplayedPresetNames.size(); ++i)
+    {
+        names[i] = m_DisplayedPresetNames[i].c_str();
+    }
+    names[m_DisplayedPresetNames.size()] = nullptr;
+
+    auto presetNamesList = gtk_string_list_new(names);
+    gtk_list_box_bind_model(
+            GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(presetNamesList), Gorfector::CreatePresetListItem, this, nullptr);
+
+    int i = 0;
+    auto row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), i);
+    while (row != nullptr)
+    {
+        auto applyButton = ZooLib::FindWidgetByName(GTK_WIDGET(row), "apply-button");
+        if (applyButton != nullptr)
+        {
+            gtk_widget_set_sensitive(applyButton, canCreateOrApplyPreset);
+        }
+
+        row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), ++i);
+    }
 }

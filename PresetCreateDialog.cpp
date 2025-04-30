@@ -46,12 +46,7 @@ namespace Gorfector
             return;
         }
 
-        auto dialog = gtk_widget_get_parent(widget);
-        while (dialog != nullptr && !ADW_IS_DIALOG(dialog))
-        {
-            dialog = gtk_widget_get_parent(dialog);
-        }
-
+        auto dialog = ZooLib::GetParentOfType(widget, ADW_TYPE_DIALOG);
         if (dialog == nullptr)
         {
             g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Dialog not found");

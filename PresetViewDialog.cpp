@@ -8,11 +8,7 @@ namespace Gorfector
 {
     void ShowViewPresetDialog(GtkWidget *widget, gpointer userData)
     {
-        auto listBoxRow = gtk_widget_get_parent(widget);
-        while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
-        {
-            listBoxRow = gtk_widget_get_parent(listBoxRow);
-        }
+        auto listBoxRow = ZooLib::GetParentOfType(widget, GTK_TYPE_LIST_BOX_ROW);
         auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
 
         auto presetPanel = static_cast<PresetPanel *>(userData);
@@ -40,7 +36,7 @@ namespace Gorfector
 
         auto preset = presetPanel->GetPreset(rowId);
 
-        auto label = gtk_label_new((*preset)["Name"].get<std::string>().c_str());
+        auto label = gtk_label_new((*preset)[PresetPanelState::k_PresetNameKey].get<std::string>().c_str());
         gtk_widget_set_css_classes(label, s_TitleClasses);
         gtk_widget_set_hexpand(label, true);
         gtk_widget_set_halign(label, GTK_ALIGN_START);

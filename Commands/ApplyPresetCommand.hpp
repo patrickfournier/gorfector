@@ -28,23 +28,23 @@ namespace Gorfector
                 return;
             }
 
-            if (command.m_Preset->contains(PresetPanelState::s_PresetSectionScannerSettings))
+            if (command.m_Preset->contains(PresetPanelState::k_ScannerSettingsKey))
             {
-                auto scannerSettings = command.m_Preset->at(PresetPanelState::s_PresetSectionScannerSettings);
+                auto scannerSettings = command.m_Preset->at(PresetPanelState::k_ScannerSettingsKey);
                 auto deviceOptionsUpdater = DeviceOptionsState::Updater(deviceOptions);
                 deviceOptionsUpdater.ApplySettings(scannerSettings);
             }
-            if (command.m_Preset->contains(PresetPanelState::s_PresetSectionScanArea))
+            if (command.m_Preset->contains(PresetPanelState::k_ScanAreaKey))
             {
-                auto scanAreaSettings = command.m_Preset->at(PresetPanelState::s_PresetSectionScanArea);
+                auto scanAreaSettings = command.m_Preset->at(PresetPanelState::k_ScanAreaKey);
                 auto deviceOptionsUpdater = DeviceOptionsState::Updater(deviceOptions);
                 deviceOptionsUpdater.ApplyScanArea(scanAreaSettings);
             }
-            if (command.m_Preset->contains(PresetPanelState::s_PresetSectionOutputSettings))
+            if (command.m_Preset->contains(PresetPanelState::k_OutputSettingsKey))
             {
-                auto outputSettings = command.m_Preset->at(PresetPanelState::s_PresetSectionOutputSettings);
+                auto outputSettings = command.m_Preset->at(PresetPanelState::k_OutputSettingsKey);
                 auto outputOptionsUpdater = OutputOptionsState::Updater(outputOptions);
-                // outputOptionsUpdater.ApplySettings(outputSettings);
+                outputOptionsUpdater.ApplySettings(outputSettings);
             }
         }
     };

@@ -61,7 +61,6 @@ set(SOURCE_FILES
         OptionRewriter.cpp
         PresetCreateDialog.cpp
         PresetPanel.cpp
-        PresetPanelState.cpp
         PreviewPanel.cpp
         ScanOptionsPanel.cpp
 
@@ -71,6 +70,7 @@ set(SOURCE_FILES
         Writers/TiffWriter.cpp
         PresetRenameDialog.cpp
         PresetViewDialog.cpp
+        ScanListPanel.cpp
 )
 
 set(GETTEXT_SOURCE_FILES
@@ -79,9 +79,12 @@ set(GETTEXT_SOURCE_FILES
         Commands/ApplyPresetCommand.hpp
         Commands/ChangeOptionCommand.hpp
         Commands/CreatePresetCommand.hpp
+        Commands/CreateScanListItemCommand.hpp
         Commands/DeletePresetCommand.hpp
+        Commands/DeleteScanItemCommand.hpp
         Commands/DeviceSelectorCommands.hpp
         Commands/DevMode/SetDumpSaneOptions.hpp
+        Commands/LoadScanItemCommand.hpp
         Commands/RenamePresetCommand.hpp
         Commands/SelectDeviceCommand.hpp
         Commands/SetCreateMissingDirectoriesCommand.hpp
@@ -94,11 +97,11 @@ set(GETTEXT_SOURCE_FILES
         Commands/SetPanCommand.hpp
         Commands/SetPngCompressionLevel.hpp
         Commands/SetScanAreaCommand.hpp
-        Commands/SetScanMode.hpp
         Commands/SetTiffCompression.hpp
         Commands/SetTiffDeflateLevel.hpp
         Commands/SetTiffJpegQuality.hpp
         Commands/SetZoomCommand.hpp
+        Commands/ToggleUseScanList.hpp
 
         Writers/FileWriter.hpp
         Writers/JpegWriter.hpp
@@ -147,6 +150,8 @@ set(GETTEXT_SOURCE_FILES
         Rect.hpp
         SaneDevice.hpp
         SaneException.hpp
+        ScanListPanel.hpp
+        ScanListState.hpp
         ScanOptionsPanel.hpp
         ViewUpdateObserver.hpp
 )

@@ -52,7 +52,7 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
     gtk_window_set_default_size(GTK_WINDOW(m_MainWindow), std::get<0>(size), std::get<1>(size));
 
     CreateMenuBar();
-    auto content = CreateContent();
+    auto content = BuildUI();
     adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(mainView), content);
 
     gtk_window_present(GTK_WINDOW(m_MainWindow));

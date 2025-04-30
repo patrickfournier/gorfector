@@ -6,6 +6,10 @@ namespace Gorfector
 {
     class PngWriterState : public ZooLib::StateComponent
     {
+    public:
+        static constexpr const char *k_CompressionLevelKey = "CompressionLevel";
+
+    private:
         int m_CompressionLevel{};
 
         friend void to_json(nlohmann::json &j, const PngWriterState &p);
@@ -55,11 +59,11 @@ namespace Gorfector
 
     inline void to_json(nlohmann::json &j, const PngWriterState &p)
     {
-        j = nlohmann::json{{"CompressionLevel", p.m_CompressionLevel}};
+        j = nlohmann::json{{PngWriterState::k_CompressionLevelKey, p.m_CompressionLevel}};
     }
 
     inline void from_json(const nlohmann::json &j, PngWriterState &p)
     {
-        j.at("CompressionLevel").get_to(p.m_CompressionLevel);
+        j.at(PngWriterState::k_CompressionLevelKey).get_to(p.m_CompressionLevel);
     }
 }

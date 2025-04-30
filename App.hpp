@@ -12,6 +12,7 @@
 
 namespace Gorfector
 {
+    class ScanListPanel;
     class PresetPanel;
     class FileWriter;
     class DeviceOptionsObserver;
@@ -36,12 +37,17 @@ namespace Gorfector
         ScanOptionsPanel *m_ScanOptionsPanel{};
         PreviewPanel *m_PreviewPanel{};
         PresetPanel *m_PresetPanel{};
+        ScanListPanel *m_ScanListPanel{};
+
+        GtkWidget *m_LeftPaned{};
+        GtkWidget *m_RightPaned{};
 
         GtkWidget *m_SettingsBox{};
 
         GtkWidget *m_PreviewButton{};
         GtkWidget *m_ScanButton{};
         GtkWidget *m_CancelButton{};
+        GtkWidget *m_AddToScanListButton{};
 
         SANE_Parameters m_ScanParameters{};
         int32_t m_BufferSize{};
@@ -68,7 +74,10 @@ namespace Gorfector
         }
 
         void OnActivate(GtkApplication *app) override;
-        GtkWidget *CreateContent() override;
+        void OnPanelResized(GtkWidget *widget);
+        GtkWidget *BuildUI() override;
+        void BuildScanListUI();
+        void RemoveScanListUI();
         void PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder) override;
 
         [[nodiscard]] SaneDevice *GetDevice() const
@@ -89,9 +98,11 @@ namespace Gorfector
         void RestoreOptionsAfterPreview();
         void StopPreview();
 
-        void CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions);
+        bool CheckFileOutputOptions(const OutputOptionsState *scanOptions) const;
+        void ScanToFile(const OutputOptionsState *scanOptions);
         void OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response);
-        bool SelectFileWriter();
+        FileWriter *SelectFileWriter(const std::string &path) const;
+        void OnAddToScanListClicked(GtkWidget *);
         void OnScanClicked(GtkWidget *widget);
         void StartScan();
         void UpdateScan();

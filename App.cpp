@@ -6,8 +6,9 @@
 
 #include "App.hpp"
 #include "AppState.hpp"
+#include "Commands/CreateScanListItemCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
-#include "Commands/SetScanMode.hpp"
+#include "Commands/ToggleUseScanList.hpp"
 #include "DeviceOptionsObserver.hpp"
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
@@ -15,6 +16,7 @@
 #include "PreferencesView.hpp"
 #include "PresetPanel.hpp"
 #include "PreviewPanel.hpp"
+#include "ScanListPanel.hpp"
 #include "ScanOptionsPanel.hpp"
 #include "Writers/FileWriter.hpp"
 #include "Writers/JpegWriter.hpp"
@@ -52,6 +54,7 @@ Gorfector::App::App(int argc, char **argv)
     }
 
     m_AppState = new AppState(&m_State, devMode);
+    m_State.LoadFromPreferenceFile(m_AppState);
 
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);
@@ -101,7 +104,23 @@ void Gorfector::App::OnActivate(GtkApplication *app)
     }
 }
 
-GtkWidget *Gorfector::App::CreateContent()
+void Gorfector::App::OnPanelResized(GtkWidget *widget)
+{
+    auto windowWidth = gtk_widget_get_width(m_MainWindow);
+    auto position = gtk_paned_get_position(GTK_PANED(widget));
+    if (widget == m_LeftPaned)
+    {
+        auto updater = AppState::Updater(m_AppState);
+        updater.SetLeftPanelWidth(static_cast<double>(position) / windowWidth);
+    }
+    else if (widget == m_RightPaned)
+    {
+        auto updater = AppState::Updater(m_AppState);
+        updater.SetRightPanelWidth(static_cast<double>(position) / windowWidth);
+    }
+}
+
+GtkWidget *Gorfector::App::BuildUI()
 {
     auto *display = gdk_display_get_default();
     auto *cssProvider = gtk_css_provider_new();
@@ -113,21 +132,23 @@ GtkWidget *Gorfector::App::CreateContent()
 
     auto deviceSelected = !GetSelectorDeviceName().empty();
 
-    auto *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_widget_set_margin_bottom(paned, 0);
-    gtk_widget_set_margin_top(paned, 0);
-    gtk_widget_set_margin_start(paned, 10);
-    gtk_widget_set_margin_end(paned, 10);
-
-    gtk_paned_set_wide_handle(GTK_PANED(paned), true);
-    gtk_paned_set_position(GTK_PANED(paned), 200);
+    m_LeftPaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_widget_set_margin_bottom(m_LeftPaned, 0);
+    gtk_widget_set_margin_top(m_LeftPaned, 0);
+    gtk_widget_set_margin_start(m_LeftPaned, 10);
+    gtk_widget_set_margin_end(m_LeftPaned, 10);
+    gtk_paned_set_wide_handle(GTK_PANED(m_LeftPaned), true);
+    auto windowWidth = gtk_widget_get_width(m_MainWindow);
+    windowWidth = windowWidth == 0 ? std::get<0>(GetMainWindowSize()) : windowWidth;
+    gtk_paned_set_position(GTK_PANED(m_LeftPaned), static_cast<int>(windowWidth * m_AppState->GetLeftPanelWidth()));
+    ZooLib::ConnectGtkSignalWithParamSpecs(this, &App::OnPanelResized, m_LeftPaned, "notify::position");
 
     auto clamp = adw_clamp_new();
     adw_clamp_set_unit(ADW_CLAMP(clamp), ADW_LENGTH_UNIT_SP);
     adw_clamp_set_tightening_threshold(ADW_CLAMP(clamp), 600);
     adw_clamp_set_maximum_size(ADW_CLAMP(clamp), 800);
     gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
-    gtk_paned_set_start_child(GTK_PANED(paned), clamp);
+    gtk_paned_set_start_child(GTK_PANED(m_LeftPaned), clamp);
 
     m_SettingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_bottom(m_SettingsBox, 0);
@@ -158,6 +179,11 @@ GtkWidget *Gorfector::App::CreateContent()
     gtk_widget_set_sensitive(m_CancelButton, false);
     gtk_box_append(GTK_BOX(buttonBox), m_CancelButton);
 
+    m_AddToScanListButton = gtk_button_new_with_label(_("Add to Scan List"));
+    ConnectGtkSignal(this, &App::OnAddToScanListClicked, m_AddToScanListButton, "clicked");
+    gtk_widget_set_sensitive(m_AddToScanListButton, deviceSelected);
+    gtk_box_append(GTK_BOX(buttonBox), m_AddToScanListButton);
+
     auto bottomAlignedSection = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_hexpand(bottomAlignedSection, true);
     gtk_widget_set_vexpand(bottomAlignedSection, true);
@@ -178,10 +204,51 @@ GtkWidget *Gorfector::App::CreateContent()
     gtk_widget_set_margin_bottom(previewBox, 10);
     gtk_widget_set_margin_top(previewBox, 0);
     gtk_widget_set_margin_start(previewBox, 10);
-    gtk_widget_set_margin_end(previewBox, 0);
-    gtk_paned_set_end_child(GTK_PANED(paned), previewBox);
+    gtk_widget_set_margin_end(previewBox, 10);
 
-    return paned;
+    if (m_AppState->GetUseScanList())
+    {
+        BuildScanListUI();
+    }
+    else
+    {
+        gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), previewBox);
+    }
+
+    return m_LeftPaned;
+}
+
+void Gorfector::App::BuildScanListUI()
+{
+    m_RightPaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_paned_set_wide_handle(GTK_PANED(m_RightPaned), true);
+    auto windowWidth = gtk_widget_get_width(m_MainWindow);
+    windowWidth = windowWidth == 0 ? std::get<0>(GetMainWindowSize()) : windowWidth;
+    gtk_paned_set_position(GTK_PANED(m_RightPaned), static_cast<int>(windowWidth * m_AppState->GetRightPanelWidth()));
+    gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), m_RightPaned);
+    ZooLib::ConnectGtkSignalWithParamSpecs(this, &App::OnPanelResized, m_RightPaned, "notify::position");
+
+    gtk_paned_set_start_child(GTK_PANED(m_RightPaned), m_PreviewPanel->GetRootWidget());
+
+    auto clamp = adw_clamp_new();
+    adw_clamp_set_unit(ADW_CLAMP(clamp), ADW_LENGTH_UNIT_SP);
+    adw_clamp_set_tightening_threshold(ADW_CLAMP(clamp), 300);
+    adw_clamp_set_maximum_size(ADW_CLAMP(clamp), 500);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
+    gtk_paned_set_end_child(GTK_PANED(m_RightPaned), clamp);
+
+    m_ScanListPanel = ZooLib::View::Create<ScanListPanel>(&m_Dispatcher, this);
+    auto scanListBox = m_ScanListPanel->GetRootWidget();
+    adw_clamp_set_child(ADW_CLAMP(clamp), scanListBox);
+
+    m_Dispatcher.RegisterHandler(CreateScanListItemCommand::Execute, m_ScanListPanel->GetState());
+}
+
+void Gorfector::App::RemoveScanListUI()
+{
+    m_RightPaned = nullptr;
+    m_ScanListPanel = nullptr;
+    m_Dispatcher.UnregisterHandler<CreateScanListItemCommand>();
 }
 
 void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
@@ -190,8 +257,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
             ->AddMenuItem(_("Select Device..."), "app.select_device")
             ->EndSection()
             ->BeginSection()
-            ->AddMenuItem("Single Scan", "app.single")
-            ->AddMenuItem("Multiple Scans", "app.multiple")
+            ->AddMenuItem("Use Scan List", "app.scanlist")
             ->EndSection()
             ->BeginSection()
             ->AddMenuItem(_("Settings..."), "app.preferences")
@@ -200,8 +266,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 
     BindMethodToAction<App>("select_device", &App::SelectDeviceDialog, this);
     BindMethodToAction<Application>("quit", &Application::Quit, this);
-    BindCommandToToggleAction<SetSingleScanMode>("single", m_AppState->GetAppMode() == AppState::Single, m_AppState);
-    BindCommandToToggleAction<SetBatchScanMode>("multiple", m_AppState->GetAppMode() == AppState::Batch, m_AppState);
+    BindCommandToToggleAction<ToggleUseScanList>("scanlist", m_AppState->GetUseScanList(), m_AppState);
     BindMethodToAction<App>("preferences", &App::PreferenceDialog, this);
     BindMethodToAction<App>("about", &App::AboutDialog, this);
 
@@ -281,8 +346,13 @@ int Gorfector::App::GetSelectorSaneInitId() const
 
 void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
-    if (m_ScanOptionsPanel != nullptr && (m_ScanOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
-                                          m_ScanOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
+    auto changeset = m_AppState->GetAggregatedChangeset(lastSeenVersions[0]);
+    if (changeset == nullptr || !changeset->HasAnyChange())
+    {
+        return;
+    }
+
+    if (m_ScanOptionsPanel != nullptr && changeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_CurrentDevice))
     {
         if (m_DeviceOptionsObserver != nullptr)
         {
@@ -311,30 +381,69 @@ void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
         }
     }
 
-    // Update the action associated with the scan mode
-    auto action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "single");
-    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetAppMode() == AppState::Single));
-    action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "multiple");
-    g_action_change_state(action, g_variant_new_boolean(m_AppState->GetAppMode() == AppState::Batch));
+    if (changeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_ScanListMode))
+    {
+        // Update the action associated with the scan mode
+        auto action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "scanlist");
+        g_action_change_state(action, g_variant_new_boolean(m_AppState->GetUseScanList()));
 
-    // TODO: also update the option panel
-    if (m_AppState->IsScanning() || m_AppState->IsPreviewing())
-    {
-        gtk_widget_set_sensitive(m_PreviewButton, false);
-        gtk_widget_set_sensitive(m_ScanButton, false);
-        gtk_widget_set_sensitive(m_CancelButton, true);
+        gtk_widget_set_visible(m_ScanButton, !m_AppState->GetUseScanList());
+        gtk_widget_set_visible(m_CancelButton, !m_AppState->GetUseScanList());
+        gtk_widget_set_visible(m_AddToScanListButton, m_AppState->GetUseScanList());
+
+        if (m_PreviewPanel != nullptr)
+        {
+            auto previewBox = m_PreviewPanel->GetRootWidget();
+            auto previewBoxParent = gtk_widget_get_parent(previewBox);
+
+            if (m_AppState->GetUseScanList() && previewBoxParent == m_LeftPaned)
+            {
+                g_object_ref(previewBox);
+                gtk_widget_unparent(previewBox);
+                BuildScanListUI();
+                g_object_unref(previewBox);
+
+                auto windowWidth = gtk_widget_get_width(m_MainWindow);
+                windowWidth = windowWidth == 0 ? std::get<0>(GetMainWindowSize()) : windowWidth;
+                gtk_paned_set_position(
+                        GTK_PANED(m_RightPaned), static_cast<int>(windowWidth * m_AppState->GetRightPanelWidth()));
+            }
+            else if (!m_AppState->GetUseScanList() && previewBoxParent == m_RightPaned)
+            {
+                g_object_ref(previewBox);
+                gtk_widget_unparent(previewBox);
+                gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), previewBox);
+                g_object_unref(previewBox);
+
+                RemoveScanListUI();
+            }
+        }
     }
-    else if (!GetSelectorDeviceName().empty())
+
+    if (changeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_ScanActivity))
     {
-        gtk_widget_set_sensitive(m_PreviewButton, true);
-        gtk_widget_set_sensitive(m_ScanButton, true);
-        gtk_widget_set_sensitive(m_CancelButton, false);
-    }
-    else
-    {
-        gtk_widget_set_sensitive(m_PreviewButton, false);
-        gtk_widget_set_sensitive(m_ScanButton, false);
-        gtk_widget_set_sensitive(m_CancelButton, false);
+        // TODO: also update the option panel
+        if (m_AppState->IsScanning() || m_AppState->IsPreviewing())
+        {
+            gtk_widget_set_sensitive(m_PreviewButton, false);
+            gtk_widget_set_sensitive(m_ScanButton, false);
+            gtk_widget_set_sensitive(m_CancelButton, true);
+            gtk_widget_set_sensitive(m_AddToScanListButton, false);
+        }
+        else if (!GetSelectorDeviceName().empty())
+        {
+            gtk_widget_set_sensitive(m_PreviewButton, true);
+            gtk_widget_set_sensitive(m_ScanButton, true);
+            gtk_widget_set_sensitive(m_CancelButton, false);
+            gtk_widget_set_sensitive(m_AddToScanListButton, true);
+        }
+        else
+        {
+            gtk_widget_set_sensitive(m_PreviewButton, false);
+            gtk_widget_set_sensitive(m_ScanButton, false);
+            gtk_widget_set_sensitive(m_CancelButton, false);
+            gtk_widget_set_sensitive(m_AddToScanListButton, false);
+        }
     }
 }
 
@@ -667,7 +776,7 @@ void IncrementPath(std::filesystem::path &path)
     path = newFilePath;
 }
 
-void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions)
+bool Gorfector::App::CheckFileOutputOptions(const OutputOptionsState *scanOptions) const
 {
     const auto &dirPath = scanOptions->GetOutputDirectory();
     const auto &fileName = scanOptions->GetOutputFileName();
@@ -677,15 +786,28 @@ void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *sca
         m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
         ZooLib::ShowUserError(
                 ADW_APPLICATION_WINDOW(m_MainWindow), _("Select a directory where to save the image files."));
-        return;
+        return false;
     }
 
     if (fileName.empty())
     {
         m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
         ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Enter a file name to save the image files."));
-        return;
+        return false;
     }
+
+    if (SelectFileWriter(fileName) == nullptr)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void Gorfector::App::ScanToFile(const OutputOptionsState *scanOptions)
+{
+    const auto &dirPath = scanOptions->GetOutputDirectory();
+    const auto &fileName = scanOptions->GetOutputFileName();
 
     if (!std::filesystem::exists(dirPath) && scanOptions->GetCreateMissingDirectories())
     {
@@ -731,7 +853,8 @@ void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *sca
                     return;
                 }
 
-                if (SelectFileWriter())
+                m_FileWriter = SelectFileWriter(m_ImageFilePath);
+                if (m_FileWriter != nullptr)
                 {
                     StartScan();
                 }
@@ -739,7 +862,8 @@ void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *sca
             }
             case OutputOptionsState::FileExistsAction::e_Overwrite:
             {
-                if (SelectFileWriter())
+                m_FileWriter = SelectFileWriter(m_ImageFilePath);
+                if (m_FileWriter != nullptr)
                 {
                     auto alert = adw_alert_dialog_new(_("File already exists"), nullptr);
                     adw_alert_dialog_format_body(
@@ -760,7 +884,8 @@ void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *sca
     }
     else
     {
-        if (SelectFileWriter())
+        m_FileWriter = SelectFileWriter(m_ImageFilePath);
+        if (m_FileWriter != nullptr)
         {
             StartScan();
         }
@@ -775,10 +900,10 @@ void Gorfector::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *resp
     }
 }
 
-bool Gorfector::App::SelectFileWriter()
+Gorfector::FileWriter *Gorfector::App::SelectFileWriter(const std::string &path) const
 {
-    m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
-    if (m_FileWriter == nullptr)
+    auto fileWriter = FileWriter::GetFormatForPath(path);
+    if (fileWriter == nullptr)
     {
         auto extensionsStr = std::string();
         for (auto format: FileWriter::GetFormats())
@@ -794,10 +919,32 @@ bool Gorfector::App::SelectFileWriter()
                 std::vformat(
                         _("The file name must ends with an extension that specify the image format, like {}"),
                         std::make_format_args(extensionsStr)));
-        return false;
     }
 
-    return true;
+    return fileWriter;
+}
+
+void Gorfector::App::OnAddToScanListClicked(GtkWidget *)
+{
+    auto device = GetDevice();
+    if (device == nullptr)
+    {
+        return;
+    }
+
+    auto scanOptions = m_ScanOptionsPanel->GetDeviceOptionsState();
+    auto outputOptions = m_ScanOptionsPanel->GetOutputOptionsState();
+
+    auto destination = outputOptions->GetOutputDestination();
+    if (destination == OutputOptionsState::OutputDestination::e_File)
+    {
+        if (!CheckFileOutputOptions(outputOptions))
+        {
+            return;
+        }
+    }
+
+    m_Dispatcher.Dispatch(CreateScanListItemCommand(scanOptions, outputOptions));
 }
 
 void Gorfector::App::OnScanClicked(GtkWidget *)
@@ -807,11 +954,14 @@ void Gorfector::App::OnScanClicked(GtkWidget *)
         return;
     }
 
-    auto scanOptions = m_ScanOptionsPanel->GetOutputOptionsState();
-    auto destination = scanOptions->GetOutputDestination();
+    auto outputOptions = m_ScanOptionsPanel->GetOutputOptionsState();
+    auto destination = outputOptions->GetOutputDestination();
     if (destination == OutputOptionsState::OutputDestination::e_File)
     {
-        CheckFileOutputOptionsAndScan(scanOptions);
+        if (CheckFileOutputOptions(outputOptions))
+        {
+            ScanToFile(outputOptions);
+        }
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Email)
     {

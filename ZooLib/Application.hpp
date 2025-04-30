@@ -32,7 +32,7 @@ namespace ZooLib
 
         [[nodiscard]] virtual std::tuple<int, int> GetMainWindowSize() = 0;
 
-        virtual GtkWidget *CreateContent() = 0;
+        virtual GtkWidget *BuildUI() = 0;
         virtual void PopulateMenuBar(AppMenuBarBuilder *menuBarBuilder) = 0;
 
         virtual void OnActivate(GtkApplication *app);

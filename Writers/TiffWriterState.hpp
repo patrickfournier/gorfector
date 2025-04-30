@@ -7,6 +7,10 @@ namespace Gorfector
     class TiffWriterState : public ZooLib::StateComponent
     {
     public:
+        static constexpr const char *k_CompressionKey = "Compression";
+        static constexpr const char *k_CompressionLevelKey = "CompressionLevel";
+        static constexpr const char *k_JpegQualityKey = "JpegQuality";
+
         enum class Compression
         {
             None,
@@ -120,15 +124,15 @@ namespace Gorfector
     inline void to_json(nlohmann::json &j, const TiffWriterState &p)
     {
         j = nlohmann::json{
-                {"Compression", p.m_Compression},
-                {"CompressionLevel", p.m_DeflateCompressionLevel},
-                {"JpegQuality", p.m_JpegQuality}};
+                {TiffWriterState::k_CompressionKey, p.m_Compression},
+                {TiffWriterState::k_CompressionLevelKey, p.m_DeflateCompressionLevel},
+                {TiffWriterState::k_JpegQualityKey, p.m_JpegQuality}};
     }
 
     inline void from_json(const nlohmann::json &j, TiffWriterState &p)
     {
-        j.at("Compression").get_to(p.m_Compression);
-        j.at("CompressionLevel").get_to(p.m_DeflateCompressionLevel);
-        j.at("JpegQuality").get_to(p.m_JpegQuality);
+        j.at(TiffWriterState::k_CompressionKey).get_to(p.m_Compression);
+        j.at(TiffWriterState::k_CompressionLevelKey).get_to(p.m_DeflateCompressionLevel);
+        j.at(TiffWriterState::k_JpegQualityKey).get_to(p.m_JpegQuality);
     }
 }

@@ -1,26 +1,78 @@
 #pragma once
 
+#include "ScanListState.hpp"
 #include "ZooLib/StateComponent.hpp"
 
 namespace Gorfector
 {
-    class AppState final : public ZooLib::StateComponent
+    class AppStateChangeset : public ZooLib::ChangesetBase
     {
     public:
-        enum AppMode
+        enum class ChangeTypeFlag
         {
-            Single,
-            Batch,
+            e_PaneSplitter = 1 << 0,
+            e_CurrentDevice = 1 << 1,
+            e_ScanActivity = 1 << 2,
+            e_ScanListMode = 1 << 3,
         };
 
     private:
+        int m_ChangeType{};
+
+    public:
+        explicit AppStateChangeset(uint64_t stateInitialVersion)
+            : ChangesetBase(stateInitialVersion)
+        {
+        }
+
+        void AddChangeType(ChangeTypeFlag changeType)
+        {
+            m_ChangeType |= static_cast<int>(changeType);
+        }
+
+        [[nodiscard]] bool IsChanged(ChangeTypeFlag changeType) const
+        {
+            return (m_ChangeType & static_cast<int>(changeType)) != 0;
+        }
+
+        [[nodiscard]] bool HasAnyChange() const
+        {
+            return m_ChangeType != 0;
+        }
+
+        void Aggregate(const AppStateChangeset &changeset)
+        {
+            ChangesetBase::Aggregate(changeset);
+
+            m_ChangeType |= changeset.m_ChangeType;
+        }
+    };
+
+    class AppState final : public ZooLib::StateComponent, public ZooLib::ChangesetManager<AppStateChangeset>
+    {
+    public:
+        static constexpr const char *k_UseScanListKey = "UseScanList";
+        static constexpr const char *k_LeftPanelWidthKey = "LeftPanelWidth";
+        static constexpr const char *k_RightPanelWidthKey = "RightPanelWidth";
+
+    private:
         const bool m_DevMode;
+        bool m_UseScanList{false};
+        double m_LeftPanelWidth{.3};
+        double m_RightPanelWidth{.3};
 
         std::string m_CurrentDeviceName{};
-        AppMode m_AppMode{};
 
         bool m_IsScanning{};
         bool m_IsPreviewing{};
+
+        [[nodiscard]] AppStateChangeset *GetCurrentChangeset()
+        {
+            return ChangesetManager::GetCurrentChangeset(GetVersion());
+        }
+
+        friend void to_json(nlohmann::json &j, const AppState &state);
+        friend void from_json(const nlohmann::json &j, AppState &state);
 
     public:
         explicit AppState(ZooLib::State *state, bool devMode)
@@ -29,21 +81,39 @@ namespace Gorfector
         {
         }
 
-        ~AppState() override = default;
+        ~AppState() override
+        {
+            m_State->SaveToFile(this);
+        }
+
+        [[nodiscard]] std::string GetSerializationKey() const override
+        {
+            return "AppState";
+        }
 
         [[nodiscard]] const std::string &GetCurrentDeviceName() const
         {
             return m_CurrentDeviceName;
         }
 
-        [[nodiscard]] AppMode GetAppMode() const
-        {
-            return m_AppMode;
-        }
-
         [[nodiscard]] bool IsDeveloperMode() const
         {
             return m_DevMode;
+        }
+
+        [[nodiscard]] bool GetUseScanList() const
+        {
+            return m_UseScanList;
+        }
+
+        [[nodiscard]] double GetLeftPanelWidth() const
+        {
+            return m_LeftPanelWidth;
+        }
+
+        [[nodiscard]] double GetRightPanelWidth() const
+        {
+            return m_RightPanelWidth;
         }
 
         [[nodiscard]] bool IsScanning() const
@@ -64,29 +134,77 @@ namespace Gorfector
             {
             }
 
+            ~Updater() override
+            {
+                m_StateComponent->PushCurrentChangeset();
+            }
+
             void LoadFromJson(const nlohmann::json &json) override
             {
+                from_json(json, *m_StateComponent);
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_ScanListMode);
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_PaneSplitter);
+            }
+
+            void SetUseScanList(bool useScanList) const
+            {
+                m_StateComponent->m_UseScanList = useScanList;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_ScanListMode);
+            }
+
+            void SetLeftPanelWidth(double width) const
+            {
+                m_StateComponent->m_LeftPanelWidth = width;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_PaneSplitter);
+            }
+
+            void SetRightPanelWidth(double width) const
+            {
+                m_StateComponent->m_RightPanelWidth = width;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_PaneSplitter);
             }
 
             void SetCurrentDevice(const std::string &deviceName) const
             {
                 m_StateComponent->m_CurrentDeviceName = deviceName;
-            }
-
-            void SetAppMode(AppMode scanMode) const
-            {
-                m_StateComponent->m_AppMode = scanMode;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_CurrentDevice);
             }
 
             void SetIsScanning(bool isScanning) const
             {
                 m_StateComponent->m_IsScanning = isScanning;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_ScanActivity);
             }
 
             void SetIsPreviewing(bool isPreviewing) const
             {
                 m_StateComponent->m_IsPreviewing = isPreviewing;
+                m_StateComponent->GetCurrentChangeset()->AddChangeType(
+                        AppStateChangeset::ChangeTypeFlag::e_ScanActivity);
             }
         };
     };
+
+    inline void to_json(nlohmann::json &j, const AppState &state)
+    {
+        j = {
+                {AppState::k_UseScanListKey, state.m_UseScanList},
+                {AppState::k_LeftPanelWidthKey, state.m_LeftPanelWidth},
+                {AppState::k_RightPanelWidthKey, state.m_RightPanelWidth},
+        };
+    }
+
+    inline void from_json(const nlohmann::json &j, AppState &state)
+    {
+        state.m_UseScanList = j.value(AppState::k_UseScanListKey, false);
+        state.m_LeftPanelWidth = j.value(AppState::k_LeftPanelWidthKey, 0.3);
+        state.m_RightPanelWidth = j.value(AppState::k_RightPanelWidthKey, 0.3);
+    }
 }

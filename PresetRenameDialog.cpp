@@ -44,12 +44,7 @@ namespace Gorfector
             return;
         }
 
-        auto dialog = gtk_widget_get_parent(widget);
-        while (dialog != nullptr && !ADW_IS_DIALOG(dialog))
-        {
-            dialog = gtk_widget_get_parent(dialog);
-        }
-
+        auto dialog = ZooLib::GetParentOfType(GTK_WIDGET(widget), ADW_TYPE_DIALOG);
         if (dialog == nullptr)
         {
             g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Dialog not found");
@@ -75,11 +70,7 @@ namespace Gorfector
 
     void ShowRenamePresetDialog(GtkWidget *widget, gpointer userData)
     {
-        auto listBoxRow = gtk_widget_get_parent(widget);
-        while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
-        {
-            listBoxRow = gtk_widget_get_parent(listBoxRow);
-        }
+        auto listBoxRow = ZooLib::GetParentOfType(widget, GTK_TYPE_LIST_BOX_ROW);
         auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
 
         auto presetPanel = static_cast<PresetPanel *>(userData);

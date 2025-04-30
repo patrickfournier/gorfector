@@ -9,9 +9,10 @@ namespace Gorfector
     class PresetPanelState : public ZooLib::StateComponent
     {
     public:
-        static const char *s_PresetSectionScanArea;
-        static const char *s_PresetSectionScannerSettings;
-        static const char *s_PresetSectionOutputSettings;
+        static constexpr const char *k_PresetNameKey = "Name";
+        static constexpr const char *k_ScanAreaKey = "ScanArea";
+        static constexpr const char *k_ScannerSettingsKey = "ScannerSettings";
+        static constexpr const char *k_OutputSettingsKey = "OutputSettings";
 
     private:
         bool m_Expanded{};
@@ -65,11 +66,13 @@ namespace Gorfector
             auto results = std::vector<nlohmann::json>{};
             for (auto preset: m_Presets)
             {
-                if (preset.contains("ScannerSettings"))
+                if (preset.contains(k_ScannerSettingsKey))
 
                 {
-                    if (preset["ScannerSettings"]["Device"]["Vendor"] == vendorName &&
-                        preset["ScannerSettings"]["Device"]["Model"] == modelName)
+                    if (preset[k_ScannerSettingsKey][DeviceOptionsState::k_DeviceKey]
+                              [DeviceOptionsState::k_DeviceVendorKey] == vendorName &&
+                        preset[k_ScannerSettingsKey][DeviceOptionsState::k_DeviceKey]
+                              [DeviceOptionsState::k_DeviceModelKey] == modelName)
                     {
                         results.push_back(preset);
                     }
@@ -85,8 +88,9 @@ namespace Gorfector
 
         [[nodiscard]] const nlohmann::json *GetPreset(const std::string &presetId) const
         {
-            auto it = std::ranges::find_if(
-                    m_Presets, [&presetId](const nlohmann::json &preset) { return preset["Name"] == presetId; });
+            auto it = std::ranges::find_if(m_Presets, [&presetId](const nlohmann::json &preset) {
+                return preset[k_PresetNameKey] == presetId;
+            });
             if (it != m_Presets.end())
             {
                 return &*it;
@@ -134,7 +138,9 @@ namespace Gorfector
                 m_StateComponent->m_Presets.erase(
                         std::ranges::remove_if(
                                 m_StateComponent->m_Presets,
-                                [&uniqueId](const nlohmann::json &preset) { return preset["Name"] == uniqueId; })
+                                [&uniqueId](const nlohmann::json &preset) {
+                                    return preset[k_PresetNameKey] == uniqueId;
+                                })
                                 .begin(),
                         m_StateComponent->m_Presets.end());
             }
@@ -142,11 +148,11 @@ namespace Gorfector
             void RenamePreset(std::string presetId, const std::string &newName)
             {
                 auto it = std::ranges::find_if(m_StateComponent->m_Presets, [&presetId](const nlohmann::json &preset) {
-                    return preset["Name"] == presetId;
+                    return preset[k_PresetNameKey] == presetId;
                 });
                 if (it != m_StateComponent->m_Presets.end())
                 {
-                    (*it)["Name"] = newName;
+                    (*it)[k_PresetNameKey] = newName;
                 }
             }
         };

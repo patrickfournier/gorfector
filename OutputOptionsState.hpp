@@ -10,6 +10,12 @@ namespace Gorfector
     class OutputOptionsState : public ZooLib::StateComponent
     {
     public:
+        static constexpr const char *k_OutputDestinationKey = "OutputDestination";
+        static constexpr const char *k_OutputDirectoryKey = "OutputDirectory";
+        static constexpr const char *k_CreateMissingDirectoriesKey = "CreateMissingDirectories";
+        static constexpr const char *k_OutputFileNameKey = "OutputFileName";
+        static constexpr const char *k_FileExistsActionKey = "FileExistsAction";
+
         enum class OutputDestination
         {
             e_File,
@@ -86,6 +92,11 @@ namespace Gorfector
                 from_json(json, *m_StateComponent);
             }
 
+            void ApplySettings(const nlohmann::json &json)
+            {
+                LoadFromJson(json);
+            }
+
             void SetOutputDestination(OutputDestination destination)
             {
                 m_StateComponent->m_OutputDestination = destination;
@@ -117,19 +128,19 @@ namespace Gorfector
     {
         auto outputDir = p.m_OutputDirectory.string();
         j = nlohmann::json{
-                {"OutputDestination", p.m_OutputDestination},
-                {"OutputDirectory", outputDir},
-                {"CreateMissingDirectories", p.m_CreateMissingDirectories},
-                {"OutputFileName", p.m_OutputFileName},
-                {"FileExistsAction", p.m_FileExistsAction}};
+                {OutputOptionsState::k_OutputDestinationKey, p.m_OutputDestination},
+                {OutputOptionsState::k_OutputDirectoryKey, outputDir},
+                {OutputOptionsState::k_CreateMissingDirectoriesKey, p.m_CreateMissingDirectories},
+                {OutputOptionsState::k_OutputFileNameKey, p.m_OutputFileName},
+                {OutputOptionsState::k_FileExistsActionKey, p.m_FileExistsAction}};
     }
 
     inline void from_json(const nlohmann::json &j, OutputOptionsState &p)
     {
-        j.at("OutputDestination").get_to(p.m_OutputDestination);
-        j.at("OutputDirectory").get_to(p.m_OutputDirectory);
-        j.at("CreateMissingDirectories").get_to(p.m_CreateMissingDirectories);
-        j.at("OutputFileName").get_to(p.m_OutputFileName);
-        j.at("FileExistsAction").get_to(p.m_FileExistsAction);
+        j.at(OutputOptionsState::k_OutputDestinationKey).get_to(p.m_OutputDestination);
+        j.at(OutputOptionsState::k_OutputDirectoryKey).get_to(p.m_OutputDirectory);
+        j.at(OutputOptionsState::k_CreateMissingDirectoriesKey).get_to(p.m_CreateMissingDirectories);
+        j.at(OutputOptionsState::k_OutputFileNameKey).get_to(p.m_OutputFileName);
+        j.at(OutputOptionsState::k_FileExistsActionKey).get_to(p.m_FileExistsAction);
     }
 }

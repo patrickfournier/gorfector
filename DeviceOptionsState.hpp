@@ -104,6 +104,16 @@ namespace Gorfector
     {
     public:
         static constexpr uint32_t k_InvalidIndex = std::numeric_limits<uint32_t>::max();
+        static constexpr const char *k_DeviceKey = "Device";
+        static constexpr const char *k_DeviceNameKey = "Name";
+        static constexpr const char *k_DeviceVendorKey = "Vendor";
+        static constexpr const char *k_DeviceModelKey = "Model";
+        static constexpr const char *k_DeviceTypeKey = "Type";
+        static constexpr const char *k_OptionsKey = "Options";
+        static constexpr const char *k_TlxKey = "tl-x";
+        static constexpr const char *k_TlyKey = "tl-y";
+        static constexpr const char *k_BrxKey = "br-x";
+        static constexpr const char *k_BryKey = "br-y";
 
     private:
         const std::string m_DeviceName;
@@ -161,37 +171,40 @@ namespace Gorfector
             {
                 m_ModeIndex = index;
             }
-            else if (strcmp(optionValue->GetName(), "tl-x") == 0)
+            else
             {
-                m_TLXIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "tl-y") == 0)
-            {
-                m_TLYIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "br-x") == 0)
-            {
-                m_BRXIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "br-y") == 0)
-            {
-                m_BRYIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "resolution") == 0)
-            {
-                m_ResolutionIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "x-resolution") == 0) // not a "well-known" option
-            {
-                m_XResolutionIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "y-resolution") == 0) // not a "well-known" option
-            {
-                m_YResolutionIndex = index;
-            }
-            else if (strcmp(optionValue->GetName(), "depth") == 0) // not a "well-known" option
-            {
-                m_BitDepthIndex = index;
+                if (strcmp(optionValue->GetName(), k_TlxKey) == 0)
+                {
+                    m_TLXIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), k_TlyKey) == 0)
+                {
+                    m_TLYIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), k_BrxKey) == 0)
+                {
+                    m_BRXIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), k_BryKey) == 0)
+                {
+                    m_BRYIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), "resolution") == 0)
+                {
+                    m_ResolutionIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), "x-resolution") == 0) // not a "well-known" option
+                {
+                    m_XResolutionIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), "y-resolution") == 0) // not a "well-known" option
+                {
+                    m_YResolutionIndex = index;
+                }
+                else if (strcmp(optionValue->GetName(), "depth") == 0) // not a "well-known" option
+                {
+                    m_BitDepthIndex = index;
+                }
             }
         }
 
@@ -385,12 +398,12 @@ namespace Gorfector
         }
 
         j = nlohmann::json::object();
-        j["Device"]["Name"] = device->GetName();
-        j["Device"]["Vendor"] = device->GetVendor();
-        j["Device"]["Model"] = device->GetModel();
-        j["Device"]["Type"] = device->GetType();
+        j[DeviceOptionsState::k_DeviceKey][DeviceOptionsState::k_DeviceNameKey] = device->GetName();
+        j[DeviceOptionsState::k_DeviceKey][DeviceOptionsState::k_DeviceVendorKey] = device->GetVendor();
+        j[DeviceOptionsState::k_DeviceKey][DeviceOptionsState::k_DeviceModelKey] = device->GetModel();
+        j[DeviceOptionsState::k_DeviceKey][DeviceOptionsState::k_DeviceTypeKey] = device->GetType();
 
-        j["Options"] = nlohmann::json::object();
+        j[DeviceOptionsState::k_OptionsKey] = nlohmann::json::object();
         for (auto optionValue: p.m_OptionValues)
         {
             if (optionValue == nullptr)
@@ -402,7 +415,7 @@ namespace Gorfector
                 continue;
             }
 
-            optionValue->Serialize(j["Options"]);
+            optionValue->Serialize(j[DeviceOptionsState::k_OptionsKey]);
         }
     }
 }

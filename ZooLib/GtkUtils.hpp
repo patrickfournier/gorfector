@@ -29,4 +29,14 @@ namespace ZooLib
 
         return nullptr;
     }
+
+    static GtkWidget *GetParentOfType(GtkWidget *widget, GType type)
+    {
+        auto parent = gtk_widget_get_parent(widget);
+        while (parent != nullptr && !G_TYPE_CHECK_INSTANCE_TYPE(parent, type))
+        {
+            parent = gtk_widget_get_parent(parent);
+        }
+        return parent;
+    }
 }

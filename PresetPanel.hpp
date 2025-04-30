@@ -15,8 +15,6 @@
 
 namespace Gorfector
 {
-    GtkWidget *CreatePresetListItem(gpointer item, gpointer userData);
-
     class PresetPanel : public ZooLib::View
     {
         App *m_App;
@@ -24,7 +22,7 @@ namespace Gorfector
 
         PresetPanelState *m_PresetPanelState{};
         ViewUpdateObserver<PresetPanel, PresetPanelState> *m_ViewUpdateObserver{};
-        CurrentDeviceObserver *m_CurrentDeviceObserver;
+        CurrentDeviceObserver<PresetPanelState> *m_CurrentDeviceObserver;
 
         std::string m_CurrentDeviceModel{};
         std::string m_CurrentDeviceVendor{};
@@ -47,6 +45,7 @@ namespace Gorfector
         {
             m_PresetPanelState = new PresetPanelState(m_App->GetState());
             m_App->GetState()->LoadFromPreferenceFile(m_PresetPanelState);
+
             BuildUI();
 
             m_ViewUpdateObserver = new ViewUpdateObserver(this, m_PresetPanelState);
@@ -64,6 +63,14 @@ namespace Gorfector
 
         ~PresetPanel() override
         {
+            m_Dispatcher.UnregisterHandler<SetPresetExpanded>();
+            m_Dispatcher.UnregisterHandler<CreatePresetCommand>();
+            m_Dispatcher.UnregisterHandler<DeletePresetCommand>();
+            m_Dispatcher.UnregisterHandler<RenamePresetCommand>();
+
+            m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
+            m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
+
             delete m_PresetPanelState;
         }
 
@@ -95,33 +102,41 @@ namespace Gorfector
                 const std::string &presetName, bool saveScannerSettings, bool saveScanArea, bool saveOutputSettings)
         {
             auto preset = nlohmann::json{};
-            preset["Name"] = presetName;
+            preset[PresetPanelState::k_PresetNameKey] = presetName;
 
             auto scannerSettings = nlohmann::json{};
             to_json(scannerSettings, *m_App->GetDeviceOptions());
 
             if (saveScanArea)
             {
-                preset[PresetPanelState::s_PresetSectionScanArea] = {
-                        {"tl-x", scannerSettings["Options"]["tl-x"]},
-                        {"tl-y", scannerSettings["Options"]["tl-y"]},
-                        {"br-x", scannerSettings["Options"]["br-x"]},
-                        {"br-y", scannerSettings["Options"]["br-y"]},
+                preset[PresetPanelState::k_ScanAreaKey] = {
+                        {DeviceOptionsState::k_TlxKey,
+                         scannerSettings[DeviceOptionsState::k_OptionsKey][DeviceOptionsState::k_TlxKey]},
+                        {DeviceOptionsState::k_TlyKey,
+                         scannerSettings[DeviceOptionsState::k_OptionsKey][DeviceOptionsState::k_TlyKey]},
+                        {DeviceOptionsState::k_BrxKey,
+                         scannerSettings[DeviceOptionsState::k_OptionsKey][DeviceOptionsState::k_BrxKey]},
+                        {DeviceOptionsState::k_BryKey,
+                         scannerSettings[DeviceOptionsState::k_OptionsKey][DeviceOptionsState::k_BryKey]},
                 };
             }
             if (saveScannerSettings)
             {
-                preset[PresetPanelState::s_PresetSectionScannerSettings] = scannerSettings;
+                preset[PresetPanelState::k_ScannerSettingsKey] = scannerSettings;
 
-                preset[PresetPanelState::s_PresetSectionScannerSettings]["Options"].erase("tl-x");
-                preset[PresetPanelState::s_PresetSectionScannerSettings]["Options"].erase("tl-y");
-                preset[PresetPanelState::s_PresetSectionScannerSettings]["Options"].erase("br-x");
-                preset[PresetPanelState::s_PresetSectionScannerSettings]["Options"].erase("br-y");
+                preset[PresetPanelState::k_ScannerSettingsKey][DeviceOptionsState::k_OptionsKey].erase(
+                        DeviceOptionsState::k_TlxKey);
+                preset[PresetPanelState::k_ScannerSettingsKey][DeviceOptionsState::k_OptionsKey].erase(
+                        DeviceOptionsState::k_TlyKey);
+                preset[PresetPanelState::k_ScannerSettingsKey][DeviceOptionsState::k_OptionsKey].erase(
+                        DeviceOptionsState::k_BrxKey);
+                preset[PresetPanelState::k_ScannerSettingsKey][DeviceOptionsState::k_OptionsKey].erase(
+                        DeviceOptionsState::k_BryKey);
             }
             if (saveOutputSettings)
             {
-                preset["OutputSettings"] = {};
-                to_json(preset[PresetPanelState::s_PresetSectionOutputSettings], *m_App->GetOutputOptions());
+                preset[PresetPanelState::k_OutputSettingsKey] = {};
+                to_json(preset[PresetPanelState::k_OutputSettingsKey], *m_App->GetOutputOptions());
             }
 
             m_Dispatcher.Dispatch(CreatePresetCommand(preset));
@@ -143,51 +158,6 @@ namespace Gorfector
             m_Dispatcher.Dispatch(RenamePresetCommand(presetName, newName));
         }
 
-        void Update(const std::vector<uint64_t> &lastSeenVersions) override
-        {
-            gtk_expander_set_expanded(GTK_EXPANDER(m_Expander), m_PresetPanelState->IsExpanded());
-
-            m_CurrentDeviceModel = m_PresetPanelState->GetCurrentDeviceModel();
-            m_CurrentDeviceVendor = m_PresetPanelState->GetCurrentDeviceVendor();
-
-            m_Dispatcher.UnregisterHandler<ApplyPresetCommand>();
-            m_Dispatcher.RegisterHandler(
-                    ApplyPresetCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
-
-            bool canCreateOrApplyPreset = m_PresetPanelState->CanCreateOrApplyPreset();
-            gtk_widget_set_sensitive(m_CreatePresetButton, canCreateOrApplyPreset);
-
-            m_DisplayedPresetNames.clear();
-            for (const auto &preset: m_PresetPanelState->GetPresetsForScanner(
-                         m_PresetPanelState->GetCurrentDeviceVendor(), m_PresetPanelState->GetCurrentDeviceModel()))
-            {
-                m_DisplayedPresetNames.push_back(preset["Name"].get<std::string>());
-            }
-
-            const char **names = new const char *[m_DisplayedPresetNames.size() + 1];
-            for (size_t i = 0; i < m_DisplayedPresetNames.size(); ++i)
-            {
-                names[i] = m_DisplayedPresetNames[i].c_str();
-            }
-            names[m_DisplayedPresetNames.size()] = nullptr;
-
-            auto presetNamesList = gtk_string_list_new(names);
-            gtk_list_box_bind_model(
-                    GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(presetNamesList), Gorfector::CreatePresetListItem, this,
-                    nullptr);
-
-            int i = 0;
-            auto row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), i);
-            while (row != nullptr)
-            {
-                auto applyButton = ZooLib::FindWidgetByName(GTK_WIDGET(row), "apply-button");
-                if (applyButton != nullptr)
-                {
-                    gtk_widget_set_sensitive(applyButton, canCreateOrApplyPreset);
-                }
-
-                row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), ++i);
-            }
-        }
+        void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };
 }

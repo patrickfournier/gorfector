@@ -86,6 +86,9 @@ Gorfector::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatche
 
 Gorfector::PreviewPanel::~PreviewPanel()
 {
+    m_Dispatcher.UnregisterHandler<SetPanCommand>();
+    m_Dispatcher.UnregisterHandler<SetZoomCommand>();
+
     m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
     delete m_ViewUpdateObserver;
     delete m_PreviewState;
