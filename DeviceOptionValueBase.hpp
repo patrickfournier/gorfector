@@ -5,7 +5,7 @@
 
 #include "SaneDevice.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class DeviceOptionValueBase
     {

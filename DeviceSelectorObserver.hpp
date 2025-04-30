@@ -6,7 +6,7 @@
 #include "ZooLib/Observer.hpp"
 
 
-namespace ZooScan
+namespace Gorfector
 {
     /**
      * @class DeviceSelectorObserver

@@ -8,7 +8,7 @@
 
 #include "ZooLib/State.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class App;
     class DeviceOptionsState;

@@ -4,7 +4,7 @@
 
 #include "PresetPanel.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     void ShowViewPresetDialog(GtkWidget *widget, gpointer userData)
     {

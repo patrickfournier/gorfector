@@ -21,7 +21,7 @@ enum class ScanAreaCursorRegions
     BottomRight,
 };
 
-ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+Gorfector::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
     : m_App(app)
     , m_Dispatcher(parentDispatcher)
 {
@@ -84,14 +84,14 @@ ZooScan::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher,
     m_Dispatcher.RegisterHandler(SetZoomCommand::Execute, m_PreviewState);
 }
 
-ZooScan::PreviewPanel::~PreviewPanel()
+Gorfector::PreviewPanel::~PreviewPanel()
 {
     m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
     delete m_ViewUpdateObserver;
     delete m_PreviewState;
 }
 
-void ZooScan::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)
+void Gorfector::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)
 {
     if (widget != m_PreviewImage)
         return;
@@ -119,7 +119,7 @@ void ZooScan::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)
     updater.SetPreviewWindowSize(width, height);
 }
 
-void ZooScan::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void *data)
+void Gorfector::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void *data)
 {
     if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
     {
@@ -137,7 +137,7 @@ void ZooScan::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void *d
  * @param deltaY The change in Y direction, in display pixels.
  * @param outScanArea The new scan area in SA units.
  */
-void ZooScan::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const
+void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const
 {
     auto width = m_PreviewState->GetScannedPixelsPerLine() * m_ZoomFactor;
     auto height = m_PreviewState->GetScannedImageHeight() * m_ZoomFactor;
@@ -323,7 +323,7 @@ void ZooScan::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect<d
  * @param outPixelArea The output pixel area.
  * @returns True if the mapping was successful, false otherwise.
  */
-bool ZooScan::PreviewPanel::ScanAreaToPixels(const Rect<double> &scanArea, Rect<double> &outPixelArea) const
+bool Gorfector::PreviewPanel::ScanAreaToPixels(const Rect<double> &scanArea, Rect<double> &outPixelArea) const
 {
     const auto width = m_PreviewState->GetScannedPixelsPerLine();
     const auto height = m_PreviewState->GetScannedImageHeight();
@@ -347,7 +347,7 @@ bool ZooScan::PreviewPanel::ScanAreaToPixels(const Rect<double> &scanArea, Rect<
     return false;
 }
 
-ScanAreaCursorRegions GetScanAreaCursorRegion(const ZooScan::Rect<double> &pixelArea, double x, double y)
+ScanAreaCursorRegions GetScanAreaCursorRegion(const Gorfector::Rect<double> &pixelArea, double x, double y)
 {
     static constexpr double tolerance = 5.0;
 
@@ -410,7 +410,7 @@ ScanAreaCursorRegions GetScanAreaCursorRegion(const ZooScan::Rect<double> &pixel
     return ScanAreaCursorRegions::Outside;
 }
 
-void ZooScan::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
+void Gorfector::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
 {
     if (m_PreviewState->GetScannedPixelsPerLine() == 0 || m_PreviewState->GetScannedImageHeight() == 0)
         return;
@@ -489,7 +489,7 @@ void ZooScan::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
     }
 }
 
-void ZooScan::PreviewPanel::OnPreviewDragUpdate(GtkGestureDrag *dragController)
+void Gorfector::PreviewPanel::OnPreviewDragUpdate(GtkGestureDrag *dragController)
 {
     if (m_DragMode == DragMode::None || m_PreviewState->GetScannedPixelsPerLine() == 0 ||
         m_PreviewState->GetScannedImageHeight() == 0)
@@ -510,7 +510,7 @@ void ZooScan::PreviewPanel::OnPreviewDragUpdate(GtkGestureDrag *dragController)
     }
 }
 
-void ZooScan::PreviewPanel::OnPreviewDragEnd(GtkGestureDrag *dragController)
+void Gorfector::PreviewPanel::OnPreviewDragEnd(GtkGestureDrag *dragController)
 {
     m_IsDragging = false;
 
@@ -536,7 +536,7 @@ void ZooScan::PreviewPanel::OnPreviewDragEnd(GtkGestureDrag *dragController)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionController, gdouble x, gdouble y)
+void Gorfector::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionController, gdouble x, gdouble y)
 {
     m_LastMousePosition = Point{x, y};
 
@@ -612,7 +612,7 @@ void ZooScan::PreviewPanel::OnMouseMove(GtkEventControllerMotion *motionControll
     }
 }
 
-void ZooScan::PreviewPanel::OnMouseScroll(GtkEventControllerScroll *scrollController, gdouble deltaX, gdouble deltaY)
+void Gorfector::PreviewPanel::OnMouseScroll(GtkEventControllerScroll *scrollController, gdouble deltaX, gdouble deltaY)
 {
     if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr)
     {
@@ -655,7 +655,7 @@ void ZooScan::PreviewPanel::OnMouseScroll(GtkEventControllerScroll *scrollContro
     }
 }
 
-void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
+void Gorfector::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
 {
     gdk_cairo_set_source_pixbuf(cr, m_PreviewPixBuf, 0, 0);
     cairo_paint(cr);
@@ -679,7 +679,7 @@ void ZooScan::PreviewPanel::OnPreviewDraw(cairo_t *cr) const
     cairo_stroke(cr);
 }
 
-void ZooScan::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
+void Gorfector::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     auto changeset = m_PreviewState->GetAggregatedChangeset(lastSeenVersions[0]);
     if (changeset == nullptr || !changeset->HasAnyChange())
@@ -888,7 +888,7 @@ void ZooScan::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersions
     gtk_widget_queue_draw(m_PreviewImage);
 }
 
-void ZooScan::PreviewPanel::Redraw()
+void Gorfector::PreviewPanel::Redraw()
 {
     if (m_PreviewPixBuf == nullptr)
     {
@@ -938,7 +938,7 @@ void ZooScan::PreviewPanel::Redraw()
     }
 }
 
-void ZooScan::PreviewPanel::FillWithEmptyPattern() const
+void Gorfector::PreviewPanel::FillWithEmptyPattern() const
 {
     g_assert(gdk_pixbuf_get_colorspace(m_PreviewPixBuf) == GDK_COLORSPACE_RGB);
     g_assert(gdk_pixbuf_get_bits_per_sample(m_PreviewPixBuf) == 8);

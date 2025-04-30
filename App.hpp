@@ -10,7 +10,7 @@
 #include "OutputOptionsState.hpp"
 #include "ZooLib/Application.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class PresetPanel;
     class FileWriter;
@@ -22,8 +22,8 @@ namespace ZooScan
     class App : public ZooLib::Application
     {
     public:
-        static constexpr auto k_ApplicationId = "com.patrickfournier.zooscan";
-        static constexpr auto k_ApplicationName = "ZooScan";
+        static constexpr auto k_ApplicationId = "com.patrickfournier.gorfector";
+        static constexpr auto k_ApplicationName = "Gorfector";
 
     private:
         AppState *m_AppState{};

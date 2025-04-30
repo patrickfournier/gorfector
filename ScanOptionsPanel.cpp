@@ -19,7 +19,7 @@
 #include "ZooLib/SignalSupport.hpp"
 
 
-const char *ZooScan::ScanOptionsPanel::SaneUnitToString(SANE_Unit unit)
+const char *Gorfector::ScanOptionsPanel::SaneUnitToString(SANE_Unit unit)
 {
     switch (unit)
     {
@@ -42,7 +42,7 @@ const char *ZooScan::ScanOptionsPanel::SaneUnitToString(SANE_Unit unit)
     }
 }
 
-std::string ZooScan::ScanOptionsPanel::SaneIntOrFixedToString(int value, const DeviceOptionValueBase *option)
+std::string Gorfector::ScanOptionsPanel::SaneIntOrFixedToString(int value, const DeviceOptionValueBase *option)
 {
     if (option->GetValueType() == SANE_TYPE_FIXED)
     {
@@ -83,7 +83,7 @@ void AddWidgetToParent(GtkWidget *parent, GtkWidget *child)
     }
 }
 
-void ZooScan::ScanOptionsPanel::AddCheckButtonForScannerOption(
+void Gorfector::ScanOptionsPanel::AddCheckButtonForScannerOption(
         GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
 {
     auto boolOption = dynamic_cast<const DeviceOptionValue<bool> *>(option);
@@ -119,7 +119,7 @@ void ZooScan::ScanOptionsPanel::AddCheckButtonForScannerOption(
     m_Widgets[index.Hash()] = checkButton;
 }
 
-void ZooScan::ScanOptionsPanel::AddVectorRowForScannerOption(
+void Gorfector::ScanOptionsPanel::AddVectorRowForScannerOption(
         GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex, uint32_t valueIndex,
         bool multiValue = false)
 {
@@ -231,7 +231,7 @@ void ZooScan::ScanOptionsPanel::AddVectorRowForScannerOption(
     }
 }
 
-void ZooScan::ScanOptionsPanel::AddStringRowForScannerOption(
+void Gorfector::ScanOptionsPanel::AddStringRowForScannerOption(
         GtkWidget *parent, const DeviceOptionValueBase *option, uint32_t settingIndex)
 {
     auto strOption = dynamic_cast<const DeviceOptionValue<std::string> *>(option);
@@ -314,7 +314,7 @@ void ZooScan::ScanOptionsPanel::AddStringRowForScannerOption(
     }
 }
 
-ZooScan::ScanOptionsPanel::ScanOptionsPanel(
+Gorfector::ScanOptionsPanel::ScanOptionsPanel(
         int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app)
     : m_App(app)
     , m_SaneInitId(saneInitId)
@@ -371,7 +371,7 @@ ZooScan::ScanOptionsPanel::ScanOptionsPanel(
     BuildUI();
 }
 
-ZooScan::ScanOptionsPanel::~ScanOptionsPanel()
+Gorfector::ScanOptionsPanel::~ScanOptionsPanel()
 {
     m_Dispatcher.UnregisterHandler<ChangeOptionCommand<bool>>();
     m_Dispatcher.UnregisterHandler<ChangeOptionCommand<int>>();
@@ -383,7 +383,7 @@ ZooScan::ScanOptionsPanel::~ScanOptionsPanel()
     delete m_DeviceOptions;
 }
 
-void ZooScan::ScanOptionsPanel::BuildUI()
+void Gorfector::ScanOptionsPanel::BuildUI()
 {
     m_Widgets.clear();
 
@@ -440,7 +440,7 @@ void ZooScan::ScanOptionsPanel::BuildUI()
     AddOutputOptions();
 }
 
-std::vector<uint32_t> ZooScan::ScanOptionsPanel::AddCommonOptions()
+std::vector<uint32_t> Gorfector::ScanOptionsPanel::AddCommonOptions()
 {
     auto optionGroup = adw_preferences_group_new();
     adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(optionGroup), _("Common Options"));
@@ -473,7 +473,7 @@ std::vector<uint32_t> ZooScan::ScanOptionsPanel::AddCommonOptions()
                        m_DeviceOptions->BRYIndex()};
 }
 
-void ZooScan::ScanOptionsPanel::AddOtherScannerOptions(const std::vector<uint32_t> &excludeIndices)
+void Gorfector::ScanOptionsPanel::AddOtherScannerOptions(const std::vector<uint32_t> &excludeIndices)
 {
     auto parent = m_PageBasic;
     GtkWidget *pendingGroup = nullptr;
@@ -504,7 +504,7 @@ enum OutputOptions
     e_FileExistsAction
 };
 
-void ZooScan::ScanOptionsPanel::AddOutputOptions()
+void Gorfector::ScanOptionsPanel::AddOutputOptions()
 {
     auto group = adw_preferences_group_new();
     adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(group), _("Destination"));
@@ -598,13 +598,13 @@ void ZooScan::ScanOptionsPanel::AddOutputOptions()
 
 void OnDirectorySelected(GObject *dialog, GAsyncResult *res, gpointer data)
 {
-    auto self = static_cast<ZooScan::ScanOptionsPanel *>(data);
+    auto self = static_cast<Gorfector::ScanOptionsPanel *>(data);
     GError *error;
     auto path = gtk_file_dialog_select_folder_finish(GTK_FILE_DIALOG(dialog), res, &error);
     self->OnDirectorySelected(path);
 }
 
-void ZooScan::ScanOptionsPanel::OnBrowseButtonClicked(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnBrowseButtonClicked(GtkWidget *widget)
 {
     auto selectDirDialog = gtk_file_dialog_new();
     gtk_file_dialog_set_title(GTK_FILE_DIALOG(selectDirDialog), _("Select Destination"));
@@ -612,7 +612,7 @@ void ZooScan::ScanOptionsPanel::OnBrowseButtonClicked(GtkWidget *widget)
             GTK_FILE_DIALOG(selectDirDialog), GTK_WINDOW(m_App->GetMainWindow()), nullptr, ::OnDirectorySelected, this);
 }
 
-void ZooScan::ScanOptionsPanel::OnDirectorySelected(GFile *file)
+void Gorfector::ScanOptionsPanel::OnDirectorySelected(GFile *file)
 {
     std::filesystem::path destinationDirectory;
     if (file != nullptr)
@@ -629,7 +629,7 @@ void ZooScan::ScanOptionsPanel::OnDirectorySelected(GFile *file)
     }
 }
 
-std::tuple<GtkWidget *, GtkWidget *> ZooScan::ScanOptionsPanel::AddScannerOptionRow(
+std::tuple<GtkWidget *, GtkWidget *> Gorfector::ScanOptionsPanel::AddScannerOptionRow(
         uint64_t optionIndex, GtkWidget *parent, GtkWidget *pendingGroup, bool skipBasicOptions,
         bool skipAdvancedOptions)
 {
@@ -778,7 +778,7 @@ std::tuple<GtkWidget *, GtkWidget *> ZooScan::ScanOptionsPanel::AddScannerOption
     return {parent, pendingGroup};
 }
 
-void ZooScan::ScanOptionsPanel::OnScannerOptionCheckBoxChanged(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnScannerOptionCheckBoxChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
     if (gObjectData == nullptr)
@@ -801,7 +801,7 @@ void ZooScan::ScanOptionsPanel::OnScannerOptionCheckBoxChanged(GtkWidget *widget
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionId");
     if (gObjectData == nullptr)
@@ -831,7 +831,7 @@ void ZooScan::ScanOptionsPanel::OnCheckBoxChanged(GtkWidget *widget)
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnScannerOptionDropDownChanged(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnScannerOptionDropDownChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
     if (gObjectData == nullptr)
@@ -889,7 +889,7 @@ void ZooScan::ScanOptionsPanel::OnScannerOptionDropDownChanged(GtkWidget *widget
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnDropDownChanged(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnDropDownChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionId");
     if (gObjectData == nullptr)
@@ -926,7 +926,7 @@ void ZooScan::ScanOptionsPanel::OnDropDownChanged(GtkWidget *widget)
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnScannerOptionNumericTextFieldChanged(GtkEventControllerFocus *focusController)
+void Gorfector::ScanOptionsPanel::OnScannerOptionNumericTextFieldChanged(GtkEventControllerFocus *focusController)
 {
     auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(focusController));
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
@@ -978,7 +978,7 @@ void ZooScan::ScanOptionsPanel::OnScannerOptionNumericTextFieldChanged(GtkEventC
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnScannerOptionStringTextFieldChanged(GtkEventControllerFocus *focusController)
+void Gorfector::ScanOptionsPanel::OnScannerOptionStringTextFieldChanged(GtkEventControllerFocus *focusController)
 {
     auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(focusController));
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
@@ -1008,7 +1008,7 @@ void ZooScan::ScanOptionsPanel::OnScannerOptionStringTextFieldChanged(GtkEventCo
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFocus *focusController)
+void Gorfector::ScanOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFocus *focusController)
 {
     auto widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(focusController));
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionId");
@@ -1044,7 +1044,7 @@ void ZooScan::ScanOptionsPanel::OnStringTextFieldChanged(GtkEventControllerFocus
     }
 }
 
-void ZooScan::ScanOptionsPanel::OnScannerOptionSpinButtonChanged(GtkWidget *widget)
+void Gorfector::ScanOptionsPanel::OnScannerOptionSpinButtonChanged(GtkWidget *widget)
 {
     auto gObjectData = g_object_get_data(G_OBJECT(widget), "OptionIndex");
     if (gObjectData == nullptr)
@@ -1082,7 +1082,7 @@ void ZooScan::ScanOptionsPanel::OnScannerOptionSpinButtonChanged(GtkWidget *widg
     }
 }
 
-void ZooScan::ScanOptionsPanel::SelectPage(Page page)
+void Gorfector::ScanOptionsPanel::SelectPage(Page page)
 {
     if (m_OptionParent != nullptr)
     {
@@ -1106,7 +1106,7 @@ void ZooScan::ScanOptionsPanel::SelectPage(Page page)
     }
 }
 
-void ZooScan::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
+void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     auto firstChangesetVersion = m_DeviceOptions->FirstChangesetVersion();
     auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersions[0]);

@@ -10,9 +10,9 @@ set(TEST_FILES
         ../ZooLib/State.cpp
 )
 
-add_executable(zooscan_standalonetests ${TEST_FILES})
+add_executable(gorfector_standalonetests ${TEST_FILES})
 
-target_link_libraries(zooscan_standalonetests gtest gtest_main)
+target_link_libraries(gorfector_standalonetests gtest gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(zooscan_standalonetests)
+gtest_discover_tests(gorfector_standalonetests)

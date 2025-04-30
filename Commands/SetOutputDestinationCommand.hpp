@@ -2,7 +2,7 @@
 #include "OutputOptionsState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class SetOutputDestinationCommand : public ZooLib::Command

@@ -3,7 +3,7 @@
 #include "Writers/PngWriterState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class SetPngCompressionLevel : public ZooLib::Command

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-    <gresource prefix="/com/patrickfournier/zooscan">
-        <file>resources/zooscan.css</file>
+    <gresource prefix="/com/patrickfournier/gorfector">
+        <file>resources/gorfector.css</file>
     </gresource>
-    <gresource prefix="/com/patrickfournier/zooscan">
+    <gresource prefix="/com/patrickfournier/gorfector">
         <file preprocess="xml-stripblanks">resources/decode-symbolic.svg</file>
     </gresource>
-    <gresource prefix="/com/patrickfournier/zooscan">
+    <gresource prefix="/com/patrickfournier/gorfector">
         <file preprocess="xml-stripblanks">resources/arrow3-down-symbolic.svg</file>
     </gresource>
 </gresources>

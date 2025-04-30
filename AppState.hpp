@@ -2,7 +2,7 @@
 
 #include "ZooLib/StateComponent.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class AppState final : public ZooLib::StateComponent
     {

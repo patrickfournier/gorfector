@@ -8,7 +8,7 @@
 #include "ZooLib/CommandDispatcher.hpp"
 #include "ZooLib/View.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class App;
 

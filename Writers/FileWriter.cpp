@@ -1,3 +1,3 @@
 #include "FileWriter.hpp"
 
-std::vector<ZooScan::FileWriter *> ZooScan::FileWriter::s_Formats{};
+std::vector<Gorfector::FileWriter *> Gorfector::FileWriter::s_Formats{};

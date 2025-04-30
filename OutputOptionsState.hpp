@@ -4,7 +4,7 @@
 #include "ZooLib/State.hpp"
 #include "ZooLib/StateComponent.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class OutputOptionsState : public ZooLib::StateComponent

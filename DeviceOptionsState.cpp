@@ -24,7 +24,7 @@ static int EnsureBufferSize(std::unique_ptr<char8_t[]> &buffer, int currentSize,
     return currentSize;
 }
 
-void ZooScan::DeviceOptionsState::ReloadOptions() const
+void Gorfector::DeviceOptionsState::ReloadOptions() const
 {
     auto device = GetDevice();
     if (device == nullptr)
@@ -122,7 +122,7 @@ void ZooScan::DeviceOptionsState::ReloadOptions() const
     }
 }
 
-void ZooScan::DeviceOptionsState::BuildOptions()
+void Gorfector::DeviceOptionsState::BuildOptions()
 {
     Clear();
 
@@ -204,7 +204,7 @@ void ZooScan::DeviceOptionsState::BuildOptions()
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
+void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         uint32_t optionIndex, uint32_t valueIndex, bool requestedValue) const
 {
     auto *option = dynamic_cast<DeviceOptionValue<bool> *>(m_StateComponent->m_OptionValues[optionIndex]);
@@ -250,7 +250,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
+void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         uint32_t optionIndex, uint32_t valueIndex, double requestedValue) const
 {
     auto *option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
@@ -274,7 +274,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     SetOptionValue(optionIndex, valueIndex, requestedValueAsInt);
 }
 
-void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
+void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         uint32_t optionIndex, uint32_t valueIndex, int requestedValue) const
 {
     auto *option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
@@ -336,7 +336,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
+void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         uint32_t optionIndex, uint32_t valueIndex, const std::string &requestedValue) const
 {
     auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(m_StateComponent->m_OptionValues[optionIndex]);
@@ -388,7 +388,7 @@ void ZooScan::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
+void Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
 {
     auto saneDevice = m_StateComponent->GetDevice();
     if (saneDevice == nullptr)
@@ -480,7 +480,7 @@ void ZooScan::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const st
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
+void Gorfector::DeviceOptionsState::Updater::FindRequestMismatches(
         const std::vector<size_t> &indicesToCheck, std::vector<size_t> &mismatches)
 {
     for (unsigned long changedIndex: indicesToCheck)
@@ -560,7 +560,7 @@ void ZooScan::DeviceOptionsState::Updater::FindRequestMismatches(
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &json)
+void Gorfector::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &json)
 {
     // Load the preset in m_OptionValues requested values.
     std::vector<size_t> indicesToApply;
@@ -612,7 +612,7 @@ void ZooScan::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &jso
     }
 }
 
-void ZooScan::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &json)
+void Gorfector::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &json)
 {
     if (m_StateComponent->m_State == nullptr)
     {
@@ -653,7 +653,7 @@ void ZooScan::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &js
     ApplyPreset(json["Options"]);
 }
 
-bool ZooScan::DeviceOptionsState::IsPreview() const
+bool Gorfector::DeviceOptionsState::IsPreview() const
 {
     auto optionValue = m_OptionValues[m_PreviewIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "preview") == 0))
@@ -664,7 +664,7 @@ bool ZooScan::DeviceOptionsState::IsPreview() const
     return false;
 }
 
-std::string ZooScan::DeviceOptionsState::GetMode() const
+std::string Gorfector::DeviceOptionsState::GetMode() const
 {
     auto optionValue = m_OptionValues[m_ModeIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "mode") == 0))
@@ -675,7 +675,7 @@ std::string ZooScan::DeviceOptionsState::GetMode() const
     return "";
 }
 
-ZooScan::ScanAreaUnit ZooScan::DeviceOptionsState::GetScanAreaUnit() const
+Gorfector::ScanAreaUnit Gorfector::DeviceOptionsState::GetScanAreaUnit() const
 {
     auto optionValue = m_OptionValues[m_TLXIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "tl-x") == 0))
@@ -686,7 +686,7 @@ ZooScan::ScanAreaUnit ZooScan::DeviceOptionsState::GetScanAreaUnit() const
     return ScanAreaUnit::Pixels;
 }
 
-ZooScan::Rect<double> ZooScan::DeviceOptionsState::GetScanArea() const
+Gorfector::Rect<double> Gorfector::DeviceOptionsState::GetScanArea() const
 {
     Rect<double> scanArea;
     SANE_Value_Type valueType;
@@ -734,7 +734,7 @@ ZooScan::Rect<double> ZooScan::DeviceOptionsState::GetScanArea() const
     return scanArea;
 }
 
-ZooScan::Rect<double> ZooScan::DeviceOptionsState::GetMaxScanArea() const
+Gorfector::Rect<double> Gorfector::DeviceOptionsState::GetMaxScanArea() const
 {
     int left = 0, right = 0;
     int top = 0, bottom = 0;
@@ -790,7 +790,7 @@ ZooScan::Rect<double> ZooScan::DeviceOptionsState::GetMaxScanArea() const
             valueType == SANE_TYPE_FIXED ? SANE_UNFIX(bottom - top) : bottom - top};
 }
 
-int ZooScan::DeviceOptionsState::GetResolution() const
+int Gorfector::DeviceOptionsState::GetResolution() const
 {
     auto optionValue = m_OptionValues[m_ResolutionIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "resolution") == 0))
@@ -801,7 +801,7 @@ int ZooScan::DeviceOptionsState::GetResolution() const
     return 0;
 }
 
-int ZooScan::DeviceOptionsState::GetXResolution() const
+int Gorfector::DeviceOptionsState::GetXResolution() const
 {
     auto optionValue = m_OptionValues[m_XResolutionIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "x-resolution") == 0))
@@ -812,7 +812,7 @@ int ZooScan::DeviceOptionsState::GetXResolution() const
     return GetResolution();
 }
 
-int ZooScan::DeviceOptionsState::GetYResolution() const
+int Gorfector::DeviceOptionsState::GetYResolution() const
 {
     auto optionValue = m_OptionValues[m_YResolutionIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "y-resolution") == 0))
@@ -823,7 +823,7 @@ int ZooScan::DeviceOptionsState::GetYResolution() const
     return GetResolution();
 }
 
-int ZooScan::DeviceOptionsState::GetBitDepth() const
+int Gorfector::DeviceOptionsState::GetBitDepth() const
 {
     auto optionValue = m_OptionValues[m_BitDepthIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "depth") == 0))

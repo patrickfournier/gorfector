@@ -4,7 +4,7 @@
 
 #include "ZooLib/Gettext.hpp"
 
-static ZooScan::App *app;
+static Gorfector::App *app;
 
 void SignalHandler(int signal)
 {
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     bindtextdomain("messages", "../locale/");
     textdomain("messages");
 
-    app = new ZooScan::App(argc, argv);
+    app = new Gorfector::App(argc, argv);
     app->Initialize();
     auto retVal = app->Run();
     delete app;

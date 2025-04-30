@@ -4,7 +4,7 @@
 
 #include "ZooLib/Gettext.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     static const char *s_EmptyNameHint = N_("Preset name must not be empty.");
     static const char *s_NameConflictHint = N_("A preset with this name already exists.");

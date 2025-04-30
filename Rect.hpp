@@ -2,7 +2,7 @@
 
 #include "Point.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     template<typename T>
     struct Rect

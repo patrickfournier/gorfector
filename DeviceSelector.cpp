@@ -9,7 +9,7 @@
 #include "ZooLib/SignalSupport.hpp"
 
 
-ZooScan::DeviceSelector::DeviceSelector(
+Gorfector::DeviceSelector::DeviceSelector(
         ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState)
     : m_App(app)
     , m_Dispatcher(parent)
@@ -55,7 +55,7 @@ ZooScan::DeviceSelector::DeviceSelector(
     m_Dispatcher.RegisterHandler(ActivateNetworkScan::Execute, m_State);
 }
 
-ZooScan::DeviceSelector::~DeviceSelector()
+Gorfector::DeviceSelector::~DeviceSelector()
 {
     m_Dispatcher.UnregisterHandler<SelectDeviceCommand>();
     m_Dispatcher.UnregisterHandler<RefreshDeviceList>();
@@ -67,19 +67,19 @@ ZooScan::DeviceSelector::~DeviceSelector()
     delete m_Observer;
 }
 
-void ZooScan::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
+void Gorfector::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
 {
     m_Dispatcher.Dispatch(RefreshDeviceList());
 }
 
-void ZooScan::DeviceSelector::OnActivateNetwork(GtkWidget *widget)
+void Gorfector::DeviceSelector::OnActivateNetwork(GtkWidget *widget)
 {
     const bool value = adw_switch_row_get_active(ADW_SWITCH_ROW(widget));
     auto command = ActivateNetworkScan(value);
     m_Dispatcher.Dispatch(command);
 }
 
-void ZooScan::DeviceSelector::SelectDevice(const int deviceIndex)
+void Gorfector::DeviceSelector::SelectDevice(const int deviceIndex)
 {
     SaneDevice *device = nullptr;
     if (deviceIndex >= 0 && deviceIndex < static_cast<int>(m_State->GetDeviceList().size()))
@@ -91,13 +91,13 @@ void ZooScan::DeviceSelector::SelectDevice(const int deviceIndex)
             SelectDeviceCommand(device == nullptr ? DeviceSelectorState::k_NullDeviceName : device->GetName()));
 }
 
-void ZooScan::DeviceSelector::OnDeviceSelected(GtkWidget *)
+void Gorfector::DeviceSelector::OnDeviceSelected(GtkWidget *)
 {
     const auto selectedIndex = static_cast<int>(adw_combo_row_get_selected(ADW_COMBO_ROW(m_DeviceSelectorList))) - 1;
     SelectDevice(selectedIndex);
 }
 
-void ZooScan::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVersion)
+void Gorfector::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVersion)
 {
     g_signal_handler_block(m_DeviceSelectorList, m_DropdownSelectedSignalId);
 

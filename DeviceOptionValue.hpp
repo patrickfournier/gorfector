@@ -3,7 +3,7 @@
 #include <sane/sane.h>
 #include "DeviceOptionValueBase.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     template<typename TValueType>
     class DeviceOptionValue : public DeviceOptionValueBase

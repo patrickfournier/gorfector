@@ -4,7 +4,7 @@
 #include "PreviewState.hpp"
 #include "ZooLib/Observer.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     /**
      * @class DeviceOptionsObserver

@@ -3,7 +3,7 @@
 #include "PresetPanelState.hpp"
 #include "ZooLib/Observer.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     /**

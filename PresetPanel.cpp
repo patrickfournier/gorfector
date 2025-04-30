@@ -13,7 +13,7 @@ enum class ItemButtons
     e_Delete
 };
 
-void ZooScan::PresetPanel::BuildUI()
+void Gorfector::PresetPanel::BuildUI()
 {
     const char *buttonClasses[] = {"flat", nullptr};
     const char *rootClasses[] = {"card", "no-bottom", nullptr};
@@ -56,7 +56,7 @@ void ZooScan::PresetPanel::BuildUI()
     gtk_widget_set_size_request(m_CreatePresetButton, 32, 32);
     gtk_widget_set_hexpand(m_CreatePresetButton, true);
     gtk_box_append(GTK_BOX(headerBox), m_CreatePresetButton);
-    g_signal_connect(m_CreatePresetButton, "clicked", G_CALLBACK(ZooScan::ShowCreatePresetDialog), this);
+    g_signal_connect(m_CreatePresetButton, "clicked", G_CALLBACK(Gorfector::ShowCreatePresetDialog), this);
 
     auto scroller = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -74,7 +74,7 @@ void ZooScan::PresetPanel::BuildUI()
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroller), m_ListBox);
 }
 
-void ZooScan::PresetPanel::OnApplyPresetButtonPressed(GtkButton *button)
+void Gorfector::PresetPanel::OnApplyPresetButtonPressed(GtkButton *button)
 {
     auto listBoxRow = gtk_widget_get_parent(GTK_WIDGET(button));
     while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
@@ -87,7 +87,7 @@ void ZooScan::PresetPanel::OnApplyPresetButtonPressed(GtkButton *button)
     m_Dispatcher.Dispatch(ApplyPresetCommand(preset));
 }
 
-void ZooScan::PresetPanel::OnDeletePresetButtonPressed(GtkButton *button)
+void Gorfector::PresetPanel::OnDeletePresetButtonPressed(GtkButton *button)
 {
     auto listBoxRow = gtk_widget_get_parent(GTK_WIDGET(button));
     while (listBoxRow != nullptr && !GTK_IS_LIST_BOX_ROW(listBoxRow))
@@ -110,7 +110,7 @@ void ZooScan::PresetPanel::OnDeletePresetButtonPressed(GtkButton *button)
     adw_dialog_present(alert, GTK_WIDGET(m_App->GetMainWindow()));
 }
 
-void ZooScan::PresetPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response)
+void Gorfector::PresetPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response)
 {
     if (strcmp(response, "delete") == 0)
     {
@@ -120,13 +120,13 @@ void ZooScan::PresetPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *r
     }
 }
 
-GtkWidget *ZooScan::CreatePresetListItem(gpointer item, gpointer userData)
+GtkWidget *Gorfector::CreatePresetListItem(gpointer item, gpointer userData)
 {
     auto presetPanel = static_cast<PresetPanel *>(userData);
     return presetPanel->CreatePresetListItem(gtk_string_object_get_string(GTK_STRING_OBJECT(item)));
 }
 
-GtkWidget *ZooScan::PresetPanel::CreatePresetListItem(const char *itemName)
+GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
 {
     if (itemName == nullptr)
         return nullptr;
@@ -171,7 +171,7 @@ GtkWidget *ZooScan::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_size_request(viewButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), viewButton);
     g_object_set_data(G_OBJECT(viewButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_View));
-    g_signal_connect(viewButton, "clicked", G_CALLBACK(ZooScan::ShowViewPresetDialog), this);
+    g_signal_connect(viewButton, "clicked", G_CALLBACK(Gorfector::ShowViewPresetDialog), this);
 
     auto renameButton = gtk_button_new();
     gtk_button_set_icon_name(GTK_BUTTON(renameButton), "document-edit-symbolic");
@@ -185,7 +185,7 @@ GtkWidget *ZooScan::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_size_request(renameButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), renameButton);
     g_object_set_data(G_OBJECT(renameButton), "ButtonId", GINT_TO_POINTER(ItemButtons::e_Rename));
-    g_signal_connect(renameButton, "clicked", G_CALLBACK(ZooScan::ShowRenamePresetDialog), this);
+    g_signal_connect(renameButton, "clicked", G_CALLBACK(Gorfector::ShowRenamePresetDialog), this);
 
     auto deleteButton = gtk_button_new();
     gtk_button_set_icon_name(GTK_BUTTON(deleteButton), "list-remove-symbolic");

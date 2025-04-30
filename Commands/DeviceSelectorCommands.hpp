@@ -3,7 +3,7 @@
 #include "DeviceSelectorState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     struct RefreshDeviceList : public ZooLib::Command
     {

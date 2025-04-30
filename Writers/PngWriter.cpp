@@ -1,3 +1,3 @@
 #include "PngWriter.hpp"
 
-const std::vector<std::string> ZooScan::PngWriter::k_Extensions = {".png", ".PNG"};
+const std::vector<std::string> Gorfector::PngWriter::k_Extensions = {".png", ".PNG"};

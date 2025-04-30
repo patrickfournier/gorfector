@@ -1,8 +1,8 @@
-This folder contains files used to customize how scanners settings are displayed in ZooScan.
+This folder contains files used to customize how scanners settings are displayed in Gorfector.
 
 The files are in JSON format and are grouped by vendor. To generate a file for a scanner:
 
-- Start ZooScan in development mode (using the `--dev` option)
+- Start Gorfector in development mode (using the `--dev` option)
 - From the menu, open the `Settings...` dialog and select the `Developer` tab.
 - Turn on the `Dump SANE Options` option and close the dialog.
 - From the menu, open the "Select Device..." dialog and select the scanner you want to dump the options for.

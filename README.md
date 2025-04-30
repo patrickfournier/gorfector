@@ -1,4 +1,4 @@
-# zooscan
+# Gorfector
 Image scanning software
 
 # Development

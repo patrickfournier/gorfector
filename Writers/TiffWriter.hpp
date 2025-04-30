@@ -8,7 +8,7 @@
 #include "TiffWriterState.hpp"
 
 
-namespace ZooScan
+namespace Gorfector
 {
     class TiffWriter : public FileWriter
     {

@@ -3,7 +3,7 @@
 #include "PreviewState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     struct SetPanCommand : public ZooLib::Command
     {

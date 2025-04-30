@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace ZooScan
+namespace Gorfector
 {
     class SaneException : public std::runtime_error
     {

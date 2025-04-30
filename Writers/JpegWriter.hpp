@@ -8,7 +8,7 @@
 #include "FileWriter.hpp"
 #include "JpegWriterState.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class JpegWriter : public FileWriter
     {

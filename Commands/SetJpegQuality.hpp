@@ -3,7 +3,7 @@
 #include "Writers/JpegWriterState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class SetJpegQuality : public ZooLib::Command

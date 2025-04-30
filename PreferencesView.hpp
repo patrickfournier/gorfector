@@ -15,7 +15,7 @@
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/View.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class PreferencesView : public ZooLib::View

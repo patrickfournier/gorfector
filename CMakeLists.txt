@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(zooscan)
+project(gorfector)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -26,15 +26,15 @@ set(GETTEXT_OUTPUT_NAME "messages")
 find_program(JQ_EXECUTABLE jq)
 find_program(CAT_EXECUTABLE cat)
 
-set(RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/zooscan.xml)
-set(RESOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/zooscan.gresource.c)
+set(RESOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/gorfector.xml)
+set(RESOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gorfector.gresource.c)
 
 add_custom_command(
         OUTPUT ${RESOURCE_OUTPUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND ${GLIB_COMPILE_RESOURCES}
         ARGS --target=${RESOURCE_OUTPUT} ${RESOURCE_FILE} --generate-source
-        DEPENDS ${RESOURCE_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/resources/zooscan.css
+        DEPENDS ${RESOURCE_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/resources/gorfector.css
         COMMENT "Compiling resources"
         VERBATIM
 )
@@ -273,20 +273,20 @@ if (GETTEXT_MSGFMT_EXECUTABLE)
 
 endif (GETTEXT_MSGFMT_EXECUTABLE)
 
-add_executable(zooscan ${SOURCE_FILES} ${RESOURCE_OUTPUT})
+add_executable(gorfector ${SOURCE_FILES} ${RESOURCE_OUTPUT})
 
-target_include_directories(zooscan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(zooscan PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result)
+target_include_directories(gorfector PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(gorfector PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result)
 
 set_source_files_properties(${RESOURCE_OUTPUT} PROPERTIES GENERATED TRUE)
-add_dependencies(zooscan resources)
+add_dependencies(gorfector resources)
 
-target_link_libraries(zooscan PRIVATE PkgConfig::GTK4)
-target_link_libraries(zooscan PRIVATE PkgConfig::ADW)
-target_link_libraries(zooscan PRIVATE libsane.so)
-target_link_libraries(zooscan PRIVATE TIFF::TIFF)
-target_link_libraries(zooscan PRIVATE JPEG::JPEG)
-target_link_libraries(zooscan PRIVATE PNG::PNG)
-target_link_libraries(zooscan PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(gorfector PRIVATE PkgConfig::GTK4)
+target_link_libraries(gorfector PRIVATE PkgConfig::ADW)
+target_link_libraries(gorfector PRIVATE libsane.so)
+target_link_libraries(gorfector PRIVATE TIFF::TIFF)
+target_link_libraries(gorfector PRIVATE JPEG::JPEG)
+target_link_libraries(gorfector PRIVATE PNG::PNG)
+target_link_libraries(gorfector PRIVATE nlohmann_json::nlohmann_json)
 
 add_subdirectory(Tests)

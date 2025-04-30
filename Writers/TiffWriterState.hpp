@@ -2,7 +2,7 @@
 
 #include <tiff.h>
 
-namespace ZooScan
+namespace Gorfector
 {
     class TiffWriterState : public ZooLib::StateComponent
     {

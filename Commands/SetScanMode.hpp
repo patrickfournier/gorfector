@@ -3,7 +3,7 @@
 #include "AppState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     struct SetSingleScanMode : public ZooLib::Command
     {

@@ -4,7 +4,7 @@
 #include "OutputOptionsState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class SetOutputDirectoryCommand : public ZooLib::Command
     {
@@ -16,9 +16,9 @@ namespace ZooScan
         {
         }
 
-        static void Execute(const SetOutputDirectoryCommand &command, ZooScan::OutputOptionsState *outputOptionsState)
+        static void Execute(const SetOutputDirectoryCommand &command, Gorfector::OutputOptionsState *outputOptionsState)
         {
-            auto updater = ZooScan::OutputOptionsState::Updater(outputOptionsState);
+            auto updater = Gorfector::OutputOptionsState::Updater(outputOptionsState);
             updater.SetOutputDirectory(command.m_OutputDirectory);
         }
     };

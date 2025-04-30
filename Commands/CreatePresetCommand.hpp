@@ -3,7 +3,7 @@
 #include "ZooLib/Command.hpp"
 #include "ZooLib/json/single_include/nlohmann/json.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class CreatePresetCommand : public ZooLib::Command

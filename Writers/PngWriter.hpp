@@ -7,7 +7,7 @@
 #include "FileWriter.hpp"
 #include "PngWriterState.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class PngWriter : public FileWriter

@@ -6,7 +6,7 @@
 #include "ZooLib/CommandDispatcher.hpp"
 #include "ZooLib/View.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class DeviceSelector : public ZooLib::View
     {

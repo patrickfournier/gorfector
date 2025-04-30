@@ -8,7 +8,7 @@
 #include "ZooLib/StringUtils.hpp"
 #include "ZooLib/json/single_include/nlohmann/json.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     static void OnPresetNameUpdated(GtkEntryBuffer *entryBuffer, GParamSpec *paramSpec, gpointer userData)
     {
@@ -54,14 +54,14 @@ namespace ZooScan
 
         if (dialog == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Dialog not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Dialog not found");
             return;
         }
 
         auto entry = ZooLib::FindWidgetByName(dialog, "preset-name");
         if (entry == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Preset name entry not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Preset name entry not found");
             return;
         }
 
@@ -72,19 +72,19 @@ namespace ZooScan
         auto scannerSettingsCB = ZooLib::FindWidgetByName(dialog, "scanner-settings");
         if (scannerSettingsCB == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Scanner settings checkbox not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Scanner settings checkbox not found");
             return;
         }
         auto scanAreaCB = ZooLib::FindWidgetByName(dialog, "scan-area");
         if (scanAreaCB == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Scan area checkbox not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Scan area checkbox not found");
             return;
         }
         auto outputSettingsCB = ZooLib::FindWidgetByName(dialog, "output-settings");
         if (outputSettingsCB == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Output settings checkbox not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Output settings checkbox not found");
             return;
         }
 

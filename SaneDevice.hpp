@@ -6,7 +6,7 @@
 
 #include "SaneException.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class SaneDevice
     {

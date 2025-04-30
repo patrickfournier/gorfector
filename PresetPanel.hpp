@@ -13,7 +13,7 @@
 #include "ZooLib/GtkUtils.hpp"
 #include "ZooLib/View.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     GtkWidget *CreatePresetListItem(gpointer item, gpointer userData);
 
@@ -173,7 +173,7 @@ namespace ZooScan
 
             auto presetNamesList = gtk_string_list_new(names);
             gtk_list_box_bind_model(
-                    GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(presetNamesList), ZooScan::CreatePresetListItem, this,
+                    GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(presetNamesList), Gorfector::CreatePresetListItem, this,
                     nullptr);
 
             int i = 0;

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ZooScan
+namespace Gorfector
 {
     template<typename T>
     struct Point

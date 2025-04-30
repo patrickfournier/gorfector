@@ -4,7 +4,7 @@
 #include "OutputOptionsState.hpp"
 #include "ZooLib/StateComponent.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class PresetPanelState : public ZooLib::StateComponent
     {

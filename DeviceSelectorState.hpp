@@ -6,7 +6,7 @@
 #include "SaneDevice.hpp"
 #include "ZooLib/StateComponent.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class DeviceSelectorState final : public ZooLib::StateComponent
     {

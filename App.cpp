@@ -25,7 +25,7 @@
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
-ZooScan::App::App(int argc, char **argv)
+Gorfector::App::App(int argc, char **argv)
 {
     SANE_Int saneVersion;
     if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
@@ -65,7 +65,7 @@ ZooScan::App::App(int argc, char **argv)
     FileWriter::Register<PngWriter>(&m_State);
 }
 
-ZooScan::App::~App()
+Gorfector::App::~App()
 {
     m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
 
@@ -90,7 +90,7 @@ ZooScan::App::~App()
     FileWriter::Clear();
 }
 
-void ZooScan::App::OnActivate(GtkApplication *app)
+void Gorfector::App::OnActivate(GtkApplication *app)
 {
     Application::OnActivate(app);
 
@@ -101,11 +101,11 @@ void ZooScan::App::OnActivate(GtkApplication *app)
     }
 }
 
-GtkWidget *ZooScan::App::CreateContent()
+GtkWidget *Gorfector::App::CreateContent()
 {
     auto *display = gdk_display_get_default();
     auto *cssProvider = gtk_css_provider_new();
-    std::string cssPath = std::string("/com/patrickfournier/zooscan/resources/zooscan.css");
+    std::string cssPath = std::string("/com/patrickfournier/gorfector/resources/gorfector.css");
     gtk_css_provider_load_from_resource(cssProvider, cssPath.c_str());
     gtk_style_context_add_provider_for_display(
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
@@ -184,7 +184,7 @@ GtkWidget *ZooScan::App::CreateContent()
     return paned;
 }
 
-void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
+void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 {
     menuBarBuilder->BeginSection()
             ->AddMenuItem(_("Select Device..."), "app.select_device")
@@ -210,7 +210,7 @@ void ZooScan::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     SetAcceleratorForAction("app.redo", {"<Ctrl><Shift>Z"});
 }
 
-void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto deviceSelector = ZooLib::View::Create<DeviceSelector>(&m_Dispatcher, this, m_DeviceSelectorState);
     auto dialog = adw_dialog_new();
@@ -226,7 +226,7 @@ void ZooScan::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter
     adw_dialog_present(dialog, m_MainWindow);
 }
 
-void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialog = adw_preferences_dialog_new();
     auto preferencePages = ZooLib::View::Create<PreferencesView>(
@@ -242,14 +242,14 @@ void ZooScan::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
     adw_dialog_present(dialog, m_MainWindow);
 }
 
-void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialogWindow = adw_about_dialog_new();
     adw_about_dialog_set_application_icon(
             ADW_ABOUT_DIALOG(dialogWindow),
             // FIXME should use the icon in resources, but does not work
             "scanner-symbolic");
-    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), "ZooScan");
+    adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), k_ApplicationName);
     adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), "0.1");
     adw_about_dialog_set_comments(
             ADW_ABOUT_DIALOG(dialogWindow), _("An application to scan images.")); // FIXME: could be more detailed
@@ -259,7 +259,7 @@ void ZooScan::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
     adw_dialog_present(ADW_DIALOG(dialogWindow), m_MainWindow);
 }
 
-const std::string &ZooScan::App::GetSelectorDeviceName() const
+const std::string &Gorfector::App::GetSelectorDeviceName() const
 {
     if (m_DeviceSelectorState == nullptr)
     {
@@ -269,7 +269,7 @@ const std::string &ZooScan::App::GetSelectorDeviceName() const
     return m_DeviceSelectorState->GetSelectedDeviceName();
 }
 
-int ZooScan::App::GetSelectorSaneInitId() const
+int Gorfector::App::GetSelectorSaneInitId() const
 {
     if (m_DeviceSelectorState == nullptr)
     {
@@ -279,7 +279,7 @@ int ZooScan::App::GetSelectorSaneInitId() const
     return m_DeviceSelectorState->GetSelectorSaneInitId();
 }
 
-void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
+void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     if (m_ScanOptionsPanel != nullptr && (m_ScanOptionsPanel->GetDeviceName() != GetSelectorDeviceName() ||
                                           m_ScanOptionsPanel->GetSaneInitId() != GetSelectorSaneInitId()))
@@ -338,7 +338,7 @@ void ZooScan::App::Update(const std::vector<uint64_t> &lastSeenVersions)
     }
 }
 
-ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
+Gorfector::DeviceOptionsState *Gorfector::App::GetDeviceOptions() const
 {
     if (m_ScanOptionsPanel == nullptr)
         return nullptr;
@@ -346,7 +346,7 @@ ZooScan::DeviceOptionsState *ZooScan::App::GetDeviceOptions() const
     return m_ScanOptionsPanel->GetDeviceOptionsState();
 }
 
-ZooScan::OutputOptionsState *ZooScan::App::GetOutputOptions()
+Gorfector::OutputOptionsState *Gorfector::App::GetOutputOptions()
 {
     if (m_ScanOptionsPanel == nullptr)
         return nullptr;
@@ -354,7 +354,7 @@ ZooScan::OutputOptionsState *ZooScan::App::GetOutputOptions()
     return m_ScanOptionsPanel->GetOutputOptionsState();
 }
 
-void ZooScan::App::RestoreOptionsAfterPreview()
+void Gorfector::App::RestoreOptionsAfterPreview()
 {
     auto device = GetDevice();
     auto options = GetDeviceOptions();
@@ -422,7 +422,7 @@ void ZooScan::App::RestoreOptionsAfterPreview()
     }
 }
 
-int ZooScan::App::GetScanHeight() const
+int Gorfector::App::GetScanHeight() const
 {
     auto height = m_ScanParameters.lines;
 
@@ -442,7 +442,7 @@ int ZooScan::App::GetScanHeight() const
     return height;
 }
 
-void ZooScan::App::OnPreviewClicked(GtkWidget *)
+void Gorfector::App::OnPreviewClicked(GtkWidget *)
 {
     auto device = GetDevice();
     auto options = GetDeviceOptions();
@@ -588,7 +588,7 @@ void ZooScan::App::OnPreviewClicked(GtkWidget *)
     }
 }
 
-void ZooScan::App::UpdatePreview()
+void Gorfector::App::UpdatePreview()
 {
     if (m_PreviewPanel == nullptr)
     {
@@ -618,7 +618,7 @@ void ZooScan::App::UpdatePreview()
     previewPanelUpdater.IncreaseProgress(readLength);
 }
 
-void ZooScan::App::OnCancelClicked(GtkWidget *)
+void Gorfector::App::OnCancelClicked(GtkWidget *)
 {
     if (m_AppState->IsScanning())
     {
@@ -667,7 +667,7 @@ void IncrementPath(std::filesystem::path &path)
     path = newFilePath;
 }
 
-void ZooScan::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions)
+void Gorfector::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *scanOptions)
 {
     const auto &dirPath = scanOptions->GetOutputDirectory();
     const auto &fileName = scanOptions->GetOutputFileName();
@@ -767,7 +767,7 @@ void ZooScan::App::CheckFileOutputOptionsAndScan(const OutputOptionsState *scanO
     }
 }
 
-void ZooScan::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response)
+void Gorfector::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response)
 {
     if (strcmp(response, "overwrite") == 0)
     {
@@ -775,7 +775,7 @@ void ZooScan::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *respon
     }
 }
 
-bool ZooScan::App::SelectFileWriter()
+bool Gorfector::App::SelectFileWriter()
 {
     m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
     if (m_FileWriter == nullptr)
@@ -800,7 +800,7 @@ bool ZooScan::App::SelectFileWriter()
     return true;
 }
 
-void ZooScan::App::OnScanClicked(GtkWidget *)
+void Gorfector::App::OnScanClicked(GtkWidget *)
 {
     if (m_ScanOptionsPanel == nullptr)
     {
@@ -815,21 +815,21 @@ void ZooScan::App::OnScanClicked(GtkWidget *)
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Email)
     {
-        m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.jpg";
+        m_ImageFilePath = GetTemporaryDirectory() / "email_image_0000.jpg";
         IncrementPath(m_ImageFilePath);
         m_FileWriter = FileWriter::GetFormatByType<JpegWriter>();
         StartScan();
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Printer)
     {
-        m_ImageFilePath = GetTemporaryDirectory() / "zooscan_email_image_0000.tif";
+        m_ImageFilePath = GetTemporaryDirectory() / "email_image_0000.tif";
         IncrementPath(m_ImageFilePath);
         m_FileWriter = FileWriter::GetFormatByType<TiffWriter>();
         StartScan();
     }
 }
 
-void ZooScan::App::StartScan()
+void Gorfector::App::StartScan()
 {
     const auto device = GetDevice();
     if (device == nullptr)
@@ -895,7 +895,7 @@ void ZooScan::App::StartScan()
             this, nullptr);
 }
 
-void ZooScan::App::UpdateScan()
+void Gorfector::App::UpdateScan()
 {
     // TODO: UpdateScan should not be called as a tick callback (not frequent enough)
     // TODO: Saving to file should be done in a separate thread
@@ -954,7 +954,7 @@ void ZooScan::App::UpdateScan()
     previewPanelUpdater.IncreaseProgress(readLength);
 }
 
-void ZooScan::App::StopPreview()
+void Gorfector::App::StopPreview()
 {
     auto device = GetDevice();
     if (device != nullptr)
@@ -974,7 +974,7 @@ void ZooScan::App::StopPreview()
     updater.SetIsPreviewing(false);
 }
 
-void ZooScan::App::StopScan(bool completed)
+void Gorfector::App::StopScan(bool completed)
 {
     auto device = GetDevice();
     if (device != nullptr)

@@ -5,7 +5,7 @@
 #include "PresetPanelState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     class DeletePresetCommand : public ZooLib::Command
     {

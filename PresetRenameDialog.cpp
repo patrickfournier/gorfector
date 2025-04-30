@@ -6,12 +6,12 @@
 #include "ZooLib/GtkUtils.hpp"
 #include "ZooLib/StringUtils.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     static void OnPresetNameUpdated(GtkEntryBuffer *entryBuffer, GParamSpec *paramSpec, gpointer userData)
     {
         auto dialog = ADW_DIALOG(userData);
-        auto presetPanel = static_cast<ZooScan::PresetPanel *>(g_object_get_data(G_OBJECT(dialog), "PresetPanel"));
+        auto presetPanel = static_cast<Gorfector::PresetPanel *>(g_object_get_data(G_OBJECT(dialog), "PresetPanel"));
         auto text = gtk_entry_buffer_get_text(entryBuffer);
         auto entryHintLabel = ZooLib::FindWidgetByName(GTK_WIDGET(dialog), "preset-name-hint");
         auto createButton = ZooLib::FindWidgetByName(GTK_WIDGET(dialog), "apply-button");
@@ -52,14 +52,14 @@ namespace ZooScan
 
         if (dialog == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Dialog not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Dialog not found");
             return;
         }
 
         auto entry = ZooLib::FindWidgetByName(dialog, "preset-name");
         if (entry == nullptr)
         {
-            g_warn_message("ZooScan", __FILE__, __LINE__, "", "Preset name entry not found");
+            g_warn_message(App::k_ApplicationName, __FILE__, __LINE__, "", "Preset name entry not found");
             return;
         }
 

@@ -1,4 +1,4 @@
 #include "DeviceSelectorState.hpp"
 
 
-const std::string ZooScan::DeviceSelectorState::k_NullDeviceName{};
+const std::string Gorfector::DeviceSelectorState::k_NullDeviceName{};

@@ -3,7 +3,7 @@
 #include "DeviceOptionsState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     struct SetScanAreaCommand : public ZooLib::Command
     {

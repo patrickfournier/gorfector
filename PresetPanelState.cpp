@@ -1,5 +1,5 @@
 #include "PresetPanelState.hpp"
 
-const char *ZooScan::PresetPanelState::s_PresetSectionScanArea = "ScanArea";
-const char *ZooScan::PresetPanelState::s_PresetSectionScannerSettings = "ScannerSettings";
-const char *ZooScan::PresetPanelState::s_PresetSectionOutputSettings = "OutputSettings";
+const char *Gorfector::PresetPanelState::s_PresetSectionScanArea = "ScanArea";
+const char *Gorfector::PresetPanelState::s_PresetSectionScannerSettings = "ScannerSettings";
+const char *Gorfector::PresetPanelState::s_PresetSectionOutputSettings = "OutputSettings";

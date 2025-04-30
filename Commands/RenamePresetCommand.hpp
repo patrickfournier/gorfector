@@ -2,7 +2,7 @@
 #include "PresetPanelState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class RenamePresetCommand : public ZooLib::Command

@@ -9,7 +9,7 @@
 
 #include "SaneDevice.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     enum class OptionFlags : uint32_t
     {

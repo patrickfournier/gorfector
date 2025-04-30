@@ -1,3 +1,3 @@
 #include "TiffWriter.hpp"
 
-const std::vector<std::string> ZooScan::TiffWriter::k_Extensions = {".tif", ".tiff", ".TIF", ".TIFF"};
+const std::vector<std::string> Gorfector::TiffWriter::k_Extensions = {".tif", ".tiff", ".TIF", ".TIFF"};

@@ -6,7 +6,7 @@
 #include "App.hpp"
 #include "DeviceOptionsState.hpp"
 
-void ZooScan::OptionRewriter::Dump(SaneDevice *device)
+void Gorfector::OptionRewriter::Dump(SaneDevice *device)
 {
     auto deviceInfo = nlohmann::json{};
 
@@ -174,7 +174,7 @@ void UpdateIndexRecursively(
     }
 }
 
-ZooScan::OptionRewriter::OptionRewriter()
+Gorfector::OptionRewriter::OptionRewriter()
 {
     auto baseDirectory = std::filesystem::current_path() / "../scanners";
     auto prefDirectory = std::filesystem::path(g_get_user_config_dir()) / App::k_ApplicationId / "scanners";
@@ -214,7 +214,7 @@ ZooScan::OptionRewriter::OptionRewriter()
     newIndexFile.close();
 }
 
-void ZooScan::OptionRewriter::LoadOptionDescriptionFile(const char *deviceVendor, const char *deviceModel)
+void Gorfector::OptionRewriter::LoadOptionDescriptionFile(const char *deviceVendor, const char *deviceModel)
 {
     m_OptionInfos.clear();
 

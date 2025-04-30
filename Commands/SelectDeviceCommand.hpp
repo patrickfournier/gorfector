@@ -2,7 +2,7 @@
 
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     struct SelectDeviceCommand : public ZooLib::Command
     {

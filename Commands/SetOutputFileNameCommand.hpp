@@ -5,7 +5,7 @@
 #include "OutputOptionsState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class SetOutputFileNameCommand : public ZooLib::Command

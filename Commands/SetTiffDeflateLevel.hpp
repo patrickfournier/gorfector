@@ -3,7 +3,7 @@
 #include "Writers/TiffWriterState.hpp"
 #include "ZooLib/Command.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
 
     class SetTiffDeflateLevel : public ZooLib::Command

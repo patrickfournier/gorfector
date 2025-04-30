@@ -2,7 +2,7 @@
 
 #include "DeviceOptionsState.hpp"
 
-namespace ZooScan
+namespace Gorfector
 {
     template<typename TValueType>
     struct ChangeOptionCommand : public ZooLib::Command
