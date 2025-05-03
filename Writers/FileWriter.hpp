@@ -27,9 +27,17 @@ namespace Gorfector
     private:
         static std::vector<FileWriter *> s_Formats;
 
+        std::string m_ApplicationName;
+
+    protected:
+        const std::string &GetApplicationName() const
+        {
+            return m_ApplicationName;
+        }
+
     public:
         template<typename TFileFormat>
-        static void Register(ZooLib::State *state)
+        static void Register(ZooLib::State *state, const std::string &applicationName)
         {
             static_assert(std::derived_from<TFileFormat, FileWriter>);
 
@@ -40,7 +48,7 @@ namespace Gorfector
                 return;
             }
 
-            auto f = new TFileFormat(state);
+            auto f = new TFileFormat(state, applicationName);
             state->LoadFromPreferenceFile(f->GetStateComponent());
             s_Formats.push_back(f);
         }
@@ -103,6 +111,11 @@ namespace Gorfector
             return "scan" + defaultExtension;
         }
 
+        explicit FileWriter(const std::string &applicationName)
+            : m_ApplicationName(applicationName)
+        {
+        }
+
         virtual ~FileWriter() = default;
 
         [[nodiscard]] virtual const std::string &GetName() const = 0;
@@ -123,8 +136,8 @@ namespace Gorfector
         }
 
         virtual Error CreateFile(
-                const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
-                const SANE_Parameters &parameters, SANE_Byte *image) = 0;
+                std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
+                SANE_Byte *image) = 0;
         virtual int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) = 0;
         virtual void CloseFile() = 0;
         virtual void CancelFile() = 0;

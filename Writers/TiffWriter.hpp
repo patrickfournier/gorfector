@@ -20,7 +20,8 @@ namespace Gorfector
         int m_LineCounter{};
 
     public:
-        explicit TiffWriter(ZooLib::State *state)
+        explicit TiffWriter(ZooLib::State *state, const std::string &applicationName)
+            : FileWriter(applicationName)
         {
             m_StateComponent = new TiffWriterState(state);
         }
@@ -46,8 +47,8 @@ namespace Gorfector
         }
 
         Error CreateFile(
-                const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
-                const SANE_Parameters &parameters, SANE_Byte *image) override
+                std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
+                SANE_Byte *image) override
         {
             double xResolution = deviceOptions == nullptr               ? 0
                                  : deviceOptions->GetXResolution() == 0 ? deviceOptions->GetResolution()
@@ -76,7 +77,7 @@ namespace Gorfector
                 TIFFSetField(m_File, TIFFTAG_MODEL, deviceOptions->GetDeviceModel());
             }
 
-            TIFFSetField(m_File, TIFFTAG_SOFTWARE, app.GetApplicationName().c_str());
+            TIFFSetField(m_File, TIFFTAG_SOFTWARE, GetApplicationName().c_str());
 
             TIFFSetField(m_File, TIFFTAG_IMAGEWIDTH, parameters.pixels_per_line);
             TIFFSetField(m_File, TIFFTAG_IMAGELENGTH, parameters.lines);

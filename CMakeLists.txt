@@ -70,7 +70,9 @@ set(SOURCE_FILES
         Writers/TiffWriter.cpp
         PresetRenameDialog.cpp
         PresetViewDialog.cpp
+        PreviewScanProcess.cpp
         ScanListPanel.cpp
+        ScanProcess.cpp
 )
 
 set(GETTEXT_SOURCE_FILES
@@ -146,6 +148,7 @@ set(GETTEXT_SOURCE_FILES
         PresetPanelDialogs.hpp
         PresetPanelState.hpp
         PreviewPanel.hpp
+        PreviewScanProcess.hpp
         PreviewState.hpp
         Rect.hpp
         SaneDevice.hpp
@@ -153,6 +156,8 @@ set(GETTEXT_SOURCE_FILES
         ScanListPanel.hpp
         ScanListState.hpp
         ScanOptionsPanel.hpp
+        ScanProcess.hpp
+        SingleScanProcess.hpp
         ViewUpdateObserver.hpp
 )
 

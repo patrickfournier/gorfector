@@ -23,7 +23,8 @@ namespace Gorfector
         int m_LinePointerSize{};
 
     public:
-        explicit PngWriter(ZooLib::State *state)
+        PngWriter(ZooLib::State *state, const std::string &applicationName)
+            : FileWriter(applicationName)
         {
             m_StateComponent = new PngWriterState(state);
         }
@@ -49,8 +50,8 @@ namespace Gorfector
         }
 
         Error CreateFile(
-                const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
-                const SANE_Parameters &parameters, SANE_Byte *image) override
+                std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
+                SANE_Byte *image) override
         {
             if (parameters.lines > 0 &&
                 static_cast<size_t>(parameters.lines) > PNG_SIZE_MAX / parameters.bytes_per_line)
@@ -96,7 +97,7 @@ namespace Gorfector
                 png_set_invert_mono(m_Png);
             }
 
-            std::string appId = app.GetApplicationName();
+            std::string appId = GetApplicationName();
             std::string creator = std::string(deviceOptions->GetDeviceVendor()) + " " + deviceOptions->GetDeviceModel();
 
             constexpr int numTexts = 2;

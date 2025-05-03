@@ -22,7 +22,8 @@ namespace Gorfector
         FILE *m_File{};
 
     public:
-        explicit JpegWriter(ZooLib::State *state)
+        JpegWriter(ZooLib::State *state, const std::string &applicationName)
+            : FileWriter(applicationName)
         {
             m_StateComponent = new JpegWriterState(state);
         }
@@ -48,8 +49,8 @@ namespace Gorfector
         }
 
         Error CreateFile(
-                const App &app, std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
-                const SANE_Parameters &parameters, SANE_Byte *image) override
+                std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
+                SANE_Byte *image) override
         {
             m_CompressStruct = new jpeg_compress_struct();
             m_ErrorHandler = new jpeg_error_mgr();

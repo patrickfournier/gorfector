@@ -12,6 +12,7 @@
 
 namespace Gorfector
 {
+    class ScanProcess;
     class ScanListPanel;
     class PresetPanel;
     class FileWriter;
@@ -49,14 +50,7 @@ namespace Gorfector
         GtkWidget *m_CancelButton{};
         GtkWidget *m_AddToScanListButton{};
 
-        SANE_Parameters m_ScanParameters{};
-        int32_t m_BufferSize{};
-        SANE_Byte *m_Buffer{};
-        int32_t m_WriteOffset{};
-        guint m_ScanCallbackId{};
-
-        FileWriter *m_FileWriter{};
-        std::filesystem::path m_ImageFilePath{};
+        ScanProcess *m_ScanProcess{};
 
         [[nodiscard]] GApplicationFlags GetApplicationFlags() override
         {
@@ -89,14 +83,9 @@ namespace Gorfector
             return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetCurrentDeviceName());
         }
 
-        [[nodiscard]] int GetScanHeight() const;
-
         void OnCancelClicked(GtkWidget *);
 
         void OnPreviewClicked(GtkWidget *widget);
-        void UpdatePreview();
-        void RestoreOptionsAfterPreview();
-        void StopPreview();
 
         bool CheckFileOutputOptions(const OutputOptionsState *scanOptions) const;
         void ScanToFile(const OutputOptionsState *scanOptions);
@@ -104,9 +93,7 @@ namespace Gorfector
         FileWriter *SelectFileWriter(const std::string &path) const;
         void OnAddToScanListClicked(GtkWidget *);
         void OnScanClicked(GtkWidget *widget);
-        void StartScan();
-        void UpdateScan();
-        void StopScan(bool completed);
+        void StartScan(FileWriter *fileWriter, const std::filesystem::path &imageFilePath);
 
         [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 
