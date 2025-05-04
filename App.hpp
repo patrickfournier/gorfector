@@ -118,7 +118,7 @@ namespace Gorfector
             return k_ApplicationName;
         }
 
-        [[nodiscard]] const AppState *GetAppState() const
+        [[nodiscard]] AppState *GetAppState()
         {
             return m_AppState;
         }
@@ -142,5 +142,10 @@ namespace Gorfector
 
         [[nodiscard]] DeviceOptionsState *GetDeviceOptions() const;
         [[nodiscard]] OutputOptionsState *GetOutputOptions();
+
+        [[nodiscard]] PreviewPanel *GetPreviewPanel() const
+        {
+            return m_PreviewPanel;
+        }
     };
 }

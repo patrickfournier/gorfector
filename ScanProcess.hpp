@@ -10,18 +10,30 @@
 
 namespace Gorfector
 {
-    void DestroyProcess(gpointer data);
-
     class ScanProcess
     {
     protected:
         SaneDevice *m_Device;
         AppState *m_AppState;
+        PreviewState *m_PreviewState;
         DeviceOptionsState *m_ScanOptions;
         OutputOptionsState *m_OutputOptions;
         GtkWidget *m_MainWindow;
         const std::function<void()> *m_FinishCallback;
         guint m_ScanCallbackId{};
+        SANE_Parameters m_ScanParameters{};
+
+        virtual std::string GetProgressString()
+        {
+            return "";
+        }
+
+        virtual void InstallGtkCallback();
+
+        virtual bool AfterStartScanChecks()
+        {
+            return true;
+        }
 
         virtual bool Update()
         {
@@ -40,20 +52,6 @@ namespace Gorfector
             return continueScan;
         }
 
-        virtual void Stop(bool canceled)
-        {
-            if (m_Device != nullptr)
-            {
-                m_Device->CancelScan();
-            }
-        }
-
-        virtual bool AfterStartScanChecks()
-        {
-            // This function can be overridden to perform additional actions after starting the scan.
-            return true;
-        }
-
         virtual void GetBuffer(SANE_Byte *&outBuffer, int &outMaxReadLength)
         {
             outBuffer = nullptr;
@@ -62,15 +60,34 @@ namespace Gorfector
 
         virtual void CommitBuffer(int32_t readLength)
         {
-            // This function can be overridden to commit the read buffer.
+            if (m_PreviewState != nullptr)
+            {
+                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
+                previewPanelUpdater.IncreaseProgress(readLength);
+            }
+        }
+
+        virtual void Stop(bool canceled)
+        {
+            if (m_PreviewState != nullptr)
+            {
+                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
+                previewPanelUpdater.SetProgressCompleted();
+            }
+
+            if (m_Device != nullptr)
+            {
+                m_Device->CancelScan();
+            }
         }
 
     public:
         ScanProcess(
-                SaneDevice *device, AppState *appState, DeviceOptionsState *scanOptions,
+                SaneDevice *device, PreviewState *previewState, AppState *appState, DeviceOptionsState *scanOptions,
                 OutputOptionsState *outputOptions, GtkWidget *mainWindow, const std::function<void()> *finishCallback)
             : m_Device(device)
             , m_AppState(appState)
+            , m_PreviewState(previewState)
             , m_ScanOptions(scanOptions)
             , m_OutputOptions(outputOptions)
             , m_MainWindow(mainWindow)
@@ -96,25 +113,22 @@ namespace Gorfector
                 return false;
             }
 
+            m_Device->GetParameters(&m_ScanParameters);
+
             if (!AfterStartScanChecks())
             {
                 Stop(true);
                 return false;
             }
 
-            m_ScanCallbackId = gtk_widget_add_tick_callback(
-                    m_MainWindow,
-                    [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
-                        auto *scanProcess = static_cast<ScanProcess *>(data);
-                        if (scanProcess->Update())
-                        {
-                            return G_SOURCE_CONTINUE;
-                        }
+            InstallGtkCallback();
 
-                        scanProcess->Stop(false);
-                        return G_SOURCE_REMOVE;
-                    },
-                    this, DestroyProcess);
+            if (m_PreviewState != nullptr)
+            {
+                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
+                previewPanelUpdater.InitProgress(
+                        GetProgressString(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
+            }
 
             return true;
         }

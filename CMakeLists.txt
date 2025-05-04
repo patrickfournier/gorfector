@@ -50,6 +50,11 @@ add_subdirectory(ZooLib/json)
 set(SOURCE_FILES
         main.cpp
 
+        Writers/FileWriter.cpp
+        Writers/JpegWriter.cpp
+        Writers/PngWriter.cpp
+        Writers/TiffWriter.cpp
+
         ZooLib/Application.cpp
         ZooLib/ErrorDialog.cpp
         ZooLib/State.cpp
@@ -59,19 +64,16 @@ set(SOURCE_FILES
         DeviceOptionsState.cpp
         DeviceSelectorState.cpp
         OptionRewriter.cpp
+        MultiScanProcess.cpp
+        PathUtils.cpp
         PresetCreateDialog.cpp
         PresetPanel.cpp
-        PreviewPanel.cpp
-        ScanOptionsPanel.cpp
-
-        Writers/FileWriter.cpp
-        Writers/JpegWriter.cpp
-        Writers/PngWriter.cpp
-        Writers/TiffWriter.cpp
         PresetRenameDialog.cpp
         PresetViewDialog.cpp
+        PreviewPanel.cpp
         PreviewScanProcess.cpp
         ScanListPanel.cpp
+        ScanOptionsPanel.cpp
         ScanProcess.cpp
 )
 
@@ -140,8 +142,10 @@ set(GETTEXT_SOURCE_FILES
         DeviceSelector.hpp
         DeviceSelectorObserver.hpp
         DeviceSelectorState.hpp
+        MultiScanProcess.hpp
         OptionRewriter.hpp
         OutputOptionsState.hpp
+        PathUtils.hpp
         Point.hpp
         PreferencesView.hpp
         PresetPanel.hpp

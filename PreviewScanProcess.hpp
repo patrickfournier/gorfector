@@ -4,11 +4,8 @@
 
 namespace Gorfector
 {
-
     class PreviewScanProcess final : public ScanProcess
     {
-        PreviewState *m_PreviewState;
-
         void SetPreviewOptions() const;
         void RestoreOptionsAfterPreview() const;
 
@@ -25,12 +22,6 @@ namespace Gorfector
 
         void Stop(bool canceled) override
         {
-            if (m_PreviewState)
-            {
-                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
-                previewPanelUpdater.SetProgressCompleted();
-            }
-
             ScanProcess::Stop(canceled);
 
             RestoreOptionsAfterPreview();
@@ -41,9 +32,7 @@ namespace Gorfector
 
         bool AfterStartScanChecks() override
         {
-            SANE_Parameters scanParameters{};
-            m_Device->GetParameters(&scanParameters);
-            if (scanParameters.format != SANE_FRAME_GRAY && scanParameters.format != SANE_FRAME_RGB)
+            if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
             {
                 ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format"));
                 return false;
@@ -62,15 +51,15 @@ namespace Gorfector
         {
             auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
             previewPanelUpdater.CommitReadBuffer(readLength);
-            previewPanelUpdater.IncreaseProgress(readLength);
+
+            ScanProcess::CommitBuffer(readLength);
         }
 
     public:
         PreviewScanProcess(
                 SaneDevice *device, PreviewState *previewState, AppState *appState, DeviceOptionsState *scanOptions,
                 OutputOptionsState *outputOptions, GtkWidget *mainWindow, const std::function<void()> *finishCallback)
-            : ScanProcess(device, appState, scanOptions, outputOptions, mainWindow, finishCallback)
-            , m_PreviewState(previewState)
+            : ScanProcess(device, previewState, appState, scanOptions, outputOptions, mainWindow, finishCallback)
         {
         }
 
@@ -84,20 +73,16 @@ namespace Gorfector
             if (!ScanProcess::Start())
             {
                 // Stop() has already been called
+                updater.SetIsPreviewing(false);
                 return false;
             }
 
             if (m_PreviewState != nullptr)
             {
-                SANE_Parameters scanParameters{};
-                m_Device->GetParameters(&scanParameters);
-
                 auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
                 previewPanelUpdater.PrepareForScan(
-                        scanParameters.pixels_per_line, scanParameters.bytes_per_line, scanParameters.lines,
-                        scanParameters.depth, scanParameters.format);
-                previewPanelUpdater.InitProgress(
-                        std::string(), 0, scanParameters.bytes_per_line * scanParameters.lines);
+                        m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines,
+                        m_ScanParameters.depth, m_ScanParameters.format);
             }
 
             return true;

@@ -4,6 +4,8 @@
 
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
+#include "MultiScanProcess.hpp"
+#include "PreviewPanel.hpp"
 
 void Gorfector::ScanListPanel::BuildUI()
 {
@@ -60,16 +62,37 @@ void Gorfector::ScanListPanel::BuildUI()
     ConnectGtkSignal(this, &ScanListPanel::OnScanClicked, m_ScanListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_ScanListButton);
 
-    m_CancelListButton = gtk_button_new_with_label(_("Cancel Scan"));
-    // ConnectGtkSignal(this, &App::OnCancelClicked, m_CancelListButton, "clicked");
+    m_CancelListButton = gtk_button_new_with_label(_("Cancel Scans"));
+    ConnectGtkSignal(this, &ScanListPanel::OnCancelClicked, m_CancelListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_CancelListButton);
 }
 
 void Gorfector::ScanListPanel::OnScanClicked(GtkWidget *widget)
 {
-    for (auto i = 0UZ; i < m_PanelState->GetScanListSize(); ++i)
+    auto *finishCallback = new std::function<void()>([this]() { this->m_ScanProcess = nullptr; });
+
+    auto appState = m_App->GetAppState();
+    auto deviceSelectorState = m_App->GetDeviceSelectorState();
+    auto currentDeviceName = appState->GetCurrentDeviceName();
+    auto currentDevice = deviceSelectorState->GetDeviceByName(currentDeviceName);
+
+    m_ScanProcess = new MultiScanProcess(
+            currentDevice, m_PanelState, m_App->GetPreviewPanel()->GetState(), appState, m_App->GetDeviceOptions(),
+            m_App->GetOutputOptions(), GTK_WIDGET(m_App->GetMainWindow()), finishCallback);
+
+    if (!m_ScanProcess->Start())
     {
-        // auto item = m_PanelState->GetScanItemAt(i);
+        // finishCallback is deleted in the destructor of ScanProcess
+        delete m_ScanProcess;
+        m_ScanProcess = nullptr;
+    }
+}
+
+void Gorfector::ScanListPanel::OnCancelClicked(GtkWidget *widget)
+{
+    if (m_ScanProcess != nullptr)
+    {
+        m_ScanProcess->Cancel();
     }
 }
 

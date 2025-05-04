@@ -7,69 +7,26 @@ namespace Gorfector
 {
     class SingleScanProcess : public ScanProcess
     {
-        PreviewState *m_PreviewState;
+    protected:
         FileWriter *m_FileWriter;
         std::filesystem::path m_ImageFilePath;
 
-        SANE_Parameters m_ScanParameters{};
         SANE_Byte *m_Buffer{};
         int32_t m_BufferSize{};
         int32_t m_WriteOffset{};
 
-    protected:
-        void Stop(bool canceled) override
+        virtual bool LoadSettings()
         {
-            ScanProcess::Stop(canceled);
+            return true;
+        }
 
-            if (m_PreviewState)
-            {
-                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
-                previewPanelUpdater.SetProgressCompleted();
-            }
-
-            if (m_FileWriter != nullptr)
-            {
-                if (canceled)
-                {
-                    m_FileWriter->CancelFile();
-                }
-                else
-                {
-                    m_FileWriter->CloseFile();
-                }
-                m_FileWriter = nullptr;
-            }
-
-            free(m_Buffer);
-            m_Buffer = nullptr;
-            m_BufferSize = 0;
-            m_WriteOffset = 0;
-
-            if (!canceled && std::filesystem::exists(m_ImageFilePath))
-            {
-                auto destination = m_OutputOptions->GetOutputDestination();
-                if (destination == OutputOptionsState::OutputDestination::e_Email)
-                {
-                    auto command = "xdg-email --attach " + m_ImageFilePath.string();
-                    std::system(command.c_str());
-                }
-                else if (destination == OutputOptionsState::OutputDestination::e_Printer)
-                {
-                    auto printDialog = gtk_print_dialog_new();
-                    auto imageFile = g_file_new_for_path(m_ImageFilePath.c_str());
-                    gtk_print_dialog_print_file(
-                            printDialog, GTK_WINDOW(m_MainWindow), nullptr, imageFile, nullptr, nullptr, nullptr);
-                }
-            }
-
-            auto updater = AppState::Updater(m_AppState);
-            updater.SetIsScanning(false);
+        std::string GetProgressString() override
+        {
+            return m_ImageFilePath.filename();
         }
 
         bool AfterStartScanChecks() override
         {
-            m_Device->GetParameters(&m_ScanParameters);
-
             if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
             {
                 ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format"));
@@ -107,8 +64,7 @@ namespace Gorfector
 
         void CommitBuffer(int32_t readLength) override
         {
-            auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
-            previewPanelUpdater.IncreaseProgress(readLength);
+            ScanProcess::CommitBuffer(readLength);
 
             auto availableBytes = m_WriteOffset + readLength;
             auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
@@ -124,13 +80,60 @@ namespace Gorfector
             }
         }
 
+        void Stop(bool canceled) override
+        {
+            ScanProcess::Stop(canceled);
+
+            SendImageToDestination(canceled);
+
+            auto updater = AppState::Updater(m_AppState);
+            updater.SetIsScanning(false);
+
+            free(m_Buffer);
+            m_Buffer = nullptr;
+            m_BufferSize = 0;
+            m_WriteOffset = 0;
+        }
+
+        void SendImageToDestination(bool canceled)
+        {
+            if (m_FileWriter != nullptr)
+            {
+                if (canceled)
+                {
+                    m_FileWriter->CancelFile();
+                }
+                else
+                {
+                    m_FileWriter->CloseFile();
+                }
+                m_FileWriter = nullptr;
+            }
+
+            if (!canceled && std::filesystem::exists(m_ImageFilePath))
+            {
+                auto destination = m_OutputOptions->GetOutputDestination();
+                if (destination == OutputOptionsState::OutputDestination::e_Email)
+                {
+                    auto command = "xdg-email --attach " + m_ImageFilePath.string();
+                    std::system(command.c_str());
+                }
+                else if (destination == OutputOptionsState::OutputDestination::e_Printer)
+                {
+                    auto printDialog = gtk_print_dialog_new();
+                    auto imageFile = g_file_new_for_path(m_ImageFilePath.c_str());
+                    gtk_print_dialog_print_file(
+                            printDialog, GTK_WINDOW(m_MainWindow), nullptr, imageFile, nullptr, nullptr, nullptr);
+                }
+            }
+        }
+
     public:
         SingleScanProcess(
                 SaneDevice *device, PreviewState *previewState, AppState *appState, DeviceOptionsState *scanOptions,
                 OutputOptionsState *outputOptions, GtkWidget *mainWindow, FileWriter *fileWriter,
                 std::filesystem::path imageFilePath, const std::function<void()> *finishCallback)
-            : ScanProcess(device, appState, scanOptions, outputOptions, mainWindow, finishCallback)
-            , m_PreviewState(previewState)
+            : ScanProcess(device, previewState, appState, scanOptions, outputOptions, mainWindow, finishCallback)
             , m_FileWriter(fileWriter)
             , m_ImageFilePath(std::move(imageFilePath))
         {
@@ -149,9 +152,16 @@ namespace Gorfector
             auto updater = AppState::Updater(m_AppState);
             updater.SetIsScanning(true);
 
+            if (!LoadSettings())
+            {
+                updater.SetIsScanning(false);
+                return false;
+            }
+
             if (!ScanProcess::Start())
             {
                 // Stop() has already been called
+                updater.SetIsScanning(false);
                 return false;
             }
 
@@ -159,13 +169,6 @@ namespace Gorfector
             m_BufferSize = m_ScanParameters.bytes_per_line * linesIn1MB;
             m_Buffer = static_cast<SANE_Byte *>(calloc(m_BufferSize, sizeof(SANE_Byte)));
             m_WriteOffset = 0;
-
-            if (m_PreviewState != nullptr)
-            {
-                auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
-                previewPanelUpdater.InitProgress(
-                        m_ImageFilePath.filename(), 0, m_ScanParameters.bytes_per_line * m_ScanParameters.lines);
-            }
 
             return true;
         }

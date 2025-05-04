@@ -23,8 +23,11 @@ namespace Gorfector
         GtkWidget *m_CancelListButton{};
         GtkWidget *m_ListBox{};
 
+        ScanProcess *m_ScanProcess{};
+
         void BuildUI();
         void OnScanClicked(GtkWidget *widget);
+        void OnCancelClicked(GtkWidget *widget);
 
     public:
         ScanListPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
