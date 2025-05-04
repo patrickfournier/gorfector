@@ -1,20 +1,40 @@
 #pragma once
 
+#include <utility>
+
 #include "ZooLib/Command.hpp"
 
 namespace Gorfector
 {
-    struct SelectDeviceCommand : public ZooLib::Command
+    /**
+     * \class SelectDeviceCommand
+     * \brief Command class to select a device in the `DeviceSelectorState`.
+     *
+     * This class encapsulates the logic for selecting a device by its name
+     * in the `DeviceSelectorState`.
+     */
+    class SelectDeviceCommand : public ZooLib::Command
     {
-    private:
+        /**
+         * \brief The name of the device to be selected.
+         */
         std::string m_DeviceName{};
 
     public:
-        explicit SelectDeviceCommand(const std::string &deviceName)
-            : m_DeviceName(deviceName)
+        /**
+         * \brief Constructor for the SelectDeviceCommand.
+         * \param deviceName The name of the device to be selected.
+         */
+        explicit SelectDeviceCommand(std::string deviceName)
+            : m_DeviceName(std::move(deviceName))
         {
         }
 
+        /**
+         * \brief Executes the command to select a device.
+         * \param command The `SelectDeviceCommand` instance containing the device name.
+         * \param deviceSelectorState Pointer to the `DeviceSelectorState` where the device will be selected.
+         */
         static void Execute(const SelectDeviceCommand &command, DeviceSelectorState *deviceSelectorState)
         {
             const DeviceSelectorState::Updater updater(deviceSelectorState);

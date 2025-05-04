@@ -16,7 +16,7 @@ namespace Gorfector
     private:
         std::vector<SaneDevice *> m_DeviceList{};
         std::string m_SelectedDeviceName{};
-        bool m_ScanNetwork{};
+        bool m_NetworkLookUp{};
         int m_SANEInitId{};
         bool m_DumpSane{};
 
@@ -44,7 +44,7 @@ namespace Gorfector
             ++m_SANEInitId;
 
             const SANE_Device **deviceList;
-            SANE_Status status = sane_get_devices(&deviceList, IsScanNetworkEnabled() ? SANE_FALSE : SANE_TRUE);
+            SANE_Status status = sane_get_devices(&deviceList, IsNetworkLookUpEnabled() ? SANE_FALSE : SANE_TRUE);
             if (status == SANE_STATUS_GOOD)
             {
                 auto deviceCount = 0;
@@ -125,9 +125,9 @@ namespace Gorfector
             return m_SelectedDeviceName;
         }
 
-        [[nodiscard]] bool IsScanNetworkEnabled() const
+        [[nodiscard]] bool IsNetworkLookUpEnabled() const
         {
-            return m_ScanNetwork;
+            return m_NetworkLookUp;
         }
 
         explicit DeviceSelectorState(ZooLib::State *state)
@@ -165,9 +165,9 @@ namespace Gorfector
                 m_StateComponent->GetDevicesFromSANE();
             }
 
-            void SetScanNetwork(const bool scanNetwork) const
+            void SetLookUpNetwork(const bool networkLookUp) const
             {
-                m_StateComponent->m_ScanNetwork = scanNetwork;
+                m_StateComponent->m_NetworkLookUp = networkLookUp;
             }
 
             void SelectDevice(const std::string &deviceName) const

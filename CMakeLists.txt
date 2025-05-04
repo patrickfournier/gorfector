@@ -80,15 +80,16 @@ set(SOURCE_FILES
 set(GETTEXT_SOURCE_FILES
         ${SOURCE_FILES}
 
+        Commands/ActivateNetworkLookUp.hpp
         Commands/ApplyPresetCommand.hpp
         Commands/ChangeOptionCommand.hpp
         Commands/CreatePresetCommand.hpp
         Commands/CreateScanListItemCommand.hpp
         Commands/DeletePresetCommand.hpp
         Commands/DeleteScanItemCommand.hpp
-        Commands/DeviceSelectorCommands.hpp
         Commands/DevMode/SetDumpSaneOptions.hpp
         Commands/LoadScanItemCommand.hpp
+        Commands/RefreshDeviceList.hpp
         Commands/RenamePresetCommand.hpp
         Commands/SelectDeviceCommand.hpp
         Commands/SetCreateMissingDirectoriesCommand.hpp

@@ -1,7 +1,8 @@
 #include <format>
 #include <memory>
 
-#include "Commands/DeviceSelectorCommands.hpp"
+#include "Commands/ActivateNetworkLookUp.hpp"
+#include "Commands/RefreshDeviceList.hpp"
 #include "Commands/SelectDeviceCommand.hpp"
 #include "DeviceSelector.hpp"
 #include "ZooLib/ErrorDialog.hpp"
@@ -52,14 +53,14 @@ Gorfector::DeviceSelector::DeviceSelector(
 
     m_Dispatcher.RegisterHandler(SelectDeviceCommand::Execute, m_State);
     m_Dispatcher.RegisterHandler(RefreshDeviceList::Execute, m_State);
-    m_Dispatcher.RegisterHandler(ActivateNetworkScan::Execute, m_State);
+    m_Dispatcher.RegisterHandler(ActivateNetworkLookUp::Execute, m_State);
 }
 
 Gorfector::DeviceSelector::~DeviceSelector()
 {
     m_Dispatcher.UnregisterHandler<SelectDeviceCommand>();
     m_Dispatcher.UnregisterHandler<RefreshDeviceList>();
-    m_Dispatcher.UnregisterHandler<ActivateNetworkScan>();
+    m_Dispatcher.UnregisterHandler<ActivateNetworkLookUp>();
 
     gtk_widget_unparent(m_DeviceSelectorRoot);
 
@@ -75,7 +76,7 @@ void Gorfector::DeviceSelector::OnRefreshDevicesClicked(GtkWidget *)
 void Gorfector::DeviceSelector::OnActivateNetwork(GtkWidget *widget)
 {
     const bool value = adw_switch_row_get_active(ADW_SWITCH_ROW(widget));
-    auto command = ActivateNetworkScan(value);
+    auto command = ActivateNetworkLookUp(value);
     m_Dispatcher.Dispatch(command);
 }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-03 22:44-0400\n"
+"POT-Creation-Date: 2025-05-04 11:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -250,7 +250,7 @@ msgstr ""
 msgid "Cancel Scans"
 msgstr ""
 
-#: DeviceSelector.cpp:159
+#: DeviceSelector.cpp:160
 msgid "Cannot open scanner {}."
 msgstr ""
 
@@ -545,7 +545,7 @@ msgstr ""
 msgid "Image Formats"
 msgstr ""
 
-#: DeviceSelector.cpp:43
+#: DeviceSelector.cpp:44
 msgid "Include Network Scanners"
 msgstr ""
 
@@ -639,15 +639,15 @@ msgstr ""
 msgid "New preset"
 msgstr ""
 
-#: DeviceSelector.cpp:31 DeviceSelector.cpp:169
+#: DeviceSelector.cpp:32 DeviceSelector.cpp:170
 msgid "No Scanner Found"
 msgstr ""
 
-#: DeviceSelector.cpp:165
+#: DeviceSelector.cpp:166
 msgid "No scanner found."
 msgstr ""
 
-#: DeviceSelector.cpp:113 entrée standard:128 entrée standard:132
+#: DeviceSelector.cpp:114 entrée standard:128 entrée standard:132
 #: entrée standard:171
 msgid "None"
 msgstr ""
@@ -722,7 +722,7 @@ msgstr ""
 msgid "Red intensity"
 msgstr ""
 
-#: DeviceSelector.cpp:48
+#: DeviceSelector.cpp:49
 msgid "Refresh Scanner List"
 msgstr ""
 
@@ -798,7 +798,7 @@ msgstr ""
 msgid "Select Device..."
 msgstr ""
 
-#: DeviceSelector.cpp:36
+#: DeviceSelector.cpp:37
 msgid "Select Scanner: "
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-03 22:44-0400\n"
+"POT-Creation-Date: 2025-05-04 11:21-0400\n"
 "PO-Revision-Date: 2025-05-03 23:01-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -258,7 +258,7 @@ msgstr "Annuler la numérisation"
 msgid "Cancel Scans"
 msgstr "Annuler les numérisations"
 
-#: DeviceSelector.cpp:159
+#: DeviceSelector.cpp:160
 msgid "Cannot open scanner {}."
 msgstr "Impossible d'ouvrir le scanner {}."
 
@@ -556,7 +556,7 @@ msgstr "Si le fichier existe"
 msgid "Image Formats"
 msgstr "Formats d'image"
 
-#: DeviceSelector.cpp:43
+#: DeviceSelector.cpp:44
 msgid "Include Network Scanners"
 msgstr "Inclure les scanners réseau"
 
@@ -653,15 +653,15 @@ msgstr "Négatifs"
 msgid "New preset"
 msgstr "Nouveau préréglage"
 
-#: DeviceSelector.cpp:31 DeviceSelector.cpp:169
+#: DeviceSelector.cpp:32 DeviceSelector.cpp:170
 msgid "No Scanner Found"
 msgstr "Aucun scanner trouvé"
 
-#: DeviceSelector.cpp:165
+#: DeviceSelector.cpp:166
 msgid "No scanner found."
 msgstr "Aucun scanner trouvé."
 
-#: DeviceSelector.cpp:113 entrée standard:128 standard:132 standard:171
+#: DeviceSelector.cpp:114 entrée standard:128 standard:132 standard:171
 msgid "None"
 msgstr "Aucun"
 
@@ -737,7 +737,7 @@ msgstr "Rouge"
 msgid "Red intensity"
 msgstr "Intensité du rouge"
 
-#: DeviceSelector.cpp:48
+#: DeviceSelector.cpp:49
 msgid "Refresh Scanner List"
 msgstr "Rafraîchir la liste des scanners"
 
@@ -813,7 +813,7 @@ msgstr "Sélectionner le périphérique"
 msgid "Select Device..."
 msgstr "Sélectionner le périphérique..."
 
-#: DeviceSelector.cpp:36
+#: DeviceSelector.cpp:37
 msgid "Select Scanner: "
 msgstr "Sélectionner le périphérique: "
 
