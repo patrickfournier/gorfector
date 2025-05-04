@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-29 13:47-0400\n"
+"POT-Creation-Date: 2025-05-03 22:44-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,6 +64,14 @@ msgstr ""
 msgid "1.8"
 msgstr ""
 
+#: ScanListState.hpp:95
+msgid "<Email>"
+msgstr ""
+
+#: ScanListState.hpp:89
+msgid "<Printer>"
+msgstr ""
+
 #: entrée standard:142 entrée standard:150
 msgid "A4"
 msgstr ""
@@ -88,7 +96,7 @@ msgstr ""
 msgid "ADF Mode"
 msgstr ""
 
-#: App.cpp:198
+#: App.cpp:261
 msgid "About..."
 msgstr ""
 
@@ -96,6 +104,10 @@ msgstr ""
 msgid ""
 "Activates document size auto-detection.  The scan area will be set to match "
 "the detected document size."
+msgstr ""
+
+#: App.cpp:179
+msgid "Add to Scan List"
 msgstr ""
 
 #: entrée standard:100
@@ -132,17 +144,22 @@ msgid ""
 "pressed to actually start the scan process."
 msgstr ""
 
-#: App.cpp:255
+#: App.cpp:317
 msgid "An application to scan images."
 msgstr ""
 
-#: PresetPanel.cpp:147
+#: PresetPanel.cpp:139
 msgid "Apply this preset"
 msgstr ""
 
-#: PresetPanel.cpp:103
+#: PresetPanel.cpp:89
 #, c-format
 msgid "Are you sure you want to delete the preset \"%s\"?"
+msgstr ""
+
+#: ScanListPanel.cpp:174
+#, c-format
+msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr ""
 
 #: entrée standard:52
@@ -221,12 +238,16 @@ msgstr ""
 msgid "Calibrate"
 msgstr ""
 
-#: App.cpp:749 PresetPanel.cpp:104
+#: App.cpp:581 PresetPanel.cpp:90 ScanListPanel.cpp:175
 msgid "Cancel"
 msgstr ""
 
-#: App.cpp:156 OutputOptionsState.hpp:27
+#: App.cpp:174 OutputOptionsState.hpp:33
 msgid "Cancel Scan"
+msgstr ""
+
+#: ScanListPanel.cpp:65
+msgid "Cancel Scans"
 msgstr ""
 
 #: DeviceSelector.cpp:159
@@ -289,7 +310,7 @@ msgstr ""
 msgid "Controls the contrast of the acquired image."
 msgstr ""
 
-#: PresetCreateDialog.cpp:169
+#: PresetCreateDialog.cpp:164
 msgid "Create"
 msgstr ""
 
@@ -297,7 +318,7 @@ msgstr ""
 msgid "Create Missing Directories"
 msgstr ""
 
-#: PresetCreateDialog.cpp:110
+#: PresetCreateDialog.cpp:105
 msgid "Create a new preset"
 msgstr ""
 
@@ -317,15 +338,19 @@ msgstr ""
 msgid "Deflate Compression Level"
 msgstr ""
 
-#: PresetPanel.cpp:104
+#: PresetPanel.cpp:90 ScanListPanel.cpp:143 ScanListPanel.cpp:175
 msgid "Delete"
 msgstr ""
 
-#: PresetPanel.cpp:101
+#: PresetPanel.cpp:87
 msgid "Delete Preset"
 msgstr ""
 
-#: PresetPanel.cpp:189
+#: ScanListPanel.cpp:172
+msgid "Delete Scan"
+msgstr ""
+
+#: PresetPanel.cpp:178
 msgid "Delete this preset"
 msgstr ""
 
@@ -352,7 +377,7 @@ msgstr ""
 msgid "Developer"
 msgstr ""
 
-#: App.cpp:701
+#: App.cpp:531
 msgid "Directory does not exists: {}."
 msgstr ""
 
@@ -388,19 +413,19 @@ msgstr ""
 msgid "Eject the sheet in the ADF"
 msgstr ""
 
-#: OutputOptionsState.hpp:19
+#: OutputOptionsState.hpp:25
 msgid "Email"
 msgstr ""
 
-#: App.cpp:686
+#: App.cpp:503
 msgid "Enter a file name to save the image files."
 msgstr ""
 
-#: PresetCreateDialog.cpp:125
+#: PresetCreateDialog.cpp:120
 msgid "Enter a name for the new preset:"
 msgstr ""
 
-#: PresetRenameDialog.cpp:108
+#: PresetRenameDialog.cpp:99
 msgid "Enter a new name for the preset:"
 msgstr ""
 
@@ -412,15 +437,15 @@ msgstr ""
 msgid "Extended SANE Status"
 msgstr ""
 
-#: App.cpp:874
+#: SingleScanProcess.hpp:51
 msgid "Failed to create file: "
 msgstr ""
 
-#: OutputOptionsState.hpp:19
+#: OutputOptionsState.hpp:25
 msgid "File"
 msgstr ""
 
-#: App.cpp:716
+#: App.cpp:546
 msgid "File '{}' already exists."
 msgstr ""
 
@@ -428,7 +453,7 @@ msgstr ""
 msgid "File Name"
 msgstr ""
 
-#: App.cpp:744
+#: App.cpp:576
 msgid "File already exists"
 msgstr ""
 
@@ -524,11 +549,11 @@ msgstr ""
 msgid "Include Network Scanners"
 msgstr ""
 
-#: OutputOptionsState.hpp:27
+#: OutputOptionsState.hpp:33
 msgid "Increase Counter"
 msgstr ""
 
-#: App.cpp:729
+#: App.cpp:559
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
@@ -550,11 +575,11 @@ msgstr ""
 msgid "Indicates whether the scanner needs to poll."
 msgstr ""
 
-#: PresetViewDialog.cpp:25
+#: PresetViewDialog.cpp:21
 msgid "Inspect Preset"
 msgstr ""
 
-#: PresetPanel.cpp:161
+#: PresetPanel.cpp:152
 msgid "Inspect this preset"
 msgstr ""
 
@@ -568,6 +593,10 @@ msgstr ""
 
 #: entrée standard:146 entrée standard:154
 msgid "Letter"
+msgstr ""
+
+#: ScanListPanel.cpp:130
+msgid "Load"
 msgstr ""
 
 #: ScanOptionsPanel.cpp:530
@@ -606,7 +635,7 @@ msgstr ""
 msgid "Negative Film"
 msgstr ""
 
-#: PresetPanel.cpp:49
+#: PresetPanel.cpp:41
 msgid "New preset"
 msgstr ""
 
@@ -635,11 +664,11 @@ msgstr ""
 msgid "Output"
 msgstr ""
 
-#: PresetCreateDialog.cpp:151
+#: PresetCreateDialog.cpp:146
 msgid "Output Settings"
 msgstr ""
 
-#: App.cpp:749 OutputOptionsState.hpp:27
+#: App.cpp:581 OutputOptionsState.hpp:33
 msgid "Overwrite"
 msgstr ""
 
@@ -661,19 +690,19 @@ msgstr ""
 msgid "Positive Film"
 msgstr ""
 
-#: PresetPanel.cpp:41
+#: PresetPanel.cpp:33
 msgid "Presets"
 msgstr ""
 
-#: App.cpp:146 entrée standard:40 entrée standard:41
+#: App.cpp:164 entrée standard:40 entrée standard:41
 msgid "Preview"
 msgstr ""
 
-#: OutputOptionsState.hpp:19
+#: OutputOptionsState.hpp:25
 msgid "Printer"
 msgstr ""
 
-#: PreviewPanel.cpp:874
+#: PreviewPanel.cpp:877
 msgid "Progress: "
 msgstr ""
 
@@ -697,15 +726,15 @@ msgstr ""
 msgid "Refresh Scanner List"
 msgstr ""
 
-#: PresetRenameDialog.cpp:132
+#: PresetRenameDialog.cpp:123
 msgid "Rename"
 msgstr ""
 
-#: PresetRenameDialog.cpp:93
+#: PresetRenameDialog.cpp:84
 msgid "Rename Preset"
 msgstr ""
 
-#: PresetPanel.cpp:175
+#: PresetPanel.cpp:165
 msgid "Rename this preset"
 msgstr ""
 
@@ -721,16 +750,24 @@ msgstr ""
 msgid "Rotate image so it appears upright."
 msgstr ""
 
-#: App.cpp:151
+#: App.cpp:169
 msgid "Scan"
 msgstr ""
 
-#: PresetCreateDialog.cpp:146 ScanOptionsPanel.cpp:462 entrée standard:44
+#: ScanListPanel.cpp:61
+msgid "Scan All"
+msgstr ""
+
+#: PresetCreateDialog.cpp:141 ScanOptionsPanel.cpp:462 entrée standard:44
 msgid "Scan Area"
 msgstr ""
 
 #: entrée standard:59
 msgid "Scan Area Is Valid"
+msgstr ""
+
+#: ScanListPanel.cpp:21
+msgid "Scan List"
 msgstr ""
 
 #: entrée standard:2 entrée standard:3
@@ -745,7 +782,7 @@ msgstr ""
 msgid "Scan speed"
 msgstr ""
 
-#: PresetCreateDialog.cpp:141
+#: PresetCreateDialog.cpp:136
 msgid "Scanners Settings"
 msgstr ""
 
@@ -753,11 +790,11 @@ msgstr ""
 msgid "Select Destination"
 msgstr ""
 
-#: App.cpp:217
+#: App.cpp:279
 msgid "Select Device"
 msgstr ""
 
-#: App.cpp:190
+#: App.cpp:254
 msgid "Select Device..."
 msgstr ""
 
@@ -765,7 +802,7 @@ msgstr ""
 msgid "Select Scanner: "
 msgstr ""
 
-#: App.cpp:679
+#: App.cpp:496
 msgid "Select a directory where to save the image files."
 msgstr ""
 
@@ -839,11 +876,11 @@ msgstr ""
 msgid "Sets the vertical resolution of the scanned image."
 msgstr ""
 
-#: App.cpp:241
+#: App.cpp:303
 msgid "Settings"
 msgstr ""
 
-#: App.cpp:197
+#: App.cpp:260
 msgid "Settings..."
 msgstr ""
 
@@ -899,12 +936,12 @@ msgstr ""
 msgid "The directory where the scanned files will be saved."
 msgstr ""
 
-#: App.cpp:746
+#: App.cpp:578
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: App.cpp:795
+#: App.cpp:630
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -946,15 +983,15 @@ msgstr ""
 msgid "Ugly kludge to provide additional status message strings to a frontend."
 msgstr ""
 
-#: App.cpp:866
+#: SingleScanProcess.hpp:38
 msgid "Unsupported depth"
 msgstr ""
 
-#: App.cpp:917
+#: SingleScanProcess.hpp:44
 msgid "Unsupported file format"
 msgstr ""
 
-#: App.cpp:568 App.cpp:859
+#: PreviewScanProcess.hpp:37 SingleScanProcess.hpp:32
 msgid "Unsupported format"
 msgstr ""
 
