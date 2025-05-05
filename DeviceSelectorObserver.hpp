@@ -2,9 +2,7 @@
 
 #include "AppState.hpp"
 #include "DeviceSelectorState.hpp"
-
 #include "ZooLib/Observer.hpp"
-
 
 namespace Gorfector
 {

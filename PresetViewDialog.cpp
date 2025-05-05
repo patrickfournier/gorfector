@@ -1,8 +1,7 @@
-#include "PresetPanelDialogs.hpp"
-
 #include <adwaita.h>
 
 #include "PresetPanel.hpp"
+#include "PresetPanelDialogs.hpp"
 
 namespace Gorfector
 {

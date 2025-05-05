@@ -1,8 +1,7 @@
-#include "PresetPanel.hpp"
-
 #include <format>
 
 #include "Commands/ApplyPresetCommand.hpp"
+#include "PresetPanel.hpp"
 #include "ZooLib/GtkUtils.hpp"
 
 void Gorfector::PresetPanel::BuildUI()

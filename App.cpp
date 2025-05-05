@@ -44,7 +44,7 @@ Gorfector::App::App(int argc, char **argv)
         std::filesystem::create_directories(prefDir);
     }
     auto prefFilePath = prefDir / "preferences.json";
-    m_State.SetPreferenceFilePath(prefFilePath);
+    m_State.SetPreferencesFilePath(prefFilePath);
 
     bool devMode{};
     for (int i = 1; i < argc; ++i)
@@ -56,7 +56,7 @@ Gorfector::App::App(int argc, char **argv)
     }
 
     m_AppState = new AppState(&m_State, devMode);
-    m_State.LoadFromPreferenceFile(m_AppState);
+    m_State.LoadFromPreferencesFile(m_AppState);
 
     m_ViewUpdateObserver = new ViewUpdateObserver(this, m_AppState);
     m_ObserverManager.AddObserver(m_ViewUpdateObserver);

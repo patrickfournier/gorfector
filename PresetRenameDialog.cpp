@@ -1,8 +1,7 @@
-#include "PresetPanelDialogs.hpp"
-
 #include <adwaita.h>
 
 #include "PresetPanel.hpp"
+#include "PresetPanelDialogs.hpp"
 #include "ZooLib/GtkUtils.hpp"
 #include "ZooLib/StringUtils.hpp"
 
@@ -17,7 +16,7 @@ namespace Gorfector
         auto createButton = ZooLib::FindWidgetByName(GTK_WIDGET(dialog), "apply-button");
 
         std::string presetName(text);
-        ZooLib::trim(presetName);
+        ZooLib::Trim(presetName);
 
         if (presetName.empty())
         {

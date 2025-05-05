@@ -77,7 +77,7 @@ namespace Gorfector
             }
 
             auto f = new TFileWriter(state, applicationName);
-            state->LoadFromPreferenceFile(f->GetStateComponent());
+            state->LoadFromPreferencesFile(f->GetStateComponent());
             s_Writers.push_back(f);
         }
 

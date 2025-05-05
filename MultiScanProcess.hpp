@@ -1,4 +1,5 @@
 #pragma once
+
 #include "PathUtils.hpp"
 #include "ScanProcess.hpp"
 #include "SingleScanProcess.hpp"

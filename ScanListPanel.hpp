@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
 #include "PresetPanel.hpp"
@@ -35,7 +36,7 @@ namespace Gorfector
             , m_Dispatcher(parentDispatcher)
         {
             m_PanelState = new ScanListState(m_App->GetState());
-            m_App->GetState()->LoadFromPreferenceFile(m_PanelState);
+            m_App->GetState()->LoadFromPreferencesFile(m_PanelState);
 
             BuildUI();
 

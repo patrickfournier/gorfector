@@ -1,7 +1,7 @@
 #pragma once
 
+#include <clocale>
 #include <libintl.h>
-#include <locale.h>
 
 #define _(string) gettext(string)
 #define gettext_noop(string) string

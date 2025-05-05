@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gtk/gtk.h>
-#include <sane/sane.h>
 #include <tuple>
 
 #include "AppState.hpp"

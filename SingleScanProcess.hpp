@@ -1,6 +1,6 @@
 #pragma once
-#include "ScanProcess.hpp"
 
+#include "ScanProcess.hpp"
 #include "Writers/FileWriter.hpp"
 
 namespace Gorfector

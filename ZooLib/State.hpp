@@ -10,6 +10,12 @@ namespace ZooLib
 {
     class StateComponent;
 
+    /**
+     * \brief Manages the state of the application, which is partitioned into components.
+     *
+     * The `State` class provides functionality to manage a collection of state components,
+     * serialize/deserialize their state to/from a preferences file, and retrieve components by type.
+     */
     class State
     {
         std::filesystem::path m_PreferencesFilePath{};
@@ -18,6 +24,10 @@ namespace ZooLib
     public:
         ~State();
 
+        /**
+         * \brief Adds a state component to the collection if it is not already present.
+         * \param stateComponent A pointer to the state component to add.
+         */
         void AddStateComponent(StateComponent *stateComponent)
         {
             if (std::ranges::find(m_StateComponents, stateComponent) == m_StateComponents.end())
@@ -26,6 +36,10 @@ namespace ZooLib
             }
         }
 
+        /**
+         * \brief Removes a state component from the collection if it exists.
+         * \param stateComponent A pointer to the state component to remove.
+         */
         void RemoveStateComponent(StateComponent *stateComponent)
         {
             if (const auto it = std::ranges::find(m_StateComponents, stateComponent); it != m_StateComponents.end())
@@ -34,6 +48,11 @@ namespace ZooLib
             }
         }
 
+        /**
+         * \brief Retrieves a state component by its type.
+         * \tparam TStateComponent The type of the state component to retrieve.
+         * \return A pointer to the state component if found, otherwise nullptr.
+         */
         template<typename TStateComponent>
         TStateComponent *GetStateComponentByType() const
         {
@@ -49,13 +68,22 @@ namespace ZooLib
             return nullptr;
         }
 
-        void SetPreferenceFilePath(const std::filesystem::path &filePath)
+        /**
+         * \brief Sets the file path for the preferences file. This file is used to serialize the components.
+         * \param filePath The file path to set.
+         */
+        void SetPreferencesFilePath(const std::filesystem::path &filePath)
         {
             m_PreferencesFilePath = filePath;
         }
 
+        /**
+         * \brief Loads the state of a component from the preferences file.
+         * \tparam TStateComponent The type of the state component to load.
+         * \param stateComponent A pointer to the state component to load.
+         */
         template<typename TStateComponent>
-        void LoadFromPreferenceFile(TStateComponent *stateComponent)
+        void LoadFromPreferencesFile(TStateComponent *stateComponent)
         {
             if (stateComponent == nullptr)
             {
@@ -76,21 +104,24 @@ namespace ZooLib
 
             try
             {
-                nlohmann::json jsonData = nlohmann::json::parse(f);
-
-                if (jsonData.contains(key))
+                if (auto jsonData = nlohmann::json::parse(f); jsonData.contains(key))
                 {
                     auto updater = typename TStateComponent::Updater(stateComponent);
                     updater.LoadFromJson(jsonData[key]);
                 }
             }
-            catch (const std::exception &e)
+            catch (const std::exception &)
             {
             }
 
             f.close();
         }
 
+        /**
+         * \brief Saves the state of a component to the preferences file.
+         * \tparam TStateComponent The type of the state component to save.
+         * \param stateComponent A pointer to the state component to save.
+         */
         template<typename TStateComponent>
         void SaveToFile(TStateComponent *stateComponent)
         {
@@ -113,7 +144,7 @@ namespace ZooLib
                 {
                     jsonData = nlohmann::json::parse(f);
                 }
-                catch (const std::exception &e)
+                catch (const std::exception &)
                 {
                 }
 

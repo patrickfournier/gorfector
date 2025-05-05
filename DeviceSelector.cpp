@@ -9,7 +9,6 @@
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
-
 Gorfector::DeviceSelector::DeviceSelector(
         ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState)
     : m_App(app)

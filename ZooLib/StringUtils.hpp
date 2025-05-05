@@ -5,22 +5,32 @@
 
 namespace ZooLib
 {
-    // trim from start (in place)
-    inline void ltrim(std::string &s)
+    /**
+     * \brief Removes leading whitespace characters from the string (in place).
+     * \param s The string to be trimmed.
+     */
+    inline void LTrim(std::string &s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+        s.erase(s.begin(), std::ranges::find_if(s, [](const unsigned char ch) { return !std::isspace(ch); }));
     }
 
-    // trim from end (in place)
-    inline void rtrim(std::string &s)
+    /**
+     * \brief Removes trailing whitespace characters from the string (in place).
+     * \param s The string to be trimmed.
+     */
+    inline void RTrim(std::string &s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](const unsigned char ch) { return !std::isspace(ch); }).base(),
+                s.end());
     }
 
-    // trim from both ends (in place)
-    inline void trim(std::string &s)
+    /**
+     * \brief Removes both leading and trailing whitespace characters from the string (in place).
+     * \param s The string to be trimmed.
+     */
+    inline void Trim(std::string &s)
     {
-        rtrim(s);
-        ltrim(s);
+        RTrim(s);
+        LTrim(s);
     }
 }

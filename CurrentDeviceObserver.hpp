@@ -1,22 +1,43 @@
 #pragma once
+
 #include "AppState.hpp"
-#include "PresetPanelState.hpp"
 #include "ZooLib/Observer.hpp"
 
 namespace Gorfector
 {
     /**
-     * @class CurrentDeviceObserver
-     * @brief A class responsible for observing the current device and updating the preset panel state.
+     * \brief A template class that observes changes in the current device state.
+     *
+     * This class listens for changes in the application state and updates the modified state
+     * with the current device's vendor and model information when a relevant change is detected.
+     *
+     * \tparam TModifiedState The type of the modified state that will be updated.
      */
     template<typename TModifiedState>
     class CurrentDeviceObserver : public ZooLib::Observer
     {
+        /**
+         * \brief Pointer to the application state being observed.
+         */
         const AppState *m_AppState;
+
+        /**
+         * \brief Pointer to the device selector state used to retrieve device information.
+         */
         const DeviceSelectorState *m_DeviceSelectorState;
+
+        /**
+         * \brief Pointer to the modified state that will be updated.
+         */
         TModifiedState *m_ModifiedState;
 
     protected:
+        /**
+         * \brief Updates the modified state when the current device changes.
+         *
+         * This method checks for changes in the current device and updates the modified state
+         * with the vendor and model information of the current device.
+         */
         void UpdateImplementation() override
         {
             auto changeset = m_AppState->GetAggregatedChangeset(m_ObservedComponentVersions[0]);
@@ -32,6 +53,13 @@ namespace Gorfector
         }
 
     public:
+        /**
+         * \brief Constructs a CurrentDeviceObserver.
+         *
+         * \param appState Pointer to the application state to observe.
+         * \param deviceSelectorState Pointer to the device selector state for retrieving device information.
+         * \param modifiedState Pointer to the modified state to be updated.
+         */
         CurrentDeviceObserver(
                 const AppState *appState, const DeviceSelectorState *deviceSelectorState, TModifiedState *modifiedState)
             : Observer({appState, deviceSelectorState}, {modifiedState})
@@ -41,5 +69,4 @@ namespace Gorfector
         {
         }
     };
-
 }

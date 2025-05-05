@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 11:21-0400\n"
+"POT-Creation-Date: 2025-05-05 10:21-0400\n"
 "PO-Revision-Date: 2025-05-03 23:01-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -43,7 +43,7 @@ msgstr " 5 "
 msgid " 6 "
 msgstr " 6 "
 
-#: ScanOptionsPanel.cpp:37
+#: ScanOptionsPanel.cpp:36
 #, c-format
 msgid "%%"
 msgstr "%%"
@@ -68,11 +68,11 @@ msgstr "1,0"
 msgid "1.8"
 msgstr "1,8"
 
-#: ScanListState.hpp:95
+#: ScanListState.hpp:96
 msgid "<Email>"
 msgstr "<Courriel>"
 
-#: ScanListState.hpp:89
+#: ScanListState.hpp:90
 msgid "<Printer>"
 msgstr "<Imprimante>"
 
@@ -140,7 +140,7 @@ msgstr "Ajoute au rouge en fonction du niveau de bleu"
 msgid "Adds to red based on green level"
 msgstr "Ajoute au rouge en fonction du niveau de vert"
 
-#: ScanOptionsPanel.cpp:420 entrée standard:17
+#: ScanOptionsPanel.cpp:419 entrée standard:17
 msgid "Advanced"
 msgstr "Avancé"
 
@@ -156,11 +156,11 @@ msgstr ""
 msgid "An application to scan images."
 msgstr "Une application pour numériser des images."
 
-#: PresetPanel.cpp:139
+#: PresetPanel.cpp:138
 msgid "Apply this preset"
 msgstr "Appliquer ce préréglage"
 
-#: PresetPanel.cpp:89
+#: PresetPanel.cpp:88
 #, c-format
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr "Voulez-vous vraiment supprimer le préréglage \"%s\"?"
@@ -186,7 +186,7 @@ msgstr "Segmentation automatique de l'image'"
 msgid "B5"
 msgstr "B5"
 
-#: ScanOptionsPanel.cpp:416
+#: ScanOptionsPanel.cpp:415
 msgid "Basic"
 msgstr "Basique"
 
@@ -234,7 +234,7 @@ msgstr "Luminosité"
 msgid "Brightness Method"
 msgstr "Méthode de luminosité"
 
-#: ScanOptionsPanel.cpp:546
+#: ScanOptionsPanel.cpp:545
 msgid "Browse for a location."
 msgstr "Choisir un répertoire."
 
@@ -246,7 +246,7 @@ msgstr "CD"
 msgid "Calibrate"
 msgstr "Calibrer"
 
-#: App.cpp:581 PresetPanel.cpp:90 ScanListPanel.cpp:175
+#: App.cpp:581 PresetPanel.cpp:89 ScanListPanel.cpp:175
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -258,7 +258,7 @@ msgstr "Annuler la numérisation"
 msgid "Cancel Scans"
 msgstr "Annuler les numérisations"
 
-#: DeviceSelector.cpp:160
+#: DeviceSelector.cpp:159
 msgid "Cannot open scanner {}."
 msgstr "Impossible d'ouvrir le scanner {}."
 
@@ -282,7 +282,7 @@ msgstr "Coefficients de correction des couleurs"
 msgid "Color correction"
 msgstr "Correction des couleurs"
 
-#: ScanOptionsPanel.cpp:446
+#: ScanOptionsPanel.cpp:445
 msgid "Common Options"
 msgstr "Options communes"
 
@@ -318,23 +318,23 @@ msgstr "Ajuste la luminosité de l'image acquise."
 msgid "Controls the contrast of the acquired image."
 msgstr "Ajuste le contraste de l'image acquise."
 
-#: PresetCreateDialog.cpp:164
+#: PresetCreateDialog.cpp:163
 msgid "Create"
 msgstr "Créer"
 
-#: ScanOptionsPanel.cpp:552
+#: ScanOptionsPanel.cpp:551
 msgid "Create Missing Directories"
 msgstr "Créer les répertoires manquants"
 
-#: PresetCreateDialog.cpp:105
+#: PresetCreateDialog.cpp:104
 msgid "Create a new preset"
 msgstr "Créer un nouveau préréglage"
 
-#: ScanOptionsPanel.cpp:553
+#: ScanOptionsPanel.cpp:552
 msgid "Create directories if they do not exist."
 msgstr "Créer les répertoires qui n'existent pas."
 
-#: ScanOptionsPanel.cpp:35
+#: ScanOptionsPanel.cpp:34
 msgid "DPI"
 msgstr "PPP"
 
@@ -346,11 +346,11 @@ msgstr "Définit le facteur de zoom que le scanner utilisera"
 msgid "Deflate Compression Level"
 msgstr "Niveau de compression Deflate"
 
-#: PresetPanel.cpp:90 ScanListPanel.cpp:143 ScanListPanel.cpp:175
+#: PresetPanel.cpp:89 ScanListPanel.cpp:143 ScanListPanel.cpp:175
 msgid "Delete"
 msgstr "Supprimer"
 
-#: PresetPanel.cpp:87
+#: PresetPanel.cpp:86
 msgid "Delete Preset"
 msgstr "Supprimer ce préréglage"
 
@@ -358,7 +358,7 @@ msgstr "Supprimer ce préréglage"
 msgid "Delete Scan"
 msgstr "Supprimer l'item"
 
-#: PresetPanel.cpp:178
+#: PresetPanel.cpp:177
 msgid "Delete this preset"
 msgstr "Supprimer ce préréglage"
 
@@ -366,7 +366,7 @@ msgstr "Supprimer ce préréglage"
 msgid "Deskew"
 msgstr "Correction de désalignement"
 
-#: ScanOptionsPanel.cpp:510 ScanOptionsPanel.cpp:515
+#: ScanOptionsPanel.cpp:509 ScanOptionsPanel.cpp:514
 msgid "Destination"
 msgstr "Destination"
 
@@ -432,11 +432,11 @@ msgstr "Courriel"
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
-#: PresetCreateDialog.cpp:120
+#: PresetCreateDialog.cpp:119
 msgid "Enter a name for the new preset:"
 msgstr "Nom du nouveau préréglage:"
 
-#: PresetRenameDialog.cpp:99
+#: PresetRenameDialog.cpp:98
 msgid "Enter a new name for the preset:"
 msgstr "Nom du préréglage:"
 
@@ -460,7 +460,7 @@ msgstr "Fichier"
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
-#: ScanOptionsPanel.cpp:562
+#: ScanOptionsPanel.cpp:561
 msgid "File Name"
 msgstr "Nom du fichier"
 
@@ -548,7 +548,7 @@ msgstr "Haut"
 msgid "Horizontal Resolution"
 msgstr "Résolution horizontale"
 
-#: ScanOptionsPanel.cpp:575
+#: ScanOptionsPanel.cpp:574
 msgid "If File Exists"
 msgstr "Si le fichier existe"
 
@@ -556,7 +556,7 @@ msgstr "Si le fichier existe"
 msgid "Image Formats"
 msgstr "Formats d'image"
 
-#: DeviceSelector.cpp:44
+#: DeviceSelector.cpp:43
 msgid "Include Network Scanners"
 msgstr "Inclure les scanners réseau"
 
@@ -589,11 +589,11 @@ msgstr ""
 msgid "Indicates whether the scanner needs to poll."
 msgstr "Indique si le scanner doit interroger."
 
-#: PresetViewDialog.cpp:21
+#: PresetViewDialog.cpp:20
 msgid "Inspect Preset"
 msgstr "Inspecter le préréglage"
 
-#: PresetPanel.cpp:152
+#: PresetPanel.cpp:151
 msgid "Inspect this preset"
 msgstr "Inspecter ce préréglage"
 
@@ -613,7 +613,7 @@ msgstr "Lettre"
 msgid "Load"
 msgstr "Charger les réglages"
 
-#: ScanOptionsPanel.cpp:530
+#: ScanOptionsPanel.cpp:529
 msgid "Location"
 msgstr "Répertoire"
 
@@ -649,19 +649,19 @@ msgstr "Besoin d'interroger"
 msgid "Negative Film"
 msgstr "Négatifs"
 
-#: PresetPanel.cpp:41
+#: PresetPanel.cpp:40
 msgid "New preset"
 msgstr "Nouveau préréglage"
 
-#: DeviceSelector.cpp:32 DeviceSelector.cpp:170
+#: DeviceSelector.cpp:31 DeviceSelector.cpp:169
 msgid "No Scanner Found"
 msgstr "Aucun scanner trouvé"
 
-#: DeviceSelector.cpp:166
+#: DeviceSelector.cpp:165
 msgid "No scanner found."
 msgstr "Aucun scanner trouvé."
 
-#: DeviceSelector.cpp:114 entrée standard:128 standard:132 standard:171
+#: DeviceSelector.cpp:113 entrée standard:128 standard:132 standard:171
 msgid "None"
 msgstr "Aucun"
 
@@ -673,11 +673,11 @@ msgstr "Nombre de bits par échantillon."
 msgid "Optional equipment"
 msgstr "Équipement optionnel"
 
-#: ScanOptionsPanel.cpp:425
+#: ScanOptionsPanel.cpp:424
 msgid "Output"
 msgstr "Sortie"
 
-#: PresetCreateDialog.cpp:146
+#: PresetCreateDialog.cpp:145
 msgid "Output Settings"
 msgstr "Paramètres de sortie"
 
@@ -705,7 +705,7 @@ msgstr "Temps d'interrogation"
 msgid "Positive Film"
 msgstr "Diapositives"
 
-#: PresetPanel.cpp:33
+#: PresetPanel.cpp:32
 msgid "Presets"
 msgstr "Préréglages"
 
@@ -717,7 +717,7 @@ msgstr "Aperçu"
 msgid "Printer"
 msgstr "Imprimante"
 
-#: PreviewPanel.cpp:877
+#: PreviewPanel.cpp:876
 msgid "Progress: "
 msgstr "Progrès: "
 
@@ -737,19 +737,19 @@ msgstr "Rouge"
 msgid "Red intensity"
 msgstr "Intensité du rouge"
 
-#: DeviceSelector.cpp:49
+#: DeviceSelector.cpp:48
 msgid "Refresh Scanner List"
 msgstr "Rafraîchir la liste des scanners"
 
-#: PresetRenameDialog.cpp:123
+#: PresetRenameDialog.cpp:122
 msgid "Rename"
 msgstr "Renommer"
 
-#: PresetRenameDialog.cpp:84
+#: PresetRenameDialog.cpp:83
 msgid "Rename Preset"
 msgstr "Renommer le préréglage"
 
-#: PresetPanel.cpp:165
+#: PresetPanel.cpp:164
 msgid "Rename this preset"
 msgstr "Renommer ce préréglage"
 
@@ -773,7 +773,7 @@ msgstr "Numériser"
 msgid "Scan All"
 msgstr "Tout numériser"
 
-#: PresetCreateDialog.cpp:141 ScanOptionsPanel.cpp:462 entrée standard:44
+#: PresetCreateDialog.cpp:140 ScanOptionsPanel.cpp:461 entrée standard:44
 msgid "Scan Area"
 msgstr "Zone de numérisation"
 
@@ -797,11 +797,11 @@ msgstr "Source de numérisation"
 msgid "Scan speed"
 msgstr "Vitesse de numérisation"
 
-#: PresetCreateDialog.cpp:136
+#: PresetCreateDialog.cpp:135
 msgid "Scanners Settings"
 msgstr "Paramètres du périphérique"
 
-#: ScanOptionsPanel.cpp:610
+#: ScanOptionsPanel.cpp:609
 msgid "Select Destination"
 msgstr "Choisir la destination"
 
@@ -813,7 +813,7 @@ msgstr "Sélectionner le périphérique"
 msgid "Select Device..."
 msgstr "Sélectionner le périphérique..."
 
-#: DeviceSelector.cpp:37
+#: DeviceSelector.cpp:36
 msgid "Select Scanner: "
 msgstr "Sélectionner le périphérique: "
 
@@ -955,7 +955,7 @@ msgstr "Vitesse"
 msgid "TIFF Settings"
 msgstr "Paramètres TIFF"
 
-#: ScanOptionsPanel.cpp:531
+#: ScanOptionsPanel.cpp:530
 msgid "The directory where the scanned files will be saved."
 msgstr "Le répertoire dans lequel les images seront enregistrées."
 
@@ -1046,11 +1046,11 @@ msgstr ""
 msgid "Zoom"
 msgstr "Zoom"
 
-#: PreviewPanel.cpp:44
+#: PreviewPanel.cpp:43
 msgid "Zoom:"
 msgstr "Zoom:"
 
-#: ScanOptionsPanel.cpp:31
+#: ScanOptionsPanel.cpp:30
 msgid "bit"
 msgstr "bit"
 
@@ -1062,15 +1062,15 @@ msgstr "gimp"
 msgid "iscan"
 msgstr "iscan"
 
-#: ScanOptionsPanel.cpp:33
+#: ScanOptionsPanel.cpp:32
 msgid "mm"
 msgstr "mm"
 
-#: ScanOptionsPanel.cpp:29
+#: ScanOptionsPanel.cpp:28
 msgid "px"
 msgstr "px"
 
-#: ScanOptionsPanel.cpp:39
+#: ScanOptionsPanel.cpp:38
 msgid "μs"
 msgstr "μs"
 

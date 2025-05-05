@@ -1,5 +1,3 @@
-#include "ScanOptionsPanel.hpp"
-
 #include <memory>
 #include <utility>
 
@@ -13,6 +11,7 @@
 #include "OptionRewriter.hpp"
 #include "OutputOptionsState.hpp"
 #include "SaneDevice.hpp"
+#include "ScanOptionsPanel.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/Gettext.hpp"
@@ -114,9 +113,9 @@ void Gorfector::ScanOptionsPanel::AddCheckButtonForScannerOption(
 
     AddWidgetToParent(parent, checkButton);
 
-    auto index = WidgetIndex(settingIndex, 0);
-    g_object_set_data(G_OBJECT(checkButton), "OptionIndex", GINT_TO_POINTER(index.Hash()));
-    m_Widgets[index.Hash()] = checkButton;
+    WidgetIndex index{.OptionValueIndices = {settingIndex, 0}};
+    g_object_set_data(G_OBJECT(checkButton), "OptionIndex", GINT_TO_POINTER(index.CompositeIndex));
+    m_Widgets[index.CompositeIndex] = checkButton;
 }
 
 void Gorfector::ScanOptionsPanel::AddVectorRowForScannerOption(
@@ -225,9 +224,9 @@ void Gorfector::ScanOptionsPanel::AddVectorRowForScannerOption(
 
         AddWidgetToParent(parent, valueWidget);
 
-        auto index = WidgetIndex(settingIndex, valueIndex);
-        g_object_set_data(G_OBJECT(valueWidget), "OptionIndex", GINT_TO_POINTER(index.Hash()));
-        m_Widgets[index.Hash()] = valueWidget;
+        WidgetIndex index{.OptionValueIndices = {settingIndex, valueIndex}};
+        g_object_set_data(G_OBJECT(valueWidget), "OptionIndex", GINT_TO_POINTER(index.CompositeIndex));
+        m_Widgets[index.CompositeIndex] = valueWidget;
     }
 }
 
@@ -308,9 +307,9 @@ void Gorfector::ScanOptionsPanel::AddStringRowForScannerOption(
 
         AddWidgetToParent(parent, valueWidget);
 
-        auto index = WidgetIndex(settingIndex, 0);
-        g_object_set_data(G_OBJECT(valueWidget), "OptionIndex", GINT_TO_POINTER(index.Hash()));
-        m_Widgets[index.Hash()] = valueWidget;
+        WidgetIndex index{.OptionValueIndices = {settingIndex, 0}};
+        g_object_set_data(G_OBJECT(valueWidget), "OptionIndex", GINT_TO_POINTER(index.CompositeIndex));
+        m_Widgets[index.CompositeIndex] = valueWidget;
     }
 }
 
@@ -333,7 +332,7 @@ Gorfector::ScanOptionsPanel::ScanOptionsPanel(
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
     m_OutputOptions = new OutputOptionsState(m_App->GetState());
-    m_App->GetState()->LoadFromPreferenceFile(m_OutputOptions);
+    m_App->GetState()->LoadFromPreferencesFile(m_OutputOptions);
 
     m_OptionUpdateObserver = new ViewUpdateObserver(this, m_DeviceOptions, m_OutputOptions);
     m_App->GetObserverManager()->AddObserver(m_OptionUpdateObserver);
@@ -784,9 +783,9 @@ void Gorfector::ScanOptionsPanel::OnScannerOptionCheckBoxChanged(GtkWidget *widg
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
-    auto optionIndex = index.m_OptionIndex;
-    auto valueIndex = index.m_ValueIndex;
+    WidgetIndex index{.CompositeIndex = reinterpret_cast<uint64_t>(gObjectData)};
+    auto optionIndex = index.OptionValueIndices[0];
+    auto valueIndex = index.OptionValueIndices[1];
 
     auto *checkBox = ADW_SWITCH_ROW(widget);
     auto isChecked = adw_switch_row_get_active(checkBox);
@@ -837,9 +836,9 @@ void Gorfector::ScanOptionsPanel::OnScannerOptionDropDownChanged(GtkWidget *widg
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
-    auto optionIndex = index.m_OptionIndex;
-    auto valueIndex = index.m_ValueIndex;
+    WidgetIndex index{.CompositeIndex = reinterpret_cast<uint64_t>(gObjectData)};
+    auto optionIndex = index.OptionValueIndices[0];
+    auto valueIndex = index.OptionValueIndices[1];
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
     auto saneType = option->GetValueType();
@@ -933,9 +932,9 @@ void Gorfector::ScanOptionsPanel::OnScannerOptionNumericTextFieldChanged(GtkEven
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
-    auto optionIndex = index.m_OptionIndex;
-    auto valueIndex = index.m_ValueIndex;
+    WidgetIndex index{.CompositeIndex = reinterpret_cast<uint64_t>(gObjectData)};
+    auto optionIndex = index.OptionValueIndices[0];
+    auto valueIndex = index.OptionValueIndices[1];
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
     auto saneType = option->GetValueType();
@@ -985,9 +984,9 @@ void Gorfector::ScanOptionsPanel::OnScannerOptionStringTextFieldChanged(GtkEvent
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
-    auto optionIndex = index.m_OptionIndex;
-    auto valueIndex = index.m_ValueIndex;
+    WidgetIndex index{.CompositeIndex = reinterpret_cast<uint64_t>(gObjectData)};
+    auto optionIndex = index.OptionValueIndices[0];
+    auto valueIndex = index.OptionValueIndices[1];
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
     auto saneType = option->GetValueType();
@@ -1050,9 +1049,9 @@ void Gorfector::ScanOptionsPanel::OnScannerOptionSpinButtonChanged(GtkWidget *wi
     if (gObjectData == nullptr)
         return;
 
-    auto index = WidgetIndex(reinterpret_cast<uint64_t>(gObjectData));
-    auto optionIndex = index.m_OptionIndex;
-    auto valueIndex = index.m_ValueIndex;
+    WidgetIndex index{.CompositeIndex = reinterpret_cast<uint64_t>(gObjectData)};
+    auto optionIndex = index.OptionValueIndices[0];
+    auto valueIndex = index.OptionValueIndices[1];
 
     auto option = m_DeviceOptions->GetOption(optionIndex);
     auto saneType = option->GetValueType();
@@ -1147,9 +1146,9 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
     {
         for (auto changedIndex: changeset->GetChangedIndices())
         {
-            auto option = m_DeviceOptions->GetOption(changedIndex.m_OptionIndex);
+            auto option = m_DeviceOptions->GetOption(changedIndex.OptionValueIndices[0]);
             auto settingValueType = option->GetValueType();
-            auto widget = m_Widgets[changedIndex.Hash()];
+            auto widget = m_Widgets[changedIndex.CompositeIndex];
 
             switch (settingValueType)
             {
@@ -1164,7 +1163,7 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
                 case SANE_TYPE_FIXED:
                 {
                     auto intOption = dynamic_cast<const DeviceOptionValue<int> *>(option);
-                    auto value = intOption->GetValue(changedIndex.m_ValueIndex);
+                    auto value = intOption->GetValue(changedIndex.OptionValueIndices[1]);
 
                     if (ADW_IS_COMBO_ROW(widget))
                     {

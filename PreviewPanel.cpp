@@ -1,5 +1,4 @@
 #include "PreviewPanel.hpp"
-
 #include "App.hpp"
 #include "Commands/SetPanCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"

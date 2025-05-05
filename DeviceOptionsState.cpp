@@ -1,10 +1,8 @@
 #include <cstring>
+#include <glib.h>
 #include <memory>
 
 #include "DeviceOptionsState.hpp"
-
-#include <glib.h>
-
 #include "SaneDevice.hpp"
 #include "SaneException.hpp"
 
@@ -246,7 +244,8 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         // No option reload required; the device accepted the value as-is. Update the requested value and the actual
         // value.
         option->SetValues(valueIndex, requestedValue, saneValue);
-        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
+        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(
+                WidgetIndex{.OptionValueIndices = {optionIndex, valueIndex}});
     }
 }
 
@@ -332,7 +331,8 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         // No option reload required; the device accepted the value as-is. Update the requested value and the actual
         // value.
         option->SetValues(valueIndex, requestedValue, saneValue[valueIndex]);
-        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
+        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(
+                WidgetIndex{.OptionValueIndices = {optionIndex, valueIndex}});
     }
 }
 
@@ -384,7 +384,8 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         // No option reload required; the device accepted the value as-is. Update the requested value and the actual
         // value.
         option->SetValues(valueIndex, requestedValue, std::string(saneValue.get()));
-        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
+        m_StateComponent->GetCurrentChangeset()->AddChangedIndex(
+                WidgetIndex{.OptionValueIndices = {optionIndex, valueIndex}});
     }
 }
 
@@ -578,7 +579,8 @@ void Gorfector::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &j
             indicesToApply.push_back(optionIndex);
             for (auto valueIndex = 0U; valueIndex < optionValue->GetValueCount(); valueIndex++)
             {
-                m_StateComponent->GetCurrentChangeset()->AddChangedIndex(WidgetIndex(optionIndex, valueIndex));
+                m_StateComponent->GetCurrentChangeset()->AddChangedIndex(
+                        WidgetIndex{.OptionValueIndices = {static_cast<uint32_t>(optionIndex), valueIndex}});
             }
         }
     }

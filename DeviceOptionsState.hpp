@@ -22,36 +22,15 @@ namespace Gorfector
         Millimeters
     };
 
-    struct WidgetIndex
+    union WidgetIndex
     {
-        const uint32_t m_OptionIndex{};
-        const uint32_t m_ValueIndex{};
-
-        WidgetIndex() = default;
-        WidgetIndex(uint32_t optionIndex, uint32_t valueIndex)
-            : m_OptionIndex(optionIndex)
-            , m_ValueIndex(valueIndex)
-        {
-        }
-        explicit WidgetIndex(uint64_t hash)
-            : m_OptionIndex(static_cast<uint32_t>(hash >> 32))
-            , m_ValueIndex(static_cast<uint32_t>(hash))
-        {
-        }
-        WidgetIndex(const WidgetIndex &other) = default;
-        WidgetIndex(WidgetIndex &&other) noexcept = default;
-
-        bool operator==(const WidgetIndex &other) const
-        {
-            return m_OptionIndex == other.m_OptionIndex && m_ValueIndex == other.m_ValueIndex;
-        }
-
-        [[nodiscard]] uint64_t Hash() const
-        {
-            return (static_cast<uint64_t>(m_OptionIndex) << 32) | m_ValueIndex;
-        }
+        const uint32_t OptionValueIndices[2];
+        const uint64_t CompositeIndex;
     };
 
+    /**
+     * \brief A changeset class for managing changes in device options state.
+     */
     class DeviceOptionsStateChangeset : public ZooLib::ChangesetBase
     {
         std::vector<WidgetIndex> m_ChangedIndices;
@@ -91,7 +70,9 @@ namespace Gorfector
 
             for (auto changedIndex: changeset.m_ChangedIndices)
             {
-                if (std::ranges::find(m_ChangedIndices, changedIndex) == m_ChangedIndices.end())
+                if (std::ranges::find_if(m_ChangedIndices, [changedIndex](const WidgetIndex &a) {
+                        return a.CompositeIndex == changedIndex.CompositeIndex;
+                    }) == m_ChangedIndices.end())
                 {
                     m_ChangedIndices.push_back(changedIndex);
                 }

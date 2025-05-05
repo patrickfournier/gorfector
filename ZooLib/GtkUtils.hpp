@@ -5,6 +5,12 @@
 
 namespace ZooLib
 {
+    /**
+     * \brief Finds a widget by its name in the widget hierarchy starting from the given root.
+     * \param root The root widget to start the search from.
+     * \param name The name of the widget to find.
+     * \return A pointer to the widget if found, otherwise nullptr.
+     */
     static GtkWidget *FindWidgetByName(GtkWidget *root, const char *name)
     {
         std::queue<GtkWidget *> widgetQueue;
@@ -30,6 +36,12 @@ namespace ZooLib
         return nullptr;
     }
 
+    /**
+     * \brief Finds the first parent of the given widget that matches the specified GType.
+     * \param widget The widget whose parent is to be found.
+     * \param type The GType to match.
+     * \return A pointer to the parent widget if found, otherwise nullptr.
+     */
     static GtkWidget *GetParentOfType(GtkWidget *widget, GType type)
     {
         auto parent = gtk_widget_get_parent(widget);

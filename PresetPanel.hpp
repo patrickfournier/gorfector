@@ -44,7 +44,7 @@ namespace Gorfector
             , m_Dispatcher(parentDispatcher)
         {
             m_PresetPanelState = new PresetPanelState(m_App->GetState());
-            m_App->GetState()->LoadFromPreferenceFile(m_PresetPanelState);
+            m_App->GetState()->LoadFromPreferencesFile(m_PresetPanelState);
 
             BuildUI();
 
