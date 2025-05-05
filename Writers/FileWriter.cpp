@@ -1,3 +1,3 @@
 #include "FileWriter.hpp"
 
-std::vector<Gorfector::FileWriter *> Gorfector::FileWriter::s_Formats{};
+std::vector<Gorfector::FileWriter *> Gorfector::FileWriter::s_Writers{};

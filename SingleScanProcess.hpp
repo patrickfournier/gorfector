@@ -45,7 +45,7 @@ namespace Gorfector
                 return false;
             }
 
-            if (auto error = m_FileWriter->CreateFile(m_ImageFilePath, m_ScanOptions, m_ScanParameters, nullptr);
+            if (auto error = m_FileWriter->CreateFile(m_ImageFilePath, m_ScanOptions, m_ScanParameters);
                 error != FileWriter::Error::None)
             {
                 auto errorString = std::string(_("Failed to create file: ")) + m_FileWriter->GetError(error);
@@ -69,10 +69,10 @@ namespace Gorfector
             auto availableBytes = m_WriteOffset + readLength;
             auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
             auto savedBytes = m_FileWriter->AppendBytes(m_Buffer, availableLines, m_ScanParameters);
-            if (savedBytes < availableBytes)
+            if (static_cast<int32_t>(savedBytes) < availableBytes)
             {
                 memmove(m_Buffer, m_Buffer + savedBytes, availableBytes - savedBytes);
-                m_WriteOffset = availableBytes - savedBytes;
+                m_WriteOffset = availableBytes - static_cast<int32_t>(savedBytes);
             }
             else
             {

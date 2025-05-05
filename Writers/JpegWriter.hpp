@@ -10,47 +10,102 @@
 
 namespace Gorfector
 {
-    class JpegWriter : public FileWriter
+    /**
+     * \class JpegWriter
+     * \brief A file writer implementation for handling JPEG image files.
+     *
+     * This class provides functionality to create, append data to, and manage JPEG files.
+     * It uses the libjpeg library for compression and supports various image formats and depths.
+     */
+    class JpegWriter final : public FileWriter
     {
+        /**
+         * \brief Supported file extensions for JPEG files.
+         */
         static const std::vector<std::string> k_Extensions;
+
+        /**
+         * \brief Name of the file writer.
+         */
         static constexpr std::string k_Name = "JPEG";
 
+        /**
+         * \brief State component for managing JPEG writer-specific settings.
+         */
         JpegWriterState *m_StateComponent{};
 
+        /**
+         * \brief JPEG compression structure used by libjpeg.
+         */
         jpeg_compress_struct *m_CompressStruct{};
+
+        /**
+         * \brief Error handler for libjpeg operations.
+         */
         jpeg_error_mgr *m_ErrorHandler{};
+
+        /**
+         * \brief File pointer for the output JPEG file.
+         */
         FILE *m_File{};
 
     public:
+        /**
+         * \brief Constructor for the JpegWriter class.
+         * \param state Pointer to the application state.
+         * \param applicationName Name of the application using the file writer.
+         */
         JpegWriter(ZooLib::State *state, const std::string &applicationName)
             : FileWriter(applicationName)
         {
             m_StateComponent = new JpegWriterState(state);
         }
 
-        ~JpegWriter()
+        /**
+         * \brief Destructor for the JpegWriter class.
+         */
+        ~JpegWriter() override
         {
             delete m_StateComponent;
         }
 
-        [[nodiscard]] JpegWriterState *GetStateComponent()
+        /**
+         * \brief Retrieves the state component for the JPEG writer.
+         * \return A pointer to the JpegWriterState object.
+         */
+        [[nodiscard]] JpegWriterState *GetStateComponent() const
         {
             return m_StateComponent;
         }
 
+        /**
+         * \brief Retrieves the name of the file writer.
+         * \return A constant reference to the name string.
+         */
         [[nodiscard]] const std::string &GetName() const override
         {
             return k_Name;
         }
 
+        /**
+         * \brief Retrieves the supported file extensions for the JPEG writer.
+         * \return A vector of strings containing the supported extensions.
+         */
         [[nodiscard]] std::vector<std::string> GetExtensions() const override
         {
             return k_Extensions;
         }
 
+        /**
+         * \brief Creates a new JPEG file for writing.
+         * \param path The file path to create.
+         * \param deviceOptions Pointer to the device options state.
+         * \param parameters SANE parameters for the file.
+         * \return An error code indicating the result of the operation.
+         */
         Error CreateFile(
-                std::filesystem::path &path, const DeviceOptionsState *deviceOptions, const SANE_Parameters &parameters,
-                SANE_Byte *image) override
+                std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
+                const SANE_Parameters &parameters) override
         {
             m_CompressStruct = new jpeg_compress_struct();
             m_ErrorHandler = new jpeg_error_mgr();
@@ -78,8 +133,18 @@ namespace Gorfector
             return Error::None;
         }
 
-        int32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
+        /**
+         * \brief Appends bytes to the JPEG file.
+         * \param bytes Pointer to the byte data.
+         * \param numberOfLines Number of lines to append.
+         * \param parameters SANE parameters for the file.
+         * \return The number of bytes appended.
+         */
+        uint32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
         {
+            if (m_CompressStruct == nullptr)
+                return 0;
+
             if (m_CompressStruct->image_height <= m_CompressStruct->next_scanline)
                 return 0;
 
@@ -114,6 +179,7 @@ namespace Gorfector
             }
             else if (parameters.depth == 16)
             {
+                // ReSharper disable once CppDFAUnreachableCode
                 constexpr auto offset = std::endian::native == std::endian::little ? 1 : 0;
 
                 if (parameters.format == SANE_FRAME_GRAY)
@@ -152,6 +218,9 @@ namespace Gorfector
             return numLinesToWrite * parameters.bytes_per_line;
         }
 
+        /**
+         * \brief Closes the JPEG file after writing.
+         */
         void CloseFile() override
         {
             jpeg_finish_compress(m_CompressStruct);
@@ -161,6 +230,9 @@ namespace Gorfector
             delete m_ErrorHandler;
         }
 
+        /**
+         * \brief Cancels the file writing operation and cleans up resources.
+         */
         void CancelFile() override
         {
             fclose(m_File);

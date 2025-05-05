@@ -613,11 +613,11 @@ void Gorfector::App::OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *resp
 
 Gorfector::FileWriter *Gorfector::App::SelectFileWriter(const std::string &path) const
 {
-    auto fileWriter = FileWriter::GetFormatForPath(path);
+    auto fileWriter = FileWriter::GetFileWriterForPath(path);
     if (fileWriter == nullptr)
     {
         auto extensionsStr = std::string();
-        for (auto format: FileWriter::GetFormats())
+        for (auto format: FileWriter::GetWriters())
         {
             auto mainExt = format->GetExtensions()[0];
             extensionsStr += extensionsStr.empty() ? mainExt : ", " + mainExt;

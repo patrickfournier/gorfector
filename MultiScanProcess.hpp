@@ -85,7 +85,7 @@ namespace Gorfector
 
             if (ComputeFileName())
             {
-                m_FileWriter = FileWriter::GetFormatForPath(m_ImageFilePath);
+                m_FileWriter = FileWriter::GetFileWriterForPath(m_ImageFilePath);
                 return m_FileWriter != nullptr;
             }
 
