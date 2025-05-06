@@ -64,16 +64,41 @@ namespace Gorfector
 
     class OptionRewriter final
     {
+        /**
+         * \brief Stores information about options, indexed by their option index.
+         */
         std::map<uint32_t, OptionInfos> m_OptionInfos;
 
     public:
+        /**
+         * \brief Dumps the options of a given SANE device.
+         * \param device Pointer to the SANE device whose options are to be dumped.
+         */
         static void Dump(SaneDevice *device);
 
+        /**
+         * \brief Constructs an `OptionRewriter` instance.
+         */
         OptionRewriter();
+
+        /**
+         * \brief Default destructor for the `OptionRewriter` class.
+         */
         ~OptionRewriter() = default;
 
+        /**
+         * \brief Loads option descriptions for a specific device based on its vendor and model.
+         * \param deviceVendor The vendor name of the device.
+         * \param deviceModel The model name of the device.
+         */
         void LoadOptionDescriptionFile(const char *deviceVendor, const char *deviceModel);
 
+        /**
+         * \brief Retrieves the title of an option.
+         * \param optionIndex The index of the option.
+         * \param defaultText The default title to return if no custom title is found.
+         * \return The title of the option, or the default text if no custom title is available.
+         */
         const char *GetTitle(int optionIndex, const char *defaultText)
         {
             const char *text = defaultText;
@@ -89,6 +114,12 @@ namespace Gorfector
             return gettext(text);
         }
 
+        /**
+         * \brief Retrieves the description of an option.
+         * \param optionIndex The index of the option.
+         * \param defaultText The default description to return if no custom description is found.
+         * \return The description of the option, or the default text if no custom description is available.
+         */
         const char *GetDescription(int optionIndex, const char *defaultText)
         {
             const char *text = defaultText;
@@ -104,6 +135,12 @@ namespace Gorfector
             return gettext(text);
         }
 
+        /**
+         * \brief Retrieves a rewritten string list for an option.
+         * \param optionIndex The index of the option.
+         * \param defaultList The default string list to use if no custom list is found.
+         * \param rewrittenStringList The output parameter to store the rewritten string list.
+         */
         void
         GetStringList(int optionIndex, const SANE_String_Const *defaultList, SANE_String_Const *rewrittenStringList)
         {
@@ -135,6 +172,12 @@ namespace Gorfector
             }
         }
 
+        /**
+         * \brief Checks if an option is display-only (read-only).
+         * \param optionIndex The index of the option.
+         * \param defaultValue The default value to return if no custom flag is found.
+         * \return True if the option is display-only, otherwise false.
+         */
         bool IsDisplayOnly(int optionIndex, bool defaultValue)
         {
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())
@@ -145,6 +188,12 @@ namespace Gorfector
             return defaultValue;
         }
 
+        /**
+         * \brief Checks if an option should be hidden.
+         * \param optionIndex The index of the option.
+         * \param defaultValue The default value to return if no custom flag is found.
+         * \return True if the option should be hidden, otherwise false.
+         */
         bool ShouldHide(int optionIndex, bool defaultValue)
         {
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())
@@ -163,6 +212,12 @@ namespace Gorfector
             return defaultValue;
         }
 
+        /**
+         * \brief Checks if an option is considered advanced.
+         * \param optionIndex The index of the option.
+         * \param defaultValue The default value to return if no custom flag is found.
+         * \return True if the option is advanced, otherwise false.
+         */
         bool IsAdvanced(int optionIndex, bool defaultValue)
         {
             if (auto it = m_OptionInfos.find(optionIndex); it != m_OptionInfos.end())

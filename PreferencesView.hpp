@@ -2,6 +2,7 @@
 
 #include <adwaita.h>
 
+#include "App.hpp"
 #include "Commands/DevMode/SetDumpSaneOptions.hpp"
 #include "Commands/SetJpegQuality.hpp"
 #include "Commands/SetPngCompressionLevel.hpp"
@@ -9,107 +10,120 @@
 #include "Commands/SetTiffDeflateLevel.hpp"
 #include "Commands/SetTiffJpegQuality.hpp"
 #include "ViewUpdateObserver.hpp"
-#include "Writers/JpegWriterState.hpp"
-#include "Writers/PngWriterState.hpp"
-#include "Writers/TiffWriterState.hpp"
+#include "ZooLib/CommandDispatcher.hpp"
 #include "ZooLib/Gettext.hpp"
+#include "ZooLib/SignalSupport.hpp"
 #include "ZooLib/View.hpp"
+
 
 namespace Gorfector
 {
+    class DeviceSelectorState;
+    class JpegWriterState;
+    class PngWriterState;
+    class TiffWriterState;
 
+    /**
+     * \class PreferencesView
+     * \brief Manages the preferences view of the application, including settings for image formats and developer
+     * options.
+     *
+     * This class is responsible for building and managing the preferences UI, handling user interactions,
+     * and dispatching commands to update the application state.
+     */
     class PreferencesView : public ZooLib::View
     {
+        /**
+         * \brief Pointer to the main application instance.
+         */
         App *m_App;
+
+        /**
+         * \brief Command dispatcher for handling user actions.
+         */
         ZooLib::CommandDispatcher m_Dispatcher;
 
+        /**
+         * \brief Array of preference pages in the UI.
+         */
         GtkWidget *m_PreferencesPages[3]{};
 
+        /**
+         * \brief Component managing TIFF writer state.
+         */
         TiffWriterState *m_TiffWriterStateComponent{};
+
+        /**
+         * \brief Component managing PNG writer state.
+         */
         PngWriterState *m_PngWriterStateComponent{};
+
+        /**
+         * \brief Component managing JPEG writer state.
+         */
         JpegWriterState *m_JpegWriterStateComponent{};
+
+        /**
+         * \brief Component managing device selector state.
+         */
         DeviceSelectorState *m_DeviceSelectorState;
 
+        /**
+         * \brief UI element for selecting TIFF compression algorithm.
+         */
         GtkWidget *m_TiffCompressionAlgo{};
+
+        /**
+         * \brief UI element for setting TIFF deflate compression level.
+         */
         GtkWidget *m_TiffDeflateCompressionLevel{};
+
+        /**
+         * \brief UI element for setting TIFF JPEG quality.
+         */
         GtkWidget *m_TiffJpegQuality{};
+
+        /**
+         * \brief UI element for setting PNG compression level.
+         */
         GtkWidget *m_PngCompressionLevel{};
+
+        /**
+         * \brief UI element for setting JPEG quality.
+         */
         GtkWidget *m_JpegQuality{};
 
+        /**
+         * \brief Observer for updating the view based on state changes.
+         */
         ViewUpdateObserver<PreferencesView, TiffWriterState, JpegWriterState, PngWriterState> *m_ViewUpdateObserver;
 
-        void BuildFileSettingsBox(GtkWidget *parent)
-        {
-            auto prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("TIFF Settings"));
-            adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
+        /**
+         * \brief Builds the file settings section of the preferences UI.
+         *
+         * \param parent The parent widget to which the settings box will be added.
+         */
+        void BuildFileSettingsBox(GtkWidget *parent);
 
-            m_TiffCompressionAlgo = adw_combo_row_new();
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffCompressionAlgo), _("Compression Algorithm"));
-            auto algos = TiffWriterState::GetCompressionAlgorithmNames();
-            adw_combo_row_set_model(
-                    ADW_COMBO_ROW(m_TiffCompressionAlgo), G_LIST_MODEL(gtk_string_list_new(algos.data())));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffCompressionAlgo);
-            ConnectGtkSignalWithParamSpecs(
-                    this, &PreferencesView::OnCompressionAlgoSelected, m_TiffCompressionAlgo, "notify::selected");
-
-            m_TiffDeflateCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
-            adw_preferences_row_set_title(
-                    ADW_PREFERENCES_ROW(m_TiffDeflateCompressionLevel), _("Deflate Compression Level"));
-            adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(m_TiffDeflateCompressionLevel),
-                    _("0 = no compression, 9 = maximum compression. Higher compression levels may slow down the "
-                      "scanning process."));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffDeflateCompressionLevel);
-            ConnectGtkSignalWithParamSpecs(
-                    this, &PreferencesView::OnValueChanged, m_TiffDeflateCompressionLevel, "notify::value");
-
-            m_TiffJpegQuality = adw_spin_row_new_with_range(0, 100, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffJpegQuality), _("JPEG Quality"));
-            adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(m_TiffJpegQuality), _("0 = lowest quality, 100 = maximum quality."));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffJpegQuality);
-            ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_TiffJpegQuality, "notify::value");
-
-            prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("PNG Settings"));
-            adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
-
-            m_PngCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_PngCompressionLevel), _("Compression Level"));
-            adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(m_PngCompressionLevel), _("0 = no compression, 9 = maximum compression. Higher "
-                                                             "compression levels may slow down the scanning process."));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_PngCompressionLevel);
-            ConnectGtkSignalWithParamSpecs(
-                    this, &PreferencesView::OnValueChanged, m_PngCompressionLevel, "notify::value");
-
-            prefGroup = adw_preferences_group_new();
-            adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("JPEG Settings"));
-            adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
-
-            m_JpegQuality = adw_spin_row_new_with_range(0, 100, 1);
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_JpegQuality), _("Quality"));
-            adw_action_row_set_subtitle(ADW_ACTION_ROW(m_JpegQuality), _("0 = lowest quality, 100 = maximum quality."));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_JpegQuality);
-            ConnectGtkSignalWithParamSpecs(this, &PreferencesView::OnValueChanged, m_JpegQuality, "notify::value");
-
-            m_Dispatcher.RegisterHandler(SetTiffCompression::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler(SetTiffDeflateLevel::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler(SetTiffJpegQuality::Execute, m_TiffWriterStateComponent);
-            m_Dispatcher.RegisterHandler(SetPngCompressionLevel::Execute, m_PngWriterStateComponent);
-            m_Dispatcher.RegisterHandler(SetJpegQuality::Execute, m_JpegWriterStateComponent);
-        }
-
+        /**
+         * \brief Handles the selection of a TIFF compression algorithm.
+         *
+         * \param widget The widget triggering the event.
+         */
         void OnCompressionAlgoSelected(GtkWidget *widget)
         {
-            auto selectedIndex = adw_combo_row_get_selected(ADW_COMBO_ROW(widget));
+            auto selectedIndex = static_cast<int>(adw_combo_row_get_selected(ADW_COMBO_ROW(widget)));
             m_Dispatcher.Dispatch(SetTiffCompression(selectedIndex));
         }
 
+        /**
+         * \brief Handles changes to spin row values in the preferences UI.
+         *
+         * \param widget The widget triggering the event.
+         */
         void OnValueChanged(GtkWidget *widget)
         {
-            auto value = adw_spin_row_get_value(ADW_SPIN_ROW(widget));
+            auto value = static_cast<int>(adw_spin_row_get_value(ADW_SPIN_ROW(widget)));
 
             if (widget == m_TiffDeflateCompressionLevel)
             {
@@ -129,6 +143,11 @@ namespace Gorfector
             }
         }
 
+        /**
+         * \brief Builds the developer settings section of the preferences UI.
+         *
+         * \param parent The parent widget to which the settings box will be added.
+         */
         void BuildDeveloperSettingsBox(GtkWidget *parent)
         {
             auto prefGroup = adw_preferences_group_new();
@@ -147,12 +166,27 @@ namespace Gorfector
             m_Dispatcher.RegisterHandler(SetDumpSaneOptions::Execute, m_DeviceSelectorState);
         }
 
+        /**
+         * \brief Handles changes to the "Dump SANE options" switch.
+         *
+         * \param widget The widget triggering the event.
+         */
         void OnDumpSaneOptionsChanged(GtkWidget *widget)
         {
             m_Dispatcher.Dispatch(SetDumpSaneOptions(adw_switch_row_get_active(ADW_SWITCH_ROW(widget))));
         }
 
     public:
+        /**
+         * \brief Constructs the PreferencesView.
+         *
+         * \param app The main application instance.
+         * \param parentDispatcher The parent command dispatcher.
+         * \param tiffWriterStateComponent The TIFF writer state component.
+         * \param pngWriterStateComponent The PNG writer state component.
+         * \param jpegWriterStateComponent The JPEG writer state component.
+         * \param deviceSelectorState The device selector state component.
+         */
         PreferencesView(
                 App *app, ZooLib::CommandDispatcher *parentDispatcher, TiffWriterState *tiffWriterStateComponent,
                 PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent,
@@ -189,6 +223,9 @@ namespace Gorfector
             app->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
         }
 
+        /**
+         * \brief Destructor for PreferencesView.
+         */
         ~PreferencesView() override
         {
             m_Dispatcher.UnregisterHandler<SetTiffCompression>();
@@ -201,11 +238,21 @@ namespace Gorfector
             delete m_ViewUpdateObserver;
         }
 
+        /**
+         * \brief Gets the root widget of the preferences view.
+         *
+         * \return The root widget.
+         */
         [[nodiscard]] GtkWidget *GetRootWidget() const override
         {
             return m_PreferencesPages[0];
         }
 
+        /**
+         * \brief Gets all preference pages in the view.
+         *
+         * \return A vector of preference page widgets.
+         */
         [[nodiscard]] std::vector<GtkWidget *> GetPreferencePages() const
         {
             auto numPages = sizeof(m_PreferencesPages) / sizeof(m_PreferencesPages[0]);
@@ -218,6 +265,11 @@ namespace Gorfector
             return pages;
         }
 
+        /**
+         * \brief Updates the preferences view based on the latest state versions.
+         *
+         * \param lastSeenVersions A vector of the last seen state versions.
+         */
         void Update(const std::vector<uint64_t> &lastSeenVersions) override
         {
             adw_combo_row_set_selected(

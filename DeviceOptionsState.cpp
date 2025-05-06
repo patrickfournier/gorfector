@@ -682,10 +682,10 @@ Gorfector::ScanAreaUnit Gorfector::DeviceOptionsState::GetScanAreaUnit() const
     auto optionValue = m_OptionValues[m_TLXIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "tl-x") == 0))
     {
-        return optionValue->GetUnit() == SANE_UNIT_DPI ? ScanAreaUnit::Pixels : ScanAreaUnit::Millimeters;
+        return optionValue->GetUnit() == SANE_UNIT_DPI ? ScanAreaUnit::e_Pixels : ScanAreaUnit::e_Millimeters;
     }
 
-    return ScanAreaUnit::Pixels;
+    return ScanAreaUnit::e_Pixels;
 }
 
 Gorfector::Rect<double> Gorfector::DeviceOptionsState::GetScanArea() const

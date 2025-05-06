@@ -1,7 +1,6 @@
 #pragma once
 
 #include "App.hpp"
-#include "Commands/ApplyPresetCommand.hpp"
 #include "Commands/CreatePresetCommand.hpp"
 #include "Commands/DeletePresetCommand.hpp"
 #include "Commands/RenamePresetCommand.hpp"

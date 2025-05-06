@@ -8,11 +8,11 @@ void Gorfector::PreviewScanProcess::SetPreviewOptions() const
     }
 
     SANE_Bool isPreview = SANE_TRUE;
-    m_Device->SetOptionValue(m_ScanOptions->PreviewIndex(), &isPreview, nullptr);
+    m_Device->SetOptionValue(m_ScanOptions->GetPreviewIndex(), &isPreview, nullptr);
 
-    if (m_ScanOptions->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->ResolutionIndex());
+        auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetResolutionIndex());
         SANE_Int resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
         if (resolutionDescription->constraint_type == SANE_CONSTRAINT_RANGE)
         {
@@ -37,12 +37,12 @@ void Gorfector::PreviewScanProcess::SetPreviewOptions() const
             resolution = resolutionDescription->constraint.word_list[nearestResolutionIndex];
         }
 
-        m_Device->SetOptionValue(m_ScanOptions->ResolutionIndex(), &resolution, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution, nullptr);
     }
 
-    if (m_ScanOptions->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBitDepthIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto depthDescription = m_Device->GetOptionDescriptor(m_ScanOptions->BitDepthIndex());
+        auto depthDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetBitDepthIndex());
 
         if (!(depthDescription->cap & SANE_CAP_INACTIVE))
         {
@@ -68,38 +68,38 @@ void Gorfector::PreviewScanProcess::SetPreviewOptions() const
                 }
             }
 
-            m_Device->SetOptionValue(m_ScanOptions->BitDepthIndex(), &depth, nullptr);
+            m_Device->SetOptionValue(m_ScanOptions->GetBitDepthIndex(), &depth, nullptr);
         }
     }
 
     auto maxScanArea = m_ScanOptions->GetMaxScanArea();
-    if (m_ScanOptions->TLXIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetTLXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->TLXIndex());
+        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->GetTLXIndex());
         double value = maxScanArea.x;
         SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
-        m_Device->SetOptionValue(m_ScanOptions->TLXIndex(), &fValue, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetTLXIndex(), &fValue, nullptr);
     }
-    if (m_ScanOptions->TLYIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetTLYIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->TLYIndex());
+        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->GetTLYIndex());
         double value = maxScanArea.y;
         SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
-        m_Device->SetOptionValue(m_ScanOptions->TLYIndex(), &fValue, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetTLYIndex(), &fValue, nullptr);
     }
-    if (m_ScanOptions->BRXIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBRXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->BRXIndex());
+        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->GetBRXIndex());
         double value = maxScanArea.x + maxScanArea.width;
         SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
-        m_Device->SetOptionValue(m_ScanOptions->BRXIndex(), &fValue, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetBRXIndex(), &fValue, nullptr);
     }
-    if (m_ScanOptions->BRYIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBRYIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->BRYIndex());
+        auto description = m_Device->GetOptionDescriptor(m_ScanOptions->GetBRYIndex());
         double value = maxScanArea.y + maxScanArea.height;
         SANE_Int fValue = description->type == SANE_TYPE_FIXED ? SANE_FIX(value) : static_cast<SANE_Int>(value);
-        m_Device->SetOptionValue(m_ScanOptions->BRYIndex(), &fValue, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetBRYIndex(), &fValue, nullptr);
     }
 }
 
@@ -111,60 +111,60 @@ void Gorfector::PreviewScanProcess::RestoreOptionsAfterPreview() const
     }
 
     SANE_Bool isPreview = SANE_FALSE;
-    m_Device->SetOptionValue(m_ScanOptions->PreviewIndex(), &isPreview, nullptr);
+    m_Device->SetOptionValue(m_ScanOptions->GetPreviewIndex(), &isPreview, nullptr);
 
-    if (m_ScanOptions->XResolutionIndex() == std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetXResolutionIndex() == std::numeric_limits<uint32_t>::max())
     {
-        if (m_ScanOptions->ResolutionIndex() != std::numeric_limits<uint32_t>::max())
+        if (m_ScanOptions->GetResolutionIndex() != std::numeric_limits<uint32_t>::max())
         {
-            auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->ResolutionIndex());
+            auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetResolutionIndex());
             int value = option->GetValue();
-            m_Device->SetOptionValue(m_ScanOptions->ResolutionIndex(), &value, nullptr);
+            m_Device->SetOptionValue(m_ScanOptions->GetResolutionIndex(), &value, nullptr);
         }
     }
     else
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->XResolutionIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetXResolutionIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->XResolutionIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetXResolutionIndex(), &value, nullptr);
     }
 
-    if (m_ScanOptions->YResolutionIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetYResolutionIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->YResolutionIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetYResolutionIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->YResolutionIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetYResolutionIndex(), &value, nullptr);
     }
 
-    if (m_ScanOptions->BitDepthIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBitDepthIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->BitDepthIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetBitDepthIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->BitDepthIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetBitDepthIndex(), &value, nullptr);
     }
 
-    if (m_ScanOptions->TLXIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetTLXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->TLXIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetTLXIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->TLXIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetTLXIndex(), &value, nullptr);
     }
-    if (m_ScanOptions->TLYIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetTLYIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->TLYIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetTLYIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->TLYIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetTLYIndex(), &value, nullptr);
     }
-    if (m_ScanOptions->BRXIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBRXIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->BRXIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetBRXIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->BRXIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetBRXIndex(), &value, nullptr);
     }
-    if (m_ScanOptions->BRYIndex() != std::numeric_limits<uint32_t>::max())
+    if (m_ScanOptions->GetBRYIndex() != std::numeric_limits<uint32_t>::max())
     {
-        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->BRYIndex());
+        auto option = m_ScanOptions->GetOption<int>(m_ScanOptions->GetBRYIndex());
         int value = option->GetValue();
-        m_Device->SetOptionValue(m_ScanOptions->BRYIndex(), &value, nullptr);
+        m_Device->SetOptionValue(m_ScanOptions->GetBRYIndex(), &value, nullptr);
     }
 }

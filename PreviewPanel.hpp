@@ -14,7 +14,6 @@ namespace Gorfector
 
     class PreviewPanel : public ZooLib::View
     {
-    private:
         constexpr static auto gdkModifiers = GDK_SHIFT_MASK | GDK_LOCK_MASK | GDK_CONTROL_MASK | GDK_ALT_MASK |
                                              GDK_SUPER_MASK | GDK_HYPER_MASK | GDK_META_MASK;
 

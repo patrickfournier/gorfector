@@ -20,10 +20,24 @@ namespace Gorfector
     class DeviceSelectorObserver;
     class PreviewPanel;
 
+    /**
+     * \class App
+     * \brief Main application class for the Gorfector application.
+     *
+     * This class manages the application's lifecycle, UI components, and interactions
+     * with the scanning devices and user interface.
+     */
     class App : public ZooLib::Application
     {
     public:
+        /**
+         * \brief The application ID used for identifying the application.
+         */
         static constexpr auto k_ApplicationId = "com.patrickfournier.gorfector";
+
+        /**
+         * \brief The application name displayed to the user.
+         */
         static constexpr auto k_ApplicationName = "Gorfector";
 
     private:
@@ -82,53 +96,85 @@ namespace Gorfector
             return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetCurrentDeviceName());
         }
 
+        void OnAddToScanListClicked(GtkWidget *);
+        void OnScanClicked(GtkWidget *widget);
         void OnCancelClicked(GtkWidget *);
-
         void OnPreviewClicked(GtkWidget *widget);
 
         bool CheckFileOutputOptions(const OutputOptionsState *scanOptions) const;
         void ScanToFile(const OutputOptionsState *scanOptions);
         void OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response);
         FileWriter *SelectFileWriter(const std::string &path) const;
-        void OnAddToScanListClicked(GtkWidget *);
-        void OnScanClicked(GtkWidget *widget);
         void StartScan(FileWriter *fileWriter, const std::filesystem::path &imageFilePath);
 
         [[nodiscard]] const std::string &GetSelectorDeviceName() const;
 
         [[nodiscard]] int GetSelectorSaneInitId() const;
 
-        void AboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
-        void SelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
-        void PreferenceDialog(GSimpleAction *action, GVariant *parameter);
+        void ShowAboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
+        void ShowSelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
+        void ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter);
 
     public:
+        /**
+         * \brief Constructor for the App class.
+         * \param argc The number of command-line arguments.
+         * \param argv The array of command-line arguments.
+         */
         App(int argc, char **argv);
 
+        /**
+         * \brief Destructor for the App class.
+         */
         ~App() override;
 
+        /**
+         * \brief Retrieves the application ID.
+         * \return The application ID as a string.
+         */
         [[nodiscard]] std::string GetApplicationId() const override
         {
             return k_ApplicationId;
         }
 
+        /**
+         * \brief Retrieves the application name.
+         * \return The application name as a string.
+         */
         [[nodiscard]] std::string GetApplicationName() const override
         {
             return k_ApplicationName;
         }
 
+        /**
+         * \brief Retrieves the application state.
+         * \return A pointer to the AppState object.
+         */
         [[nodiscard]] AppState *GetAppState()
         {
             return m_AppState;
         }
 
+        /**
+         * \brief Retrieves the device selector state.
+         * \return A pointer to the DeviceSelectorState object.
+         */
         [[nodiscard]] const DeviceSelectorState *GetDeviceSelectorState() const
         {
             return m_DeviceSelectorState;
         }
 
+        /**
+         * \brief Updates the application UI from the state components.
+         * \param lastSeenVersions A vector of last seen version identifiers for the state components.
+         */
         void Update(const std::vector<uint64_t> &lastSeenVersions);
 
+        /**
+         * \brief Retrieves a SaneDevice by its name.
+         * \param deviceName The name of the device.
+         * \return A pointer to the SaneDevice object.
+         */
         [[nodiscard]] SaneDevice *GetDeviceByName(const std::string &deviceName) const
         {
             if (m_DeviceSelectorState == nullptr)
@@ -139,9 +185,22 @@ namespace Gorfector
             return m_DeviceSelectorState->GetDeviceByName(deviceName);
         }
 
+        /**
+         * \brief Retrieves the device options state.
+         * \return A pointer to the DeviceOptionsState object.
+         */
         [[nodiscard]] DeviceOptionsState *GetDeviceOptions() const;
+
+        /**
+         * \brief Retrieves the output options state.
+         * \return A pointer to the OutputOptionsState object.
+         */
         [[nodiscard]] OutputOptionsState *GetOutputOptions();
 
+        /**
+         * \brief Retrieves the preview panel.
+         * \return A pointer to the PreviewPanel object.
+         */
         [[nodiscard]] PreviewPanel *GetPreviewPanel() const
         {
             return m_PreviewPanel;

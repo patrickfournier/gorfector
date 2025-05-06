@@ -19,12 +19,25 @@ namespace Gorfector
         TView *m_View{};
 
     protected:
+        /**
+         * \brief Updates the view by calling its `Update` method with the observed component versions.
+         *
+         * This method is called when a change in the observed state components is detected.
+         * It ensures that the view is updated to reflect the latest state.
+         */
         void UpdateImplementation() override
         {
             m_View->Update(m_ObservedComponentVersions);
         }
 
     public:
+        /**
+         * \brief Constructs a `ViewUpdateObserver` instance.
+         * \param view Pointer to the view to be updated.
+         * \param observedStateComponents Pointers to the state components to be observed.
+         *
+         * Initializes the observer with the given view and state components to monitor.
+         */
         explicit ViewUpdateObserver(TView *view, const TStates *...observedStateComponents)
             : Observer(
                       {

@@ -75,6 +75,7 @@ set(SOURCE_FILES
         ScanListPanel.cpp
         ScanOptionsPanel.cpp
         ScanProcess.cpp
+        PreferencesView.cpp
 )
 
 set(GETTEXT_SOURCE_FILES

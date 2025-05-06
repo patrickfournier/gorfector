@@ -447,29 +447,29 @@ std::vector<uint32_t> Gorfector::ScanOptionsPanel::AddCommonOptions()
     gtk_widget_set_margin_top(optionGroup, 10);
     AddWidgetToParent(m_PageBasic, optionGroup);
 
-    if (m_DeviceOptions->XResolutionIndex() != DeviceOptionsState::k_InvalidIndex)
+    if (m_DeviceOptions->GetXResolutionIndex() != DeviceOptionsState::k_InvalidIndex)
     {
-        AddScannerOptionRow(m_DeviceOptions->XResolutionIndex(), optionGroup, nullptr, false, false);
-        AddScannerOptionRow(m_DeviceOptions->YResolutionIndex(), optionGroup, nullptr, false, false);
+        AddScannerOptionRow(m_DeviceOptions->GetXResolutionIndex(), optionGroup, nullptr, false, false);
+        AddScannerOptionRow(m_DeviceOptions->GetYResolutionIndex(), optionGroup, nullptr, false, false);
     }
     else
     {
-        AddScannerOptionRow(m_DeviceOptions->ResolutionIndex(), optionGroup, nullptr, false, false);
+        AddScannerOptionRow(m_DeviceOptions->GetResolutionIndex(), optionGroup, nullptr, false, false);
     }
 
     auto *expander = adw_expander_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(expander), _("Scan Area"));
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(optionGroup), expander);
 
-    AddScannerOptionRow(m_DeviceOptions->TLXIndex(), expander, nullptr, false, false);
-    AddScannerOptionRow(m_DeviceOptions->TLYIndex(), expander, nullptr, false, false);
-    AddScannerOptionRow(m_DeviceOptions->BRXIndex(), expander, nullptr, false, false);
-    AddScannerOptionRow(m_DeviceOptions->BRYIndex(), expander, nullptr, false, false);
+    AddScannerOptionRow(m_DeviceOptions->GetTLXIndex(), expander, nullptr, false, false);
+    AddScannerOptionRow(m_DeviceOptions->GetTLYIndex(), expander, nullptr, false, false);
+    AddScannerOptionRow(m_DeviceOptions->GetBRXIndex(), expander, nullptr, false, false);
+    AddScannerOptionRow(m_DeviceOptions->GetBRYIndex(), expander, nullptr, false, false);
 
-    return std::vector{m_DeviceOptions->ResolutionIndex(),  m_DeviceOptions->XResolutionIndex(),
-                       m_DeviceOptions->YResolutionIndex(), m_DeviceOptions->TLXIndex(),
-                       m_DeviceOptions->TLYIndex(),         m_DeviceOptions->BRXIndex(),
-                       m_DeviceOptions->BRYIndex()};
+    return std::vector{m_DeviceOptions->GetResolutionIndex(),  m_DeviceOptions->GetXResolutionIndex(),
+                       m_DeviceOptions->GetYResolutionIndex(), m_DeviceOptions->GetTLXIndex(),
+                       m_DeviceOptions->GetTLYIndex(),         m_DeviceOptions->GetBRXIndex(),
+                       m_DeviceOptions->GetBRYIndex()};
 }
 
 void Gorfector::ScanOptionsPanel::AddOtherScannerOptions(const std::vector<uint32_t> &excludeIndices)

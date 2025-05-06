@@ -1,8 +1,7 @@
 #pragma once
 
+#include <cstring>
 #include <sane/sane.h>
-#include <stdint.h>
-#include <string.h>
 
 #include "SaneException.hpp"
 
@@ -16,7 +15,6 @@ namespace Gorfector
     public:
         explicit SaneDevice(const SANE_Device *device)
             : m_Device(device)
-            , m_Handle(nullptr)
         {
         }
 

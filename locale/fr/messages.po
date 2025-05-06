@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-05 10:21-0400\n"
+"POT-Creation-Date: 2025-05-06 11:10-0400\n"
 "PO-Revision-Date: 2025-05-03 23:01-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -48,11 +48,11 @@ msgstr " 6 "
 msgid "%%"
 msgstr "%%"
 
-#: PreferencesView.hpp:70 PreferencesView.hpp:93
+#: PreferencesView.cpp:29 PreferencesView.cpp:51
 msgid "0 = lowest quality, 100 = maximum quality."
 msgstr "0 = qualité la plus basse, 100 = qualité maximale."
 
-#: PreferencesView.hpp:61 PreferencesView.hpp:81
+#: PreferencesView.cpp:21 PreferencesView.cpp:40
 msgid ""
 "0 = no compression, 9 = maximum compression. Higher compression levels may "
 "slow down the scanning process."
@@ -250,7 +250,7 @@ msgstr "Calibrer"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: App.cpp:174 OutputOptionsState.hpp:33
+#: App.cpp:174 OutputOptionsState.hpp:48
 msgid "Cancel Scan"
 msgstr "Annuler la numérisation"
 
@@ -286,11 +286,11 @@ msgstr "Correction des couleurs"
 msgid "Common Options"
 msgstr "Options communes"
 
-#: PreferencesView.hpp:48
+#: PreferencesView.cpp:10
 msgid "Compression Algorithm"
 msgstr "Algorithme de compression"
 
-#: PreferencesView.hpp:79
+#: PreferencesView.cpp:38
 msgid "Compression Level"
 msgstr "Niveau de compression"
 
@@ -342,7 +342,7 @@ msgstr "PPP"
 msgid "Defines the zoom factor the scanner will use"
 msgstr "Définit le facteur de zoom que le scanner utilisera"
 
-#: PreferencesView.hpp:58
+#: PreferencesView.cpp:18
 msgid "Deflate Compression Level"
 msgstr "Niveau de compression Deflate"
 
@@ -384,7 +384,7 @@ msgstr ""
 msgid "Determines the speed at which the scan proceeds."
 msgstr "Détermine la vitesse de numérisation."
 
-#: PreferencesView.hpp:182
+#: PreferencesView.hpp:215
 msgid "Developer"
 msgstr "Développeur"
 
@@ -404,7 +404,7 @@ msgstr "Sensibilité de détection des doubles feuilles"
 msgid "Dropout"
 msgstr "Dropout"
 
-#: PreferencesView.hpp:139
+#: PreferencesView.hpp:157
 msgid "Dump SANE options"
 msgstr "Imprimer les options SANE"
 
@@ -424,7 +424,7 @@ msgstr "Éjecter le document après numérisation"
 msgid "Eject the sheet in the ADF"
 msgstr "Éjecter la feuille dans l'AAD"
 
-#: OutputOptionsState.hpp:25
+#: OutputOptionsState.hpp:37
 msgid "Email"
 msgstr "Courriel"
 
@@ -452,7 +452,7 @@ msgstr "État SANE étendu"
 msgid "Failed to create file: "
 msgstr "Échec de la création du fichier: "
 
-#: OutputOptionsState.hpp:25
+#: OutputOptionsState.hpp:37
 msgid "File"
 msgstr "Fichier"
 
@@ -504,7 +504,7 @@ msgstr "Table de correction gamma pour la bande verte."
 msgid "Gamma-correction table for the red band."
 msgstr "Table de correction gamma pour la bande rouge."
 
-#: PreferencesView.hpp:135 PreferencesView.hpp:169
+#: PreferencesView.hpp:153 PreferencesView.hpp:202
 msgid "General"
 msgstr "Général"
 
@@ -552,7 +552,7 @@ msgstr "Résolution horizontale"
 msgid "If File Exists"
 msgstr "Si le fichier existe"
 
-#: PreferencesView.hpp:174
+#: PreferencesView.hpp:207
 msgid "Image Formats"
 msgstr "Formats d'image"
 
@@ -560,7 +560,7 @@ msgstr "Formats d'image"
 msgid "Include Network Scanners"
 msgstr "Inclure les scanners réseau"
 
-#: OutputOptionsState.hpp:33
+#: OutputOptionsState.hpp:48
 msgid "Increase Counter"
 msgstr "Incrémenter"
 
@@ -597,11 +597,11 @@ msgstr "Inspecter le préréglage"
 msgid "Inspect this preset"
 msgstr "Inspecter ce préréglage"
 
-#: PreferencesView.hpp:68
+#: PreferencesView.cpp:28
 msgid "JPEG Quality"
 msgstr "Qualité JPEG"
 
-#: PreferencesView.hpp:88
+#: PreferencesView.cpp:46
 msgid "JPEG Settings"
 msgstr "Paramètres JPEG"
 
@@ -681,11 +681,11 @@ msgstr "Sortie"
 msgid "Output Settings"
 msgstr "Paramètres de sortie"
 
-#: App.cpp:581 OutputOptionsState.hpp:33
+#: App.cpp:581 OutputOptionsState.hpp:48
 msgid "Overwrite"
 msgstr "Écraser"
 
-#: PreferencesView.hpp:75
+#: PreferencesView.cpp:34
 msgid "PNG Settings"
 msgstr "Paramètres PNG"
 
@@ -713,7 +713,7 @@ msgstr "Préréglages"
 msgid "Preview"
 msgstr "Aperçu"
 
-#: OutputOptionsState.hpp:25
+#: OutputOptionsState.hpp:37
 msgid "Printer"
 msgstr "Imprimante"
 
@@ -721,7 +721,7 @@ msgstr "Imprimante"
 msgid "Progress: "
 msgstr "Progrès: "
 
-#: PreferencesView.hpp:92
+#: PreferencesView.cpp:50
 msgid "Quality"
 msgstr "Qualité"
 
@@ -951,7 +951,7 @@ msgstr ""
 msgid "Speed"
 msgstr "Vitesse"
 
-#: PreferencesView.hpp:44
+#: PreferencesView.cpp:6
 msgid "TIFF Settings"
 msgstr "Paramètres TIFF"
 
@@ -1034,7 +1034,7 @@ msgstr "Résolution verticale"
 msgid "Wait for Button"
 msgstr "Attendre le bouton"
 
-#: PreferencesView.hpp:141
+#: PreferencesView.hpp:159
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."

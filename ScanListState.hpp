@@ -156,7 +156,8 @@ namespace Gorfector
                     itemId = lastItem[k_ItemIdKey].get<int>() + 1;
                 }
 
-                std::string scanAreaUnits = deviceOptions->GetScanAreaUnit() == ScanAreaUnit::Millimeters ? "mm" : "px";
+                std::string scanAreaUnits =
+                        deviceOptions->GetScanAreaUnit() == ScanAreaUnit::e_Millimeters ? "mm" : "px";
                 auto scanAreaHuman = deviceOptions->GetScanArea();
                 auto scanItem = nlohmann::json{
                         {k_ItemIdKey, itemId},

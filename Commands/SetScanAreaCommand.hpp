@@ -40,10 +40,12 @@ namespace Gorfector
         static void Execute(const SetScanAreaCommand &command, DeviceOptionsState *deviceOptionState)
         {
             auto updater = DeviceOptionsState::Updater(deviceOptionState);
-            updater.SetOptionValue(deviceOptionState->TLXIndex(), 0, command.m_ScanArea.x);
-            updater.SetOptionValue(deviceOptionState->TLYIndex(), 0, command.m_ScanArea.y);
-            updater.SetOptionValue(deviceOptionState->BRXIndex(), 0, command.m_ScanArea.x + command.m_ScanArea.width);
-            updater.SetOptionValue(deviceOptionState->BRYIndex(), 0, command.m_ScanArea.y + command.m_ScanArea.height);
+            updater.SetOptionValue(deviceOptionState->GetTLXIndex(), 0, command.m_ScanArea.x);
+            updater.SetOptionValue(deviceOptionState->GetTLYIndex(), 0, command.m_ScanArea.y);
+            updater.SetOptionValue(
+                    deviceOptionState->GetBRXIndex(), 0, command.m_ScanArea.x + command.m_ScanArea.width);
+            updater.SetOptionValue(
+                    deviceOptionState->GetBRYIndex(), 0, command.m_ScanArea.y + command.m_ScanArea.height);
         }
     };
 }

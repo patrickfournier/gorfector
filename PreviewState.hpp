@@ -7,7 +7,6 @@
 #include "ZooLib/ChangesetManager.hpp"
 #include "ZooLib/StateComponent.hpp"
 
-
 namespace Gorfector
 {
     class PreviewStateChangeset : public ZooLib::ChangesetBase

@@ -261,18 +261,18 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
             ->AddMenuItem(_("About..."), "app.about")
             ->EndSection();
 
-    BindMethodToAction<App>("select_device", &App::SelectDeviceDialog, this);
+    BindMethodToAction<App>("select_device", &App::ShowSelectDeviceDialog, this);
     BindMethodToAction<Application>("quit", &Application::Quit, this);
     BindCommandToToggleAction<ToggleUseScanList>("scanlist", m_AppState->GetUseScanList(), m_AppState);
-    BindMethodToAction<App>("preferences", &App::PreferenceDialog, this);
-    BindMethodToAction<App>("about", &App::AboutDialog, this);
+    BindMethodToAction<App>("preferences", &App::ShowPreferenceDialog, this);
+    BindMethodToAction<App>("about", &App::ShowAboutDialog, this);
 
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
     SetAcceleratorForAction("app.undo", {"<Ctrl>Z"});
     SetAcceleratorForAction("app.redo", {"<Ctrl><Shift>Z"});
 }
 
-void Gorfector::App::SelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::ShowSelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto deviceSelector = ZooLib::View::Create<DeviceSelector>(&m_Dispatcher, this, m_DeviceSelectorState);
     auto dialog = adw_dialog_new();
@@ -288,7 +288,7 @@ void Gorfector::App::SelectDeviceDialog(GSimpleAction *action, GVariant *paramet
     adw_dialog_present(dialog, m_MainWindow);
 }
 
-void Gorfector::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialog = adw_preferences_dialog_new();
     auto preferencePages = ZooLib::View::Create<PreferencesView>(
@@ -304,7 +304,7 @@ void Gorfector::App::PreferenceDialog(GSimpleAction *action, GVariant *parameter
     adw_dialog_present(dialog, m_MainWindow);
 }
 
-void Gorfector::App::AboutDialog(GSimpleAction *action, GVariant *parameter)
+void Gorfector::App::ShowAboutDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialogWindow = adw_about_dialog_new();
     adw_about_dialog_set_application_icon(
