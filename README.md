@@ -1,4 +1,7 @@
 # Gorfector
+
+Gnome Observable/Organic Record Freight Extractor
+
 Image scanning software
 
 # Development
@@ -7,6 +10,7 @@ Image scanning software
 
 1. Clone the repository
 2. Configure git to use the local hooks directory:
+
 ```
 git config --local core.hooksPath .githooks/
 ```
