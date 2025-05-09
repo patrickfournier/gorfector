@@ -76,6 +76,9 @@ namespace ZooLib
          */
         std::filesystem::path m_TempDirectoryPath;
 
+        std::filesystem::path m_UserConfigDirectoryPath;
+        std::filesystem::path m_SystemConfigDirectoryPath;
+
         /**
          * \brief Indicates whether the application is running in test mode.
          *
@@ -387,6 +390,47 @@ namespace ZooLib
             }
 
             return m_TempDirectoryPath;
+        }
+
+        /**
+         * \brief Gets the user-specific configuration directory path.
+         *
+         * This method retrieves the path to the user's configuration directory for this application.
+         * The path is lazily initialized on first call and created if it doesn't exist.
+         * It's typically located at ~/.config/[application-id]/ on Linux systems.
+         *
+         * \return A reference to the user configuration directory path.
+         */
+        [[nodiscard]] const std::filesystem::path &GetUserConfigDirectoryPath()
+        {
+            if (m_UserConfigDirectoryPath.empty())
+            {
+                m_UserConfigDirectoryPath = std::filesystem::path(g_get_user_config_dir()) / GetApplicationId();
+                if (!std::filesystem::exists(m_UserConfigDirectoryPath))
+                {
+                    std::filesystem::create_directories(m_UserConfigDirectoryPath);
+                }
+            }
+
+            return m_UserConfigDirectoryPath;
+        }
+
+        /**
+         * \brief Gets the system-wide configuration directory path.
+         *
+         * This method retrieves the path to the system-wide configuration directory for this application.
+         * The path is lazily initialized on first call.
+         *
+         * \return A reference to the system-wide configuration directory path.
+         */
+        [[nodiscard]] const std::filesystem::path &GetSystemConfigDirectoryPath()
+        {
+            if (m_SystemConfigDirectoryPath.empty())
+            {
+                m_SystemConfigDirectoryPath = std::filesystem::current_path();
+            }
+
+            return m_SystemConfigDirectoryPath;
         }
 
         /**

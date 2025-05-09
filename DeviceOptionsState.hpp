@@ -87,7 +87,7 @@ namespace Gorfector
          *
          * \return True if all options should be rebuilt, false otherwise.
          */
-        [[nodiscard]] bool RebuildAll() const
+        [[nodiscard]] bool ShouldRebuildOptions() const
         {
             return m_ReloadOptions;
         }

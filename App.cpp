@@ -39,11 +39,7 @@ Gorfector::App::App(int argc, char **argv, bool testMode)
         throw std::runtime_error("Failed to initialize SANE");
     }
 
-    auto prefDir = std::filesystem::path(g_get_user_config_dir()) / k_ApplicationId;
-    if (!std::filesystem::exists(prefDir))
-    {
-        std::filesystem::create_directories(prefDir);
-    }
+    auto prefDir = GetUserConfigDirectoryPath();
     auto prefFilePath = prefDir / "preferences.json";
     m_State.SetPreferencesFilePath(prefFilePath);
 

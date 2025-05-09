@@ -78,8 +78,10 @@ namespace Gorfector
 
         /**
          * \brief Constructs an `OptionRewriter` instance.
+         * \param systemConfigPath Path to system config files.
+         * \param userConfigPath Path to user config files.
          */
-        OptionRewriter();
+        OptionRewriter(const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath);
 
         /**
          * \brief Default destructor for the `OptionRewriter` class.
@@ -88,10 +90,14 @@ namespace Gorfector
 
         /**
          * \brief Loads option descriptions for a specific device based on its vendor and model.
+         * \param systemConfigPath Path to system configuration files.
+         * \param userConfigPath Path to user configuration files.
          * \param deviceVendor The vendor name of the device.
          * \param deviceModel The model name of the device.
          */
-        void LoadOptionDescriptionFile(const char *deviceVendor, const char *deviceModel);
+        void LoadOptionDescriptionFile(
+                const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath,
+                const char *deviceVendor, const char *deviceModel);
 
         /**
          * \brief Retrieves the title of an option.

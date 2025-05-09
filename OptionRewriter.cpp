@@ -174,10 +174,11 @@ void UpdateIndexRecursively(
     }
 }
 
-Gorfector::OptionRewriter::OptionRewriter()
+Gorfector::OptionRewriter::OptionRewriter(
+        const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath)
 {
-    auto baseDirectory = std::filesystem::current_path() / "../scanners";
-    auto prefDirectory = std::filesystem::path(g_get_user_config_dir()) / App::k_ApplicationId / "scanners";
+    auto baseDirectory = systemConfigPath / "scanners";
+    auto prefDirectory = userConfigPath / "scanners";
 
     if (!std::filesystem::exists(prefDirectory))
     {
@@ -214,12 +215,14 @@ Gorfector::OptionRewriter::OptionRewriter()
     newIndexFile.close();
 }
 
-void Gorfector::OptionRewriter::LoadOptionDescriptionFile(const char *deviceVendor, const char *deviceModel)
+void Gorfector::OptionRewriter::LoadOptionDescriptionFile(
+        const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath,
+        const char *deviceVendor, const char *deviceModel)
 {
     m_OptionInfos.clear();
 
-    auto baseDirectory = std::filesystem::current_path() / "../scanners";
-    auto prefDirectory = std::filesystem::path(g_get_user_config_dir()) / App::k_ApplicationId / "scanners";
+    auto baseDirectory = systemConfigPath / "scanners";
+    auto prefDirectory = userConfigPath / "scanners";
     auto indexFilePath = prefDirectory / "index.json";
 
     nlohmann::json index;

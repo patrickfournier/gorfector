@@ -323,11 +323,13 @@ Gorfector::ScanOptionsPanel::ScanOptionsPanel(
     if (m_DeviceName.empty())
         return;
 
-    m_Rewriter = new OptionRewriter();
+    m_Rewriter = new OptionRewriter(m_App->GetSystemConfigDirectoryPath(), m_App->GetUserConfigDirectoryPath());
     auto device = m_App->GetDeviceByName(m_DeviceName);
     if (device != nullptr)
     {
-        m_Rewriter->LoadOptionDescriptionFile(device->GetVendor(), device->GetModel());
+        m_Rewriter->LoadOptionDescriptionFile(
+                m_App->GetSystemConfigDirectoryPath(), m_App->GetUserConfigDirectoryPath(), device->GetVendor(),
+                device->GetModel());
     }
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);
@@ -1138,7 +1140,7 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
 
     if ((firstChangesetVersion != std::numeric_limits<uint64_t>::max() &&
          firstChangesetVersion > lastSeenVersions[0]) ||
-        changeset->RebuildAll())
+        changeset->ShouldRebuildOptions())
     {
         BuildUI();
     }
