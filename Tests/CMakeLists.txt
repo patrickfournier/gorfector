@@ -36,4 +36,4 @@ target_link_libraries(gorfector_standalonetests PRIVATE PkgConfig::ADW)
 target_link_libraries(gorfector_standalonetests PRIVATE "${XDO_LIB}")
 
 include(GoogleTest)
-gtest_discover_tests(gorfector_standalonetests)
+gtest_discover_tests(gorfector_standalonetests DISCOVERY_MODE PRE_TEST)
