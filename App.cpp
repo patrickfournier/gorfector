@@ -29,7 +29,8 @@
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
-Gorfector::App::App(int argc, char **argv)
+Gorfector::App::App(int argc, char **argv, bool testMode)
+    : Application(testMode)
 {
     SANE_Int saneVersion;
     if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
@@ -187,7 +188,7 @@ GtkWidget *Gorfector::App::BuildUI()
     gtk_widget_set_valign(bottomAlignedSection, GTK_ALIGN_END);
     gtk_box_append(GTK_BOX(m_SettingsBox), bottomAlignedSection);
 
-    m_PresetPanel = ZooLib::View::Create<PresetPanel>(&m_Dispatcher, this);
+    m_PresetPanel = PresetPanel::Create(&m_Dispatcher, this);
     auto presetsBox = m_PresetPanel->GetRootWidget();
     gtk_widget_set_margin_bottom(presetsBox, 0);
     gtk_widget_set_margin_top(presetsBox, 0);
@@ -196,7 +197,7 @@ GtkWidget *Gorfector::App::BuildUI()
     gtk_box_append(GTK_BOX(bottomAlignedSection), presetsBox);
     gtk_widget_set_hexpand(presetsBox, true);
 
-    m_PreviewPanel = ZooLib::View::Create<PreviewPanel>(&m_Dispatcher, this);
+    m_PreviewPanel = PreviewPanel::Create(&m_Dispatcher, this);
     auto previewBox = m_PreviewPanel->GetRootWidget();
     gtk_widget_set_margin_bottom(previewBox, 10);
     gtk_widget_set_margin_top(previewBox, 0);
@@ -234,7 +235,7 @@ void Gorfector::App::BuildScanListUI()
     gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
     gtk_paned_set_end_child(GTK_PANED(m_RightPaned), clamp);
 
-    m_ScanListPanel = ZooLib::View::Create<ScanListPanel>(&m_Dispatcher, this);
+    m_ScanListPanel = ScanListPanel::Create(&m_Dispatcher, this);
     auto scanListBox = m_ScanListPanel->GetRootWidget();
     adw_clamp_set_child(ADW_CLAMP(clamp), scanListBox);
 
@@ -274,7 +275,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
 
 void Gorfector::App::ShowSelectDeviceDialog(GSimpleAction *action, GVariant *parameter)
 {
-    auto deviceSelector = ZooLib::View::Create<DeviceSelector>(&m_Dispatcher, this, m_DeviceSelectorState);
+    auto deviceSelector = DeviceSelector::Create(&m_Dispatcher, this, m_DeviceSelectorState);
     auto dialog = adw_dialog_new();
     adw_dialog_set_title(dialog, _("Select Device"));
     adw_dialog_set_follows_content_size(dialog, true);
@@ -291,7 +292,7 @@ void Gorfector::App::ShowSelectDeviceDialog(GSimpleAction *action, GVariant *par
 void Gorfector::App::ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialog = adw_preferences_dialog_new();
-    auto preferencePages = ZooLib::View::Create<PreferencesView>(
+    auto preferencePages = PreferencesView::Create(
             this, &m_Dispatcher, FileWriter::GetFormatByType<TiffWriter>()->GetStateComponent(),
             FileWriter::GetFormatByType<PngWriter>()->GetStateComponent(),
             FileWriter::GetFormatByType<JpegWriter>()->GetStateComponent(), m_DeviceSelectorState);
@@ -365,8 +366,8 @@ void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 
     if (m_ScanOptionsPanel == nullptr && m_SettingsBox != nullptr && !GetSelectorDeviceName().empty())
     {
-        m_ScanOptionsPanel = ZooLib::View::Create<ScanOptionsPanel>(
-                GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
+        m_ScanOptionsPanel =
+                ScanOptionsPanel::Create(GetSelectorSaneInitId(), GetSelectorDeviceName(), &m_Dispatcher, this);
         gtk_box_prepend(GTK_BOX(m_SettingsBox), m_ScanOptionsPanel->GetRootWidget());
         m_Dispatcher.RegisterHandler(SetScanAreaCommand::Execute, m_ScanOptionsPanel->GetDeviceOptionsState());
 

@@ -65,6 +65,8 @@ namespace Gorfector
         Rect<double> m_OriginalScanArea{};
         Point<double> m_LastMousePosition{};
 
+        PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app);
+
         void OnPreviewDragBegin(GtkGestureDrag *dragController);
         void OnPreviewDragUpdate(GtkGestureDrag *dragController);
         void OnPreviewDragEnd(GtkGestureDrag *dragController);
@@ -84,7 +86,23 @@ namespace Gorfector
         void Redraw();
 
     public:
-        PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app);
+        /**
+         * \brief Creates a new instance of a `PreviewPanel` class.
+         *
+         * This static method allocates and initializes a new `PreviewPanel` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
+         *
+         * \param parentDispatcher Pointer to the parent command dispatcher.
+         * \param app Pointer to the application instance.
+         * \return A pointer to the newly created `PreviewPanel` instance.
+         */
+        static PreviewPanel *Create(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        {
+            auto view = new PreviewPanel(parentDispatcher, app);
+            view->PostCreateView();
+            return view;
+        }
+
         ~PreviewPanel() override;
 
         GtkWidget *GetRootWidget() const override

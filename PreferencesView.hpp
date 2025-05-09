@@ -99,6 +99,52 @@ namespace Gorfector
         ViewUpdateObserver<PreferencesView, TiffWriterState, JpegWriterState, PngWriterState> *m_ViewUpdateObserver;
 
         /**
+         * \brief Constructs the PreferencesView.
+         *
+         * \param app The main application instance.
+         * \param parentDispatcher The parent command dispatcher.
+         * \param tiffWriterStateComponent The TIFF writer state component.
+         * \param pngWriterStateComponent The PNG writer state component.
+         * \param jpegWriterStateComponent The JPEG writer state component.
+         * \param deviceSelectorState The device selector state component.
+         */
+        PreferencesView(
+                App *app, ZooLib::CommandDispatcher *parentDispatcher, TiffWriterState *tiffWriterStateComponent,
+                PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent,
+                DeviceSelectorState *deviceSelectorState)
+            : m_App(app)
+            , m_Dispatcher(parentDispatcher)
+            , m_TiffWriterStateComponent(tiffWriterStateComponent)
+            , m_PngWriterStateComponent(pngWriterStateComponent)
+            , m_JpegWriterStateComponent(jpegWriterStateComponent)
+            , m_DeviceSelectorState(deviceSelectorState)
+        {
+            auto i = 0;
+            m_PreferencesPages[i] = adw_preferences_page_new();
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("General"));
+            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "configure-symbolic");
+
+            ++i;
+            m_PreferencesPages[i] = adw_preferences_page_new();
+            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Image Formats"));
+            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "emblem-photos-symbolic");
+            BuildFileSettingsBox(m_PreferencesPages[i]);
+
+            if (m_App->GetAppState()->IsDeveloperMode())
+            {
+                ++i;
+                m_PreferencesPages[i] = adw_preferences_page_new();
+                adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Developer"));
+                adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "diagnostics-symbolic");
+                BuildDeveloperSettingsBox(m_PreferencesPages[i]);
+            }
+
+            m_ViewUpdateObserver = new ViewUpdateObserver(
+                    this, m_TiffWriterStateComponent, m_JpegWriterStateComponent, m_PngWriterStateComponent);
+            app->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
+        }
+
+        /**
          * \brief Builds the file settings section of the preferences UI.
          *
          * \param parent The parent widget to which the settings box will be added.
@@ -178,7 +224,10 @@ namespace Gorfector
 
     public:
         /**
-         * \brief Constructs the PreferencesView.
+         * \brief Creates a new instance of a `PreferencesView` class.
+         *
+         * This static method allocates and initializes a new `PreferencesView` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
          *
          * \param app The main application instance.
          * \param parentDispatcher The parent command dispatcher.
@@ -186,41 +235,18 @@ namespace Gorfector
          * \param pngWriterStateComponent The PNG writer state component.
          * \param jpegWriterStateComponent The JPEG writer state component.
          * \param deviceSelectorState The device selector state component.
+         * \return A pointer to the newly created `PreferencesView` instance.
          */
-        PreferencesView(
-                App *app, ZooLib::CommandDispatcher *parentDispatcher, TiffWriterState *tiffWriterStateComponent,
-                PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent,
-                DeviceSelectorState *deviceSelectorState)
-            : m_App(app)
-            , m_Dispatcher(parentDispatcher)
-            , m_TiffWriterStateComponent(tiffWriterStateComponent)
-            , m_PngWriterStateComponent(pngWriterStateComponent)
-            , m_JpegWriterStateComponent(jpegWriterStateComponent)
-            , m_DeviceSelectorState(deviceSelectorState)
+        static PreferencesView *
+        Create(App *app, ZooLib::CommandDispatcher *parentDispatcher, TiffWriterState *tiffWriterStateComponent,
+               PngWriterState *pngWriterStateComponent, JpegWriterState *jpegWriterStateComponent,
+               DeviceSelectorState *deviceSelectorState)
         {
-            auto i = 0;
-            m_PreferencesPages[i] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("General"));
-            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "configure-symbolic");
-
-            ++i;
-            m_PreferencesPages[i] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Image Formats"));
-            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "emblem-photos-symbolic");
-            BuildFileSettingsBox(m_PreferencesPages[i]);
-
-            if (m_App->GetAppState()->IsDeveloperMode())
-            {
-                ++i;
-                m_PreferencesPages[i] = adw_preferences_page_new();
-                adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Developer"));
-                adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "diagnostics-symbolic");
-                BuildDeveloperSettingsBox(m_PreferencesPages[i]);
-            }
-
-            m_ViewUpdateObserver = new ViewUpdateObserver(
-                    this, m_TiffWriterStateComponent, m_JpegWriterStateComponent, m_PngWriterStateComponent);
-            app->GetObserverManager()->AddObserver(m_ViewUpdateObserver);
+            auto view = new PreferencesView(
+                    app, parentDispatcher, tiffWriterStateComponent, pngWriterStateComponent, jpegWriterStateComponent,
+                    deviceSelectorState);
+            view->PostCreateView();
+            return view;
         }
 
         /**

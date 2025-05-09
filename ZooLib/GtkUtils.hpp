@@ -21,6 +21,11 @@ namespace ZooLib
             auto current = widgetQueue.front();
             widgetQueue.pop();
 
+            if (current == nullptr)
+            {
+                continue;
+            }
+
             if (strcmp(gtk_widget_get_name(current), name) == 0)
             {
                 return current;
@@ -44,6 +49,11 @@ namespace ZooLib
      */
     static GtkWidget *GetParentOfType(GtkWidget *widget, GType type)
     {
+        if (widget == nullptr)
+        {
+            return nullptr;
+        }
+
         auto parent = gtk_widget_get_parent(widget);
         while (parent != nullptr && !G_TYPE_CHECK_INSTANCE_TYPE(parent, type))
         {

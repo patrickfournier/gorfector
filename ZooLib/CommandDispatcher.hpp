@@ -3,6 +3,7 @@
 #include <functional>
 #include <typeindex>
 #include <unordered_map>
+
 #include "Command.hpp"
 
 namespace ZooLib

@@ -33,7 +33,7 @@ namespace ZooLib
         /**
          * \brief Destructor. Cleans up all dynamically allocated changesets.
          */
-        ~ChangesetManager()
+        virtual ~ChangesetManager()
         {
             for (auto changeset: m_Changesets)
             {

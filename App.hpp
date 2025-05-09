@@ -65,6 +65,15 @@ namespace Gorfector
 
         ScanProcess *m_ScanProcess{};
 
+        /**
+         * \brief Constructor for the App class.
+         * \param argc The number of command-line arguments.
+         * \param argv The array of command-line arguments.
+         * \param testMode If true, enables test mode for automated testing with
+         *                 test actions that can be pushed to the application.
+         */
+        App(int argc, char **argv, bool testMode = false);
+
         [[nodiscard]] GApplicationFlags GetApplicationFlags() override
         {
             return G_APPLICATION_DEFAULT_FLAGS;
@@ -116,12 +125,12 @@ namespace Gorfector
         void ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter);
 
     public:
-        /**
-         * \brief Constructor for the App class.
-         * \param argc The number of command-line arguments.
-         * \param argv The array of command-line arguments.
-         */
-        App(int argc, char **argv);
+        static App *Create(int argc, char **argv, bool testMode = false)
+        {
+            auto app = new App(argc, argv, testMode);
+            app->Initialize();
+            return app;
+        }
 
         /**
          * \brief Destructor for the App class.

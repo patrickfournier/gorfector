@@ -32,12 +32,6 @@ namespace Gorfector
         GtkWidget *m_ListBox{};
         std::vector<std::string> m_DisplayedPresetNames{};
 
-        void OnExpanderExpanded(GtkWidget *widget)
-        {
-            m_Dispatcher.Dispatch(SetPresetExpanded(gtk_expander_get_expanded(GTK_EXPANDER(widget))));
-        }
-
-    public:
         PresetPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
             : m_App(app)
             , m_Dispatcher(parentDispatcher)
@@ -58,6 +52,29 @@ namespace Gorfector
             m_Dispatcher.RegisterHandler(CreatePresetCommand::Execute, m_PresetPanelState);
             m_Dispatcher.RegisterHandler(DeletePresetCommand::Execute, m_PresetPanelState);
             m_Dispatcher.RegisterHandler(RenamePresetCommand::Execute, m_PresetPanelState);
+        }
+
+        void OnExpanderExpanded(GtkWidget *widget)
+        {
+            m_Dispatcher.Dispatch(SetPresetExpanded(gtk_expander_get_expanded(GTK_EXPANDER(widget))));
+        }
+
+    public:
+        /**
+         * \brief Creates a new instance of a `PresetPanel` class.
+         *
+         * This static method allocates and initializes a new `PresetPanel` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
+         *
+         * \param parentDispatcher Pointer to the parent command dispatcher.
+         * \param app Pointer to the application instance.
+         * \return A pointer to the newly created `PresetPanel` instance.
+         */
+        static PresetPanel *Create(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        {
+            auto view = new PresetPanel(parentDispatcher, app);
+            view->PostCreateView();
+            return view;
         }
 
         ~PresetPanel() override

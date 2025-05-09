@@ -4,8 +4,9 @@
 #include "Application.hpp"
 #include "SignalSupport.hpp"
 
-ZooLib::Application::Application()
+ZooLib::Application::Application(const bool testMode)
     : m_GtkApp(nullptr)
+    , m_TestMode(testMode)
 {
 }
 
@@ -13,12 +14,20 @@ void ZooLib::Application::Initialize()
 {
     m_GtkApp = adw_application_new(GetApplicationId().c_str(), GetApplicationFlags());
     ConnectGtkSignal(this, &Application::OnActivate, m_GtkApp, "activate");
+
+    if (m_TestMode)
+    {
+        m_TestActionsStack = new std::vector<std::function<void(Application *)>>();
+        m_TestActionsStack->emplace_back([](Application *appParam) { appParam->Quit(); });
+    }
 }
 
 ZooLib::Application::~Application()
 {
     g_object_unref(m_GtkApp);
     m_GtkApp = nullptr;
+    delete m_TestActionsStack;
+    m_TestActionsStack = nullptr;
 }
 
 void ZooLib::Application::CreateMenuBar()
@@ -64,4 +73,24 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
                 return G_SOURCE_CONTINUE;
             },
             this, nullptr);
+
+    if (m_TestMode)
+    {
+        gtk_widget_add_tick_callback(
+                m_MainWindow,
+                [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
+                    auto app = static_cast<Application *>(data);
+
+                    if (app->m_TestActionsStack != nullptr && !app->m_TestActionsStack->empty())
+                    {
+                        auto action = app->m_TestActionsStack->back();
+                        app->m_TestActionsStack->pop_back();
+                        action(app);
+                        return G_SOURCE_CONTINUE;
+                    }
+
+                    return G_SOURCE_REMOVE;
+                },
+                this, nullptr);
+    }
 }

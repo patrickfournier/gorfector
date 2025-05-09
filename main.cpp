@@ -25,10 +25,8 @@ int main(int argc, char **argv)
     bindtextdomain("messages", "../locale/");
     textdomain("messages");
 
-    app = new Gorfector::App(argc, argv);
-    app->Initialize();
+    app = Gorfector::App::Create(argc, argv);
     auto retVal = app->Run();
     delete app;
-    app = nullptr;
     return retVal;
 }

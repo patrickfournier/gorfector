@@ -43,23 +43,23 @@ namespace ZooLib
 
     public:
         /**
-         * \brief Creates a new instance of a derived `View` class.
+         * Classes deriving from `View` should make their constructors protected or private and
+         * implement a static `Create` method to ensure proper instantiation. The `Create` method
+         * should call `PostCreateView` after creating the instance.
          *
-         * This static method allocates and initializes a new `View` instance, ensuring that
-         * the `PostCreateView` method is called to set up the destroy signal.
-         *
-         * \tparam TView The type of the derived `View` class.
-         * \tparam TArgs The types of the arguments to pass to the constructor.
-         * \param args The arguments to pass to the constructor of the derived class.
-         * \return A pointer to the newly created `View` instance.
+         * ```cpp
+         *  static DerivedView *Create(Arguments... args)
+         *  {
+         *      auto view = new DerivedView(args);
+         *      view->PostCreateView();
+         *      return view;
+         *  }
+         *  ```
          */
-        template<typename TView, typename... TArgs>
-        static TView *Create(TArgs &&...args)
-        {
-            auto view = new TView(std::forward<TArgs>(args)...);
-            view->PostCreateView();
-            return view;
-        }
+
+        // Note: the above requirement could be avoided if there was support for friend static variadic template
+        // methods. Then we could have a template static method in the base class that would be a friend of the derived
+        // class.
 
         /**
          * \brief Virtual destructor to allow proper cleanup of derived classes.

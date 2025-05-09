@@ -267,6 +267,11 @@ namespace Gorfector
             {
             }
 
+            ~Updater() override
+            {
+                m_StateComponent->PushCurrentChangeset();
+            }
+
             void LoadFromJson(const nlohmann::json &json) override
             {
             }

@@ -26,15 +26,6 @@ namespace ZooLib
          */
         std::vector<GMenu *> m_CurrentMenuStack{};
 
-        /**
-         * \brief Retrieves the current menu from the stack.
-         * \return A pointer to the current GMenu.
-         */
-        [[nodiscard]] GMenu *GetCurrentMenu() const
-        {
-            return m_CurrentMenuStack.back();
-        }
-
     public:
         /**
          * \brief Constructs a new AppMenuBarBuilder and initializes the root menu bar model.
@@ -48,15 +39,19 @@ namespace ZooLib
         /**
          * \brief Begins a new submenu under the current menu.
          * \param name The name of the submenu.
-         * \param position The position to insert the submenu (default is -1, appends to the end).
+         * \param position The position to insert the submenu (default is std::numeric_limits<int>::max(), appends to
+         * the end).
          * \return A pointer to the current AppMenuBarBuilder instance for chaining.
          */
-        AppMenuBarBuilder *BeginSubMenu(const std::string &name, int position = -1)
+        AppMenuBarBuilder *BeginSubMenu(const std::string &name, int position = std::numeric_limits<int>::max())
         {
             auto *subMenu = g_menu_new();
 
-            if (position >= 0)
+            if (position != std::numeric_limits<int>::max())
             {
+                if (position < 0)
+                    position = 0;
+
                 g_menu_insert_submenu(GetCurrentMenu(), position, name.c_str(), G_MENU_MODEL(subMenu));
             }
             else
@@ -81,13 +76,18 @@ namespace ZooLib
          * \brief Adds a menu item to the current menu.
          * \param name The name of the menu item.
          * \param action The action associated with the menu item.
-         * \param position The position to insert the menu item (default is -1, appends to the end).
+         * \param position The position to insert the menu item (default is std::numeric_limits<int>::max(), appends to
+         * the end).
          * \return A pointer to the current AppMenuBarBuilder instance for chaining.
          */
-        AppMenuBarBuilder *AddMenuItem(const std::string &name, const std::string &action, int position = -1)
+        AppMenuBarBuilder *
+        AddMenuItem(const std::string &name, const std::string &action, int position = std::numeric_limits<int>::max())
         {
-            if (position >= 0)
+            if (position != std::numeric_limits<int>::max())
             {
+                if (position < 0)
+                    position = 0;
+
                 g_menu_insert(GetCurrentMenu(), position, name.c_str(), action.c_str());
                 return this;
             }
@@ -98,14 +98,18 @@ namespace ZooLib
 
         /**
          * \brief Begins a new section in the current menu.
-         * \param position The position to insert the section (default is -1, appends to the end).
+         * \param position The position to insert the section (default is std::numeric_limits<int>::max(), appends to
+         * the end).
          * \return A pointer to the current AppMenuBarBuilder instance for chaining.
          */
-        AppMenuBarBuilder *BeginSection(int position = -1)
+        AppMenuBarBuilder *BeginSection(int position = std::numeric_limits<int>::max())
         {
             auto *sectionMenu = g_menu_new();
-            if (position >= 0)
+            if (position != std::numeric_limits<int>::max())
             {
+                if (position < 0)
+                    position = 0;
+
                 g_menu_insert_section(GetCurrentMenu(), position, nullptr, G_MENU_MODEL(sectionMenu));
             }
             else
@@ -133,6 +137,15 @@ namespace ZooLib
         [[nodiscard]] GMenu *GetMenuBarModel() const
         {
             return m_MenuBarModel;
+        }
+
+        /**
+         * \brief Retrieves the current menu from the stack.
+         * \return A pointer to the current GMenu.
+         */
+        [[nodiscard]] GMenu *GetCurrentMenu() const
+        {
+            return m_CurrentMenuStack.back();
         }
     };
 }

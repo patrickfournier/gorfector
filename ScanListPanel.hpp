@@ -26,11 +26,6 @@ namespace Gorfector
 
         ScanProcess *m_ScanProcess{};
 
-        void BuildUI();
-        void OnScanClicked(GtkWidget *widget);
-        void OnCancelClicked(GtkWidget *widget);
-
-    public:
         ScanListPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
             : m_App(app)
             , m_Dispatcher(parentDispatcher)
@@ -48,6 +43,18 @@ namespace Gorfector
             m_App->GetObserverManager()->AddObserver(m_CurrentDeviceObserver);
 
             m_Dispatcher.RegisterHandler(DeleteScanItemCommand::Execute, m_PanelState);
+        }
+
+        void BuildUI();
+        void OnScanClicked(GtkWidget *widget);
+        void OnCancelClicked(GtkWidget *widget);
+
+    public:
+        static ScanListPanel *Create(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        {
+            auto view = new ScanListPanel(parentDispatcher, app);
+            view->PostCreateView();
+            return view;
         }
 
         ~ScanListPanel() override

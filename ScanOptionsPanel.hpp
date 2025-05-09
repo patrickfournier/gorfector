@@ -58,6 +58,8 @@ namespace Gorfector
 
         OptionRewriter *m_Rewriter{};
 
+        ScanOptionsPanel(int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
+
         void BuildUI();
         std::vector<uint32_t> AddCommonOptions();
         void AddOtherScannerOptions(const std::vector<uint32_t> &excludeIndices);
@@ -85,7 +87,25 @@ namespace Gorfector
         void OnScannerOptionSpinButtonChanged(GtkWidget *widget);
 
     public:
-        ScanOptionsPanel(int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app);
+        /**
+         * \brief Creates a new instance of a `ScanOptionsPanel` class.
+         *
+         * This static method allocates and initializes a new `ScanOptionsPanel` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
+         *
+         * \param saneInitId The SANE initialization ID.
+         * \param deviceName The name of the device.
+         * \param parentDispatcher Pointer to the parent command dispatcher.
+         * \param app Pointer to the application instance.
+         * \return A pointer to the newly created `ScanOptionsPanel` instance.
+         */
+        static ScanOptionsPanel *
+        Create(int saneInitId, std::string deviceName, ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        {
+            auto view = new ScanOptionsPanel(saneInitId, std::move(deviceName), parentDispatcher, app);
+            view->PostCreateView();
+            return view;
+        }
 
         ~ScanOptionsPanel() override;
 

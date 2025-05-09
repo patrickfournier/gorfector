@@ -77,6 +77,43 @@ namespace ZooLib
         std::filesystem::path m_TempDirectoryPath;
 
         /**
+         * \brief Indicates whether the application is running in test mode.
+         *
+         * When set to `true`, the application operates in a test environment,
+         * playing back the actions in `m_TestActionsStack`.
+         */
+        bool m_TestMode{};
+
+        /**
+         * \brief Stack of test actions to be executed in test mode.
+         *
+         * The `m_TestActionsStack` is used to store
+         * actions that are executed sequentially when the application is running in test mode.
+         *
+         * \remarks The stack is dynamically allocated and initialized only when test mode is enabled.
+         * Actions can be pushed to the stack using the `PushTestAction` method.
+         */
+        std::vector<std::function<void(Application *)>> *m_TestActionsStack{};
+
+        /**
+         * \brief Constructs an `Application` instance.
+         *
+         * This constructor initializes the application and sets the test mode.
+         * When `testMode` is set to `true`, the application operates in a test
+         * environment, allowing for automated testing and playback of test actions.
+         *
+         * \param testMode A boolean indicating whether the application is in test mode.
+         */
+        explicit Application(bool testMode = false);
+
+        /**
+         * \brief Initializes the application.
+         *
+         * This method is called to perform any necessary setup before the application runs.
+         */
+        virtual void Initialize();
+
+        /**
          * \brief Retrieves the application flags.
          *
          * This method must be implemented by derived classes to specify the flags
@@ -156,16 +193,21 @@ namespace ZooLib
 
     public:
         /**
-         * \brief Default constructor for the `Application` class.
-         */
-        Application();
-
-        /**
-         * \brief Initializes the application.
+         * Classes deriving from `Application` should make their constructors protected or private and
+         * implement a static `Create` method to ensure proper instantiation. The `Create` method
+         * should call `Initialize` after creating the instance.
          *
-         * This method is called to perform any necessary setup before the application runs.
+         * ```cpp
+         *  static DerivedApplication *Create(Arguments... args)
+         *  {
+         *      auto app = new DerivedApplication(args);
+         *      app->Initialize();
+         *      return app;
+         *  }
+         *  ```
          */
-        virtual void Initialize();
+
+        Application() = delete;
 
         /**
          * \brief Destructor for the `Application` class.
@@ -345,6 +387,30 @@ namespace ZooLib
             }
 
             return m_TempDirectoryPath;
+        }
+
+        /**
+         * \brief Adds a test action to the execution stack.
+         *
+         * This method allows adding actions that will be executed sequentially
+         * when the application is running in test mode. If the test actions stack
+         * doesn't exist yet, it is automatically created.
+         *
+         * \param action A function to execute that takes a pointer to the application
+         *               instance as a parameter.
+         *
+         * \remarks This method is primarily used for automated testing,
+         *          allowing to simulate user interactions or specific behaviors
+         *          during test execution.
+         */
+        void PushTestAction(const std::function<void(Application *)> &action)
+        {
+            if (m_TestActionsStack == nullptr)
+            {
+                m_TestActionsStack = new std::vector<std::function<void(Application *)>>();
+            }
+
+            m_TestActionsStack->push_back(action);
         }
     };
 }

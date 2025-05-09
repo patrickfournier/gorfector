@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef TEST_FRIENDS
+#define TEST_FRIENDS
+#endif
+
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -20,6 +24,8 @@ namespace ZooLib
     {
         std::filesystem::path m_PreferencesFilePath{};
         std::vector<StateComponent *> m_StateComponents;
+
+        TEST_FRIENDS;
 
     public:
         ~State();

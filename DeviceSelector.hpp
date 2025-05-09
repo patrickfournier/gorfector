@@ -31,6 +31,15 @@ namespace Gorfector
         gulong m_DropdownSelectedSignalId; ///< Signal ID for dropdown selection events.
 
         /**
+         * \brief Constructor for the DeviceSelector class.
+         * \param parent Pointer to the parent command dispatcher.
+         * \param app Pointer to the application instance.
+         * \param deviceSelectorState Pointer to the device selector state.
+         */
+        DeviceSelector(
+                ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState);
+
+        /**
          * \brief Callback for the "Refresh Devices" button click event.
          * \param widget The GTK widget triggering the event.
          */
@@ -56,13 +65,23 @@ namespace Gorfector
 
     public:
         /**
-         * \brief Constructor for the DeviceSelector class.
+         * \brief Creates a new instance of a `DeviceSelector` class.
+         *
+         * This static method allocates and initializes a new `DeviceSelector` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
+         *
          * \param parent Pointer to the parent command dispatcher.
          * \param app Pointer to the application instance.
          * \param deviceSelectorState Pointer to the device selector state.
+         * \return A pointer to the newly created `DeviceSelector` instance.
          */
-        DeviceSelector(
-                ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState);
+        static DeviceSelector *
+        Create(ZooLib::CommandDispatcher *parent, ZooLib::Application *app, DeviceSelectorState *deviceSelectorState)
+        {
+            auto view = new DeviceSelector(parent, app, deviceSelectorState);
+            view->PostCreateView();
+            return view;
+        }
 
         /**
          * \brief Destructor for the DeviceSelector class.
