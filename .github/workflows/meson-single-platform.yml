@@ -21,11 +21,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install meson
         sudo apt-get install gettext
+        sudo apt-get install libxml2-utils
         sudo apt-get install xvfb
 
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libglib2.0-dev-bin
         sudo apt-get install libgtk-4-dev
         sudo apt-get install libadwaita-1-dev
