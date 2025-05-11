@@ -9,6 +9,8 @@
 #include "SignalSupport.hpp"
 #include "State.hpp"
 
+#include "config.h"
+
 namespace ZooLib
 {
     class AppMenuBarBuilder;
@@ -335,7 +337,10 @@ namespace ZooLib
          *
          * \return The application ID as a string.
          */
-        [[nodiscard]] virtual std::string GetApplicationId() const = 0;
+        [[nodiscard]] virtual std::string GetApplicationId() const
+        {
+            return APP_ID;
+        }
 
         /**
          * \brief Gets the application name.
@@ -427,7 +432,7 @@ namespace ZooLib
         {
             if (m_SystemConfigDirectoryPath.empty())
             {
-                m_SystemConfigDirectoryPath = std::filesystem::current_path();
+                m_SystemConfigDirectoryPath = std::filesystem::path(DATADIR) / GetApplicationId();
             }
 
             return m_SystemConfigDirectoryPath;

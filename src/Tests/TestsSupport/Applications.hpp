@@ -55,7 +55,7 @@ namespace TestsSupport
 
         std::string GetApplicationId() const override
         {
-            return "com.example.testapp";
+            return Application::GetApplicationId() + "_tests";
         }
 
         std::string GetApplicationName() const override

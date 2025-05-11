@@ -5,14 +5,6 @@
 #include "ZooLib/Gettext.hpp"
 #include "config.h"
 
-#ifndef GETTEXT_PACKAGE
-#define GETTEXT_PACKAGE "gorfector"
-#endif
-
-#ifndef GNOMELOCALEDIR
-#define GNOMELOCALEDIR "../po"
-#endif
-
 static Gorfector::App *app;
 
 void SignalHandler(int signal)

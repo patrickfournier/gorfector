@@ -51,7 +51,6 @@ executable(
         libpng_dep,
         nlohmann_json_dep,
         libsane_dep,
-        # schemas_dep,
         config_dep,
     ],
     include_directories : [

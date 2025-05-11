@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Gorfector
+Icon=gorfector
+StartupNotify=true
+Exec=@bindir@/gorfector

@@ -31,11 +31,6 @@ namespace Gorfector
     {
     public:
         /**
-         * \brief The application ID used for identifying the application.
-         */
-        static constexpr auto k_ApplicationId = "com.patrickfournier.gorfector";
-
-        /**
          * \brief The application name displayed to the user.
          */
         static constexpr auto k_ApplicationName = "Gorfector";
@@ -136,15 +131,6 @@ namespace Gorfector
          * \brief Destructor for the App class.
          */
         ~App() override;
-
-        /**
-         * \brief Retrieves the application ID.
-         * \return The application ID as a string.
-         */
-        [[nodiscard]] std::string GetApplicationId() const override
-        {
-            return k_ApplicationId;
-        }
 
         /**
          * \brief Retrieves the application name.

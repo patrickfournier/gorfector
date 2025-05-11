@@ -25,6 +25,11 @@ namespace ZooLib
             return app;
         }
 
+        std::string GetApplicationId() const override
+        {
+            return Application::GetApplicationId() + "_extended_tests";
+        }
+
         AdwApplication *GetGtkApp() const
         {
             return m_GtkApp;
