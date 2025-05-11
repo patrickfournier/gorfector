@@ -1,3 +1,8 @@
+config_dep = declare_dependency(
+    sources: [configure_file(output: 'config.h', configuration: conf)],
+    include_directories: '.',
+)
+
 gorfector_sources = [
     'App.cpp',
     'DeviceOptionsState.cpp',
@@ -28,10 +33,16 @@ gorfector_sources = [
     'ZooLib/State.cpp',
 ]
 
+root_include = include_directories('.')
+
+generated_sources = [
+    gorfector_resources,
+]
+
 executable(
     'gorfector',
     gorfector_sources,
-    gorfector_resources,
+    generated_sources,
     dependencies : [
         gtk4_dep,
         adw_dep,
@@ -40,9 +51,11 @@ executable(
         libpng_dep,
         nlohmann_json_dep,
         libsane_dep,
+        # schemas_dep,
+        config_dep,
     ],
     include_directories : [
-        rootInclude,
+        root_include,
         'Commands',
         'Writers',
         'ZooLib',

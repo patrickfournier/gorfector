@@ -34,6 +34,7 @@ libjpeg_dep = dependency('libjpeg', version : '>=2.1.0', required : true)
 libpng_dep = dependency('libpng', version : '>=1.6.0', required : true)
 nlohmann_json_dep = dependency('nlohmann_json', required: true)
 libsane_dep = cx.find_library('sane', required : true)
+#schemas_dep = dependency('gsettings-desktop-schemas')
 
 cxxflags = [
         '-Wall',
@@ -46,22 +47,12 @@ cxxflags = [
         '-Wno-unused-parameter',
 ]
 
-configure_file(
-        output: 'config.h',
-        configuration: conf,
-)
-
-rootInclude = include_directories('.')
-
 subdir('scanners')
 subdir('po')
 subdir('resources')
 subdir('src')
 
-#test('test', gorfector)
-
-# Extra scripts
-gnome.post_install(
-        glib_compile_schemas: true,
-        gtk_update_icon_cache: true,
-)
+#gnome.post_install(
+#        glib_compile_schemas: true,
+#        gtk_update_icon_cache: true,
+#)

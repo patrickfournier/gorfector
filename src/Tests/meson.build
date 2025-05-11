@@ -36,7 +36,7 @@ test_exe = executable(
         xdo_dep,
     ],
     include_directories : [
-        rootInclude,
+        root_include,
         'TestsSupport',
         'ZooLib',
         '..',
