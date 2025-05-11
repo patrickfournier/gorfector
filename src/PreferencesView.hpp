@@ -1,6 +1,7 @@
 #pragma once
 
 #include <adwaita.h>
+#include <vector>
 
 #include "App.hpp"
 #include "Commands/DevMode/SetDumpSaneOptions.hpp"
@@ -46,7 +47,7 @@ namespace Gorfector
         /**
          * \brief Array of preference pages in the UI.
          */
-        GtkWidget *m_PreferencesPages[3]{};
+        GtkWidget *m_PreferencesPages[2]{};
 
         /**
          * \brief Component managing TIFF writer state.
@@ -121,22 +122,21 @@ namespace Gorfector
         {
             auto i = 0;
             m_PreferencesPages[i] = adw_preferences_page_new();
-            adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("General"));
-            adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "configure-symbolic");
-
-            ++i;
-            m_PreferencesPages[i] = adw_preferences_page_new();
             adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Image Formats"));
             adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "emblem-photos-symbolic");
             BuildFileSettingsBox(m_PreferencesPages[i]);
 
+            ++i;
             if (m_App->GetAppState()->IsDeveloperMode())
             {
-                ++i;
                 m_PreferencesPages[i] = adw_preferences_page_new();
                 adw_preferences_page_set_title(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), _("Developer"));
                 adw_preferences_page_set_icon_name(ADW_PREFERENCES_PAGE(m_PreferencesPages[i]), "diagnostics-symbolic");
                 BuildDeveloperSettingsBox(m_PreferencesPages[i]);
+            }
+            else
+            {
+                m_PreferencesPages[i] = nullptr;
             }
 
             m_ViewUpdateObserver = new ViewUpdateObserver(
@@ -282,10 +282,17 @@ namespace Gorfector
         [[nodiscard]] std::vector<GtkWidget *> GetPreferencePages() const
         {
             auto numPages = sizeof(m_PreferencesPages) / sizeof(m_PreferencesPages[0]);
-            auto pages = std::vector<GtkWidget *>(numPages);
+            std::vector<GtkWidget *> pages;
+            pages.reserve(numPages);
+
             for (auto i = 0UZ; i < numPages; ++i)
             {
-                pages[i] = m_PreferencesPages[i];
+                if (m_PreferencesPages[i] == nullptr)
+                {
+                    continue;
+                }
+
+                pages.push_back(m_PreferencesPages[i]);
             }
 
             return pages;

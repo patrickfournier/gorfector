@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-10 21:56-0400\n"
+"POT-Creation-Date: 2025-05-11 16:04-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,10 @@ msgstr ""
 
 #: src/App.cpp:251
 msgid "Select Device..."
+msgstr ""
+
+#: src/App.cpp:254
+msgid "Use Scan List"
 msgstr ""
 
 #: src/App.cpp:257
@@ -191,23 +195,23 @@ msgstr ""
 msgid "Quality"
 msgstr ""
 
-#: src/PreferencesView.hpp:124 src/PreferencesView.hpp:200
-msgid "General"
-msgstr ""
-
-#: src/PreferencesView.hpp:129
+#: src/PreferencesView.hpp:124
 msgid "Image Formats"
 msgstr ""
 
-#: src/PreferencesView.hpp:137
+#: src/PreferencesView.hpp:132
 msgid "Developer"
 msgstr ""
 
-#: src/PreferencesView.hpp:204
+#: src/PreferencesView.hpp:199
+msgid "General"
+msgstr ""
+
+#: src/PreferencesView.hpp:203
 msgid "Dump SANE options"
 msgstr ""
 
-#: src/PreferencesView.hpp:206
+#: src/PreferencesView.hpp:205
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."
