@@ -1,8 +1,17 @@
-#include "App.hpp"
 
 #include <csignal>
 
+#include "App.hpp"
 #include "ZooLib/Gettext.hpp"
+#include "config.h"
+
+#ifndef GETTEXT_PACKAGE
+#define GETTEXT_PACKAGE "gorfector"
+#endif
+
+#ifndef GNOMELOCALEDIR
+#define GNOMELOCALEDIR "../po"
+#endif
 
 static Gorfector::App *app;
 
@@ -21,9 +30,9 @@ int main(int argc, char **argv)
     signal(SIGKILL, SignalHandler);
 
     setlocale(LC_ALL, "");
-    bind_textdomain_codeset("messages", "UTF-8");
-    bindtextdomain("messages", "../locale/");
-    textdomain("messages");
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    bindtextdomain(GETTEXT_PACKAGE, GNOMELOCALEDIR);
+    textdomain(GETTEXT_PACKAGE);
 
     app = Gorfector::App::Create(argc, argv);
     auto retVal = app->Run();

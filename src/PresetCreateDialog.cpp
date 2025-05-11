@@ -1,11 +1,11 @@
 #include <adwaita.h>
 
+#include <nlohmann/json.hpp>
 #include "PresetPanel.hpp"
 #include "PresetPanelDialogs.hpp"
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/GtkUtils.hpp"
 #include "ZooLib/StringUtils.hpp"
-#include "ZooLib/json/single_include/nlohmann/json.hpp"
 
 namespace Gorfector
 {

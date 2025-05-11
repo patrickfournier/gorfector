@@ -118,7 +118,7 @@ GtkWidget *Gorfector::App::BuildUI()
 {
     auto *display = gdk_display_get_default();
     auto *cssProvider = gtk_css_provider_new();
-    std::string cssPath = std::string("/com/patrickfournier/gorfector/resources/gorfector.css");
+    std::string cssPath = std::string("/com/patrickfournier/gorfector/gorfector.css");
     gtk_css_provider_load_from_resource(cssProvider, cssPath.c_str());
     gtk_style_context_add_provider_for_display(
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);

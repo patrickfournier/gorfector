@@ -2,9 +2,9 @@
 
 #include <utility>
 
+#include <nlohmann/json.hpp>
 #include "PresetPanelState.hpp"
 #include "ZooLib/Command.hpp"
-#include "ZooLib/json/single_include/nlohmann/json.hpp"
 
 namespace Gorfector
 {

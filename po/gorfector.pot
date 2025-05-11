@@ -1,0 +1,1078 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gorfector package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gorfector\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-10 21:56-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/App.cpp:161
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:40
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:41
+msgid "Preview"
+msgstr ""
+
+#: src/App.cpp:166
+msgid "Scan"
+msgstr ""
+
+#: src/App.cpp:171 src/OutputOptionsState.hpp:51
+msgid "Cancel Scan"
+msgstr ""
+
+#: src/App.cpp:176
+msgid "Add to Scan List"
+msgstr ""
+
+#: src/App.cpp:251
+msgid "Select Device..."
+msgstr ""
+
+#: src/App.cpp:257
+msgid "Settings..."
+msgstr ""
+
+#: src/App.cpp:258
+msgid "About..."
+msgstr ""
+
+#: src/App.cpp:276
+msgid "Select Device"
+msgstr ""
+
+#: src/App.cpp:300
+msgid "Settings"
+msgstr ""
+
+#: src/App.cpp:314
+msgid "An application to scan images."
+msgstr ""
+
+#: src/App.cpp:493
+msgid "Select a directory where to save the image files."
+msgstr ""
+
+#: src/App.cpp:500
+msgid "Enter a file name to save the image files."
+msgstr ""
+
+#: src/App.cpp:528
+msgid "Directory does not exists: {}."
+msgstr ""
+
+#: src/App.cpp:543
+msgid "File '{}' already exists."
+msgstr ""
+
+#: src/App.cpp:556
+msgid "Incrementing file name '{}' failed to produce a unique name."
+msgstr ""
+
+#: src/App.cpp:573
+msgid "File already exists"
+msgstr ""
+
+#: src/App.cpp:575
+#, c-format
+msgid "The file \"%s\" already exists. Really overwrite it?"
+msgstr ""
+
+#: src/App.cpp:578 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:175
+msgid "Cancel"
+msgstr ""
+
+#: src/App.cpp:578 src/OutputOptionsState.hpp:51
+msgid "Overwrite"
+msgstr ""
+
+#: src/App.cpp:627
+msgid ""
+"The file name must ends with an extension that specify the image format, "
+"like {}"
+msgstr ""
+
+#: src/DeviceSelector.cpp:31 src/DeviceSelector.cpp:169
+msgid "No Scanner Found"
+msgstr ""
+
+#: src/DeviceSelector.cpp:36
+msgid "Select Scanner: "
+msgstr ""
+
+#: src/DeviceSelector.cpp:43
+msgid "Include Network Scanners"
+msgstr ""
+
+#: src/DeviceSelector.cpp:48
+msgid "Refresh Scanner List"
+msgstr ""
+
+#: src/DeviceSelector.cpp:113
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:128
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:132
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:171
+msgid "None"
+msgstr ""
+
+#: src/DeviceSelector.cpp:159
+msgid "Cannot open scanner {}."
+msgstr ""
+
+#: src/DeviceSelector.cpp:165
+msgid "No scanner found."
+msgstr ""
+
+#: src/OutputOptionsState.hpp:39
+msgid "File"
+msgstr ""
+
+#: src/OutputOptionsState.hpp:39
+msgid "Printer"
+msgstr ""
+
+#: src/OutputOptionsState.hpp:39
+msgid "Email"
+msgstr ""
+
+#: src/OutputOptionsState.hpp:51
+msgid "Increase Counter"
+msgstr ""
+
+#: src/PreferencesView.cpp:6
+msgid "TIFF Settings"
+msgstr ""
+
+#: src/PreferencesView.cpp:10
+msgid "Compression Algorithm"
+msgstr ""
+
+#: src/PreferencesView.cpp:18
+msgid "Deflate Compression Level"
+msgstr ""
+
+#: src/PreferencesView.cpp:21 src/PreferencesView.cpp:40
+msgid ""
+"0 = no compression, 9 = maximum compression. Higher compression levels may "
+"slow down the scanning process."
+msgstr ""
+
+#: src/PreferencesView.cpp:28
+msgid "JPEG Quality"
+msgstr ""
+
+#: src/PreferencesView.cpp:29 src/PreferencesView.cpp:52
+msgid "0 = lowest quality, 100 = maximum quality."
+msgstr ""
+
+#: src/PreferencesView.cpp:34
+msgid "PNG Settings"
+msgstr ""
+
+#: src/PreferencesView.cpp:38
+msgid "Compression Level"
+msgstr ""
+
+#: src/PreferencesView.cpp:47
+msgid "JPEG Settings"
+msgstr ""
+
+#: src/PreferencesView.cpp:51
+msgid "Quality"
+msgstr ""
+
+#: src/PreferencesView.hpp:124 src/PreferencesView.hpp:200
+msgid "General"
+msgstr ""
+
+#: src/PreferencesView.hpp:129
+msgid "Image Formats"
+msgstr ""
+
+#: src/PreferencesView.hpp:137
+msgid "Developer"
+msgstr ""
+
+#: src/PreferencesView.hpp:204
+msgid "Dump SANE options"
+msgstr ""
+
+#: src/PreferencesView.hpp:206
+msgid ""
+"When selecting a scanner, dump its SANE options to stdout. This is useful "
+"for creating scanner config files."
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:104
+msgid "Create a new preset"
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:119
+msgid "Enter a name for the new preset:"
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:135
+msgid "Scanners Settings"
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:140 src/ScanOptionsPanel.cpp:463
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:44
+msgid "Scan Area"
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:145
+msgid "Output Settings"
+msgstr ""
+
+#: src/PresetCreateDialog.cpp:163
+msgid "Create"
+msgstr ""
+
+#: src/PresetPanel.cpp:32
+msgid "Presets"
+msgstr ""
+
+#: src/PresetPanel.cpp:40
+msgid "New preset"
+msgstr ""
+
+#: src/PresetPanel.cpp:86
+msgid "Delete Preset"
+msgstr ""
+
+#: src/PresetPanel.cpp:88
+#, c-format
+msgid "Are you sure you want to delete the preset \"%s\"?"
+msgstr ""
+
+#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:143 src/ScanListPanel.cpp:175
+msgid "Delete"
+msgstr ""
+
+#: src/PresetPanel.cpp:138
+msgid "Apply this preset"
+msgstr ""
+
+#: src/PresetPanel.cpp:151
+msgid "Inspect this preset"
+msgstr ""
+
+#: src/PresetPanel.cpp:164
+msgid "Rename this preset"
+msgstr ""
+
+#: src/PresetPanel.cpp:177
+msgid "Delete this preset"
+msgstr ""
+
+#. *
+#. * \brief Preset panel dialog constants and functions.
+#. *
+#. * This namespace contains constants and function declarations related to the preset panel dialogs.
+#.
+#: src/PresetPanelDialogs.hpp:14
+msgid "Preset name must not be empty."
+msgstr ""
+
+#. /< Hint for empty preset name.
+#: src/PresetPanelDialogs.hpp:15
+msgid "A preset with this name already exists."
+msgstr ""
+
+#: src/PresetRenameDialog.cpp:83
+msgid "Rename Preset"
+msgstr ""
+
+#: src/PresetRenameDialog.cpp:98
+msgid "Enter a new name for the preset:"
+msgstr ""
+
+#: src/PresetRenameDialog.cpp:122
+msgid "Rename"
+msgstr ""
+
+#: src/PresetViewDialog.cpp:20
+msgid "Inspect Preset"
+msgstr ""
+
+#: src/PreviewPanel.cpp:43
+msgid "Zoom:"
+msgstr ""
+
+#: src/PreviewPanel.cpp:876
+msgid "Progress: "
+msgstr ""
+
+#: src/PreviewScanProcess.hpp:37 src/SingleScanProcess.hpp:32
+msgid "Unsupported format"
+msgstr ""
+
+#: src/ScanListPanel.cpp:21
+msgid "Scan List"
+msgstr ""
+
+#: src/ScanListPanel.cpp:61
+msgid "Scan All"
+msgstr ""
+
+#: src/ScanListPanel.cpp:65
+msgid "Cancel Scans"
+msgstr ""
+
+#: src/ScanListPanel.cpp:130
+msgid "Load"
+msgstr ""
+
+#: src/ScanListPanel.cpp:172
+msgid "Delete Scan"
+msgstr ""
+
+#: src/ScanListPanel.cpp:174
+#, c-format
+msgid "Are you sure you want to delete the scan item #%03d ?"
+msgstr ""
+
+#: src/ScanListState.hpp:90
+msgid "<Printer>"
+msgstr ""
+
+#: src/ScanListState.hpp:96
+msgid "<Email>"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:28
+msgid "px"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:30
+msgid "bit"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:32
+msgid "mm"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:34
+msgid "DPI"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:36
+#, c-format
+msgid "%%"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:38
+msgid "μs"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:417
+msgid "Basic"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:421
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:17
+msgid "Advanced"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:426
+msgid "Output"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:447
+msgid "Common Options"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:511 src/ScanOptionsPanel.cpp:516
+msgid "Destination"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:531
+msgid "Location"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:532
+msgid "The directory where the scanned files will be saved."
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:547
+msgid "Browse for a location."
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:553
+msgid "Create Missing Directories"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:554
+msgid "Create directories if they do not exist."
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:563
+msgid "File Name"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:576
+msgid "If File Exists"
+msgstr ""
+
+#: src/ScanOptionsPanel.cpp:611
+msgid "Select Destination"
+msgstr ""
+
+#: src/SingleScanProcess.hpp:38
+msgid "Unsupported depth"
+msgstr ""
+
+#: src/SingleScanProcess.hpp:44
+msgid "Unsupported file format"
+msgstr ""
+
+#: src/SingleScanProcess.hpp:51
+msgid "Failed to create file: "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:2
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:3
+msgid "Scan Mode"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:4
+msgid "Bit Depth"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:5
+msgid "Halftoning"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:6
+msgid "Dropout"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:7
+msgid "Brightness Method"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:8
+msgid "Brightness"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:9
+msgid "Contrast"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:10
+msgid "Sharpness"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:11
+msgid "Gamma Correction"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:12
+msgid "Color correction"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:13
+msgid "Resolution"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:14
+msgid "Horizontal Resolution"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:15
+msgid "Vertical Resolution"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:16
+msgid "Threshold"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:18
+msgid "Mirror image"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:19
+msgid "Scan speed"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:20
+msgid "Automatic Area Segmentation"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:21
+msgid "Short resolution list"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:22
+msgid "Zoom"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:23
+msgid "Red intensity"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:24
+msgid "Green intensity"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:25
+msgid "Blue intensity"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:26
+msgid "Wait for Button"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:27
+msgid "Monitor Button"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:28
+msgid "Polling Time"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:29
+msgid "Needs Polling"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:30
+msgid "Color Correction Coefficients"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:31
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:133
+msgid "Red"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:32
+msgid "Shift Green to Red"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:33
+msgid "Shift Blue to Red"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:34
+msgid "Shift Red to Green"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:35
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:134
+msgid "Green"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:36
+msgid "Shift Blue to Green"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:37
+msgid "Shift Red to Blue"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:38
+msgid "Shift Green to Blue"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:39
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:135
+msgid "Blue"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:42
+msgid "Speed"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:43
+msgid "Geometry"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:45
+msgid "Top Left X"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:46
+msgid "Top Left Y"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:47
+msgid "Bottom Right X"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:48
+msgid "Bottom Right Y"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:49
+msgid "Quick format"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:50
+msgid "Optional equipment"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:51
+msgid "Scan Source"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:52
+msgid "Auto eject"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:53
+msgid "Film Type"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:54
+msgid "Focus Position"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:55
+msgid "Bay"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:56
+msgid "Eject"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:57
+msgid "ADF Mode"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:58
+msgid "Auto-detect document size"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:59
+msgid "Scan Area Is Valid"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:60
+msgid "ADF Auto Scan"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:61
+msgid "Double Feed Detection Sensitivity"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:62
+msgid "Extended SANE Status"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:63
+msgid "ADF Duplex Direction Matches"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:64
+msgid "Deskew"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:65
+msgid "Trim image to paper size"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:66
+msgid "Calibrate"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:67
+msgid "Clean"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:68
+msgid "Selects the scan mode."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:69
+msgid "Number of bits per sample."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:70
+msgid "Selects the halftone."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:71
+msgid "Selects the dropout."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:72
+msgid "Selects the method to change the brightness of the acquired image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:73
+msgid "Controls the brightness of the acquired image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:74
+msgid "Controls the contrast of the acquired image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:75
+msgid "Selects the gamma correction value."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:76
+msgid "Sets the color correction table for the selected output device."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:77
+msgid "Sets the resolution of the scanned image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:78
+msgid "Sets the horizontal resolution of the scanned image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:79
+msgid "Sets the vertical resolution of the scanned image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:80
+msgid "Sets the minimum brightness to get a white pixel."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:81
+msgid "Mirror the image."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:82
+msgid "Determines the speed at which the scan proceeds."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:83
+msgid "Display short resolution list"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:84
+msgid "Defines the zoom factor the scanner will use"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:85
+msgid "Gamma-correction table for the red band."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:86
+msgid "Gamma-correction table for the green band."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:87
+msgid "Gamma-correction table for the blue band."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:88
+msgid ""
+"After sending the scan command, wait until the button on the scanner is "
+"pressed to actually start the scan process."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:89
+msgid "Indicates whether a button on the scanner has been pressed."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:90
+msgid "Time between queries when waiting for device state changes."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:91
+msgid "Indicates whether the scanner needs to poll."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:92
+msgid "Matrix multiplication of RGB values."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:93
+msgid "Controls red level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:94
+msgid "Adds to red based on green level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:95
+msgid "Adds to red based on blue level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:96
+msgid "Adds to green based on red level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:97
+msgid "Controls green level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:98
+msgid "Adds to green based on blue level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:99
+msgid "Adds to blue based on red level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:100
+msgid "Adds to blue based on green level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:101
+msgid "Control blue level"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:102
+msgid "Request a preview-quality scan."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:103
+msgid "Sets the area to scan based on common media sizes."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:104
+msgid "Top-left x position of scan area."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:105
+msgid "Top-left y position of scan area."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:106
+msgid "Bottom-right x position of scan area."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:107
+msgid "Bottom-right y position of scan area."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:108
+msgid "Select an area to scan based on well-known media sizes. (DEPRECATED)"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:109
+msgid "Selects the scan source."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:110
+msgid "Eject document after scanning"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:111
+msgid "Sets the focus position to either the glass or 2.5mm above the glass"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:112
+msgid "Select bay to scan"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:113
+msgid "Eject the sheet in the ADF"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:114
+msgid "Selects the ADF mode (simplex/duplex)"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:115
+msgid ""
+"Activates document size auto-detection.  The scan area will be set to match "
+"the detected document size."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:116
+msgid "Indicates whether the current scan area settings are valid."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:117
+msgid "Skips per sheet device setup for faster throughput."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:118
+msgid ""
+"Sets the sensitivity with which multi-sheet page feeds are detected and "
+"reported as errors."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:119
+msgid "Ugly kludge to provide additional status message strings to a frontend."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:120
+msgid ""
+"Indicates whether the device's ADF duplex mode, if available, scans in the "
+"same direction for the front and back."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:121
+msgid "Rotate image so it appears upright."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:122
+msgid ""
+"Determines empty margins in the scanned image and removes them.  This "
+"normally reduces the image to the size of the original document but may "
+"remove more."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:123
+msgid ""
+"Performs color matching to make sure that the document's color tones are "
+"scanned correctly."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:124
+msgid "Cleans the scanners reading section."
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:125
+msgid "Black and White"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:126
+msgid "Gray"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:127
+msgid "Color"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:129
+msgid "Halftone A (Hard Tone)"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:130
+msgid "Halftone B (Soft Tone)"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:131
+msgid "Halftone C (Net Screen)"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:136
+msgid "iscan"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:137
+msgid "gimp"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:138
+msgid "1.0"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:139
+msgid "1.8"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:140
+msgid "User defined"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:141
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:149
+msgid "Maximum"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:142
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:150
+msgid "A4"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:143
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:151
+msgid "A5 Landscape"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:144
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:152
+msgid "A5 Portrait"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:145
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:153
+msgid "B5"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:146
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:154
+msgid "Letter"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:147
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:155
+msgid "Executive"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:148
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:156
+msgid "CD"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:157
+msgid "Flatbed"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:158
+msgid "Transparency Unit"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:159
+msgid "Positive Film"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:160
+msgid "Negative Film"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:161
+msgid "Focus on glass"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:162
+msgid "Focus 2.5mm above glass"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:163
+msgid " 1 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:164
+msgid " 2 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:165
+msgid " 3 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:166
+msgid " 4 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:167
+msgid " 5 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:168
+msgid " 6 "
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:169
+msgid "Simplex"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:170
+msgid "Duplex"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:172
+msgid "Low"
+msgstr ""
+
+#: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:173
+msgid "High"
+msgstr ""

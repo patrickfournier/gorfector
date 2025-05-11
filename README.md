@@ -14,3 +14,16 @@ Image scanning software
 ```
 git config --local core.hooksPath .githooks/
 ```
+
+meson wrap install nlohmann_json
+meson wrap install gtest
+
+# Build
+```
+meson build scanner_settings
+meson build gorfector-pot
+meson build gorfector-update-po
+meson build gorfector-gmo
+meson build gorfector
+meson install
+```

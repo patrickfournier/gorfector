@@ -36,7 +36,7 @@ namespace Gorfector
         j.at("string_list").get_to(p.StringStringList);
 
         uint32_t flags{};
-        for (auto flag: j["flags"])
+        for (const auto &flag: j["flags"])
         {
             if (flag == "ForceBasic")
             {
@@ -155,7 +155,7 @@ namespace Gorfector
                 auto i = 0UZ;
                 for (; i < it->second.StringStringList.size(); ++i)
                 {
-                    auto text = it->second.StringStringList[i];
+                    auto &text = it->second.StringStringList[i];
                     if (text.empty())
                     {
                         rewrittenStringList[i] = text.c_str();
@@ -172,7 +172,14 @@ namespace Gorfector
                 auto i = 0UZ;
                 for (; defaultList[i] != nullptr; ++i)
                 {
-                    rewrittenStringList[i] = defaultList[i];
+                    if (defaultList[i][0] == '\0')
+                    {
+                        rewrittenStringList[i] = defaultList[i];
+                    }
+                    else
+                    {
+                        rewrittenStringList[i] = gettext(defaultList[i]);
+                    }
                 }
                 rewrittenStringList[i] = nullptr;
             }

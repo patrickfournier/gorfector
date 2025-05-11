@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: CMake on a single platform
+name: Meson on a single platform
 
 on:
   push:
@@ -8,15 +6,8 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +15,13 @@ jobs:
 
     - name: Init submodules
       run: git submodule update --init --recursive
+
+    - name: Install tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install meson
+        sudo apt-get install gettext
+        sudo apt-get install xvfb
 
     - name: Install dependencies
       run: |
@@ -34,33 +32,21 @@ jobs:
         sudo apt-get install libsane-dev
         sudo apt-get install libtiff-dev
         sudo apt-get install libpng-dev
-        sudo apt-get install gettext
         sudo apt-get install libxdo-dev libxdo3
-        sudo apt-get install xvfb
 
-    - name: CMake version
+    - name: Configure Meson
       env:
         CC: clang
         CXX: clang++
-      run: cmake --version
+      run: meson setup --prefix ${{github.workspace}}/gorfector --buildtype release ${{github.workspace}}/buildDir
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+    - name: Build and Install
+      working-directory: ${{github.workspace}}/buildDir
       env:
         CC: clang
         CXX: clang++
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: meson install
 
-    - name: Build
-      # Build your program with the given configuration
-      env:
-        CC: clang
-        CXX: clang++
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: xvfb-run ctest --test-dir ${{github.workspace}}/build/Tests -C ${{env.BUILD_TYPE}}
+    - name: Run tests
+      working-directory: ${{github.workspace}}/buildDir
+      run: xvfb-run meson test

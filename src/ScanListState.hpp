@@ -3,9 +3,9 @@
 #include <gtk/gtk.h>
 #include <vector>
 
+#include <nlohmann/json.hpp>
 #include "DeviceOptionsState.hpp"
 #include "OutputOptionsState.hpp"
-#include "ZooLib/json/single_include/nlohmann/json.hpp"
 
 namespace Gorfector
 {
