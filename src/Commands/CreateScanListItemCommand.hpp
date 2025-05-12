@@ -29,13 +29,23 @@ namespace Gorfector
 
     public:
         /**
-         * \brief Constructor for the CreateScanListItemCommand.
+         * \brief Constructor for the CreateScanListItemCommand, used to create a fully parametrized scan item.
          * \param deviceOptions Pointer to the device options state.
          * \param outputOptions Pointer to the output options state.
          */
         CreateScanListItemCommand(const DeviceOptionsState *deviceOptions, const OutputOptionsState *outputOptions)
             : m_DeviceOptions(deviceOptions)
             , m_OutputOptions(outputOptions)
+        {
+        }
+
+        /**
+         * \brief Constructor for the CreateScanListItemCommand, used to create a scan area item.
+         * \param deviceOptions Pointer to the device options state.
+         */
+        explicit CreateScanListItemCommand(const DeviceOptionsState *deviceOptions)
+            : m_DeviceOptions(deviceOptions)
+            , m_OutputOptions(nullptr)
         {
         }
 
@@ -47,7 +57,14 @@ namespace Gorfector
         static void Execute(const CreateScanListItemCommand &command, ScanListState *scanListState)
         {
             auto updater = ScanListState::Updater(scanListState);
-            updater.AddScanItem(command.m_DeviceOptions, command.m_OutputOptions);
+            if (command.m_OutputOptions == nullptr)
+            {
+                updater.AddScanAreaItem(command.m_DeviceOptions);
+            }
+            else
+            {
+                updater.AddCompleteScanItem(command.m_DeviceOptions, command.m_OutputOptions);
+            }
         }
     };
 }

@@ -60,7 +60,14 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_widget_set_margin_end(buttonBox, 0);
     gtk_box_append(GTK_BOX(m_RootWidget), buttonBox);
 
-    m_AddToScanListButton = gtk_button_new_with_label(_("Add to List"));
+    auto menuModel = g_menu_new();
+    g_menu_append(menuModel, _("Add Scan Area"), "app.add-scan-area");
+    g_menu_append(menuModel, _("Add All Params"), "app.add-all-params");
+    m_App->BindMethodToAction<ScanListPanel>("add-scan-area", &ScanListPanel::SetAddScanArea, this);
+    m_App->BindMethodToAction<ScanListPanel>("add-all-params", &ScanListPanel::SetAddAllParams, this);
+
+    m_AddToScanListButton = adw_split_button_new();
+    adw_split_button_set_menu_model(ADW_SPLIT_BUTTON(m_AddToScanListButton), G_MENU_MODEL(menuModel));
     ConnectGtkSignal(this, &ScanListPanel::OnAddToScanListClicked, m_AddToScanListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_AddToScanListButton);
 
@@ -87,6 +94,16 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_box_append(GTK_BOX(buttonBox), m_CancelListButton);
 }
 
+void Gorfector::ScanListPanel::SetAddScanArea(GSimpleAction *action, GVariant *parameter)
+{
+    m_Dispatcher.Dispatch(SetAddToScanListAddsAllParamsCommand(false));
+}
+
+void Gorfector::ScanListPanel::SetAddAllParams(GSimpleAction *action, GVariant *parameter)
+{
+    m_Dispatcher.Dispatch(SetAddToScanListAddsAllParamsCommand(true));
+}
+
 void Gorfector::ScanListPanel::OnAddToScanListClicked(GtkWidget *widget)
 {
     auto scanOptions = m_App->GetDeviceOptions();
@@ -106,7 +123,14 @@ void Gorfector::ScanListPanel::OnAddToScanListClicked(GtkWidget *widget)
         }
     }
 
-    m_Dispatcher.Dispatch(CreateScanListItemCommand(scanOptions, outputOptions));
+    if (m_PanelState->GetAddToScanListButtonAddsAllParams())
+    {
+        m_Dispatcher.Dispatch(CreateScanListItemCommand(scanOptions, outputOptions));
+    }
+    else
+    {
+        m_Dispatcher.Dispatch(CreateScanListItemCommand(scanOptions));
+    }
 }
 
 void Gorfector::ScanListPanel::OnClearScanListClicked(GtkWidget *widget)
@@ -267,14 +291,15 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
     std::string units{};
     int itemId;
     double tlx{}, tly{}, brx{}, bry{};
-    std::string filePath{};
+    bool isScanAreaItem{};
     m_ScanListItemNames.clear();
     for (size_t i = 0; i < scanCount; ++i)
     {
-        m_PanelState->GetScanItemInfos(i, itemId, units, tlx, tly, brx, bry, filePath);
+        m_PanelState->GetScanItemInfos(i, itemId, units, tlx, tly, brx, bry, isScanAreaItem);
+        auto type = isScanAreaItem ? "◰" : "▤";
         auto labelText = std::format(
-                "<b>#{:03}</b> <small>({:.2f}; {:.2f}) - ({:.2f}; {:.2f}) {}</small>", itemId, tlx, tly, brx, bry,
-                units);
+                "{} <b>#{:03}</b> <small>({:.2f}; {:.2f}) - ({:.2f}; {:.2f}) {}</small>", type, itemId, tlx, tly, brx,
+                bry, units);
         m_ScanListItemNames.push_back(labelText);
     }
     for (size_t i = 0; i < scanCount; ++i)
@@ -288,6 +313,15 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
 
     gtk_list_box_bind_model(
             GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
+
+    if (m_PanelState->GetAddToScanListButtonAddsAllParams())
+    {
+        adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add All Params"));
+    }
+    else
+    {
+        adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add Scan Area"));
+    }
 
     if (scanCount == 0)
     {

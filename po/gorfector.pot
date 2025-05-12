@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-11 20:12-0400\n"
+"POT-Creation-Date: 2025-05-12 10:19-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,8 +88,8 @@ msgstr ""
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:107
-#: src/ScanListPanel.cpp:228
+#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:140
+#: src/ScanListPanel.cpp:261
 msgid "Cancel"
 msgstr ""
 
@@ -256,7 +256,7 @@ msgstr ""
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr ""
 
-#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:196 src/ScanListPanel.cpp:228
+#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:229 src/ScanListPanel.cpp:261
 msgid "Delete"
 msgstr ""
 
@@ -322,53 +322,49 @@ msgstr ""
 msgid "Scan List"
 msgstr ""
 
-#: src/ScanListPanel.cpp:63
-msgid "Add to List"
+#: src/ScanListPanel.cpp:64 src/ScanListPanel.cpp:323
+msgid "Add Scan Area"
 msgstr ""
 
-#: src/ScanListPanel.cpp:67
+#: src/ScanListPanel.cpp:65 src/ScanListPanel.cpp:319
+msgid "Add All Params"
+msgstr ""
+
+#: src/ScanListPanel.cpp:74
 msgid "Clear List"
 msgstr ""
 
-#: src/ScanListPanel.cpp:71
+#: src/ScanListPanel.cpp:88
 msgid "Scan All"
 msgstr ""
 
-#: src/ScanListPanel.cpp:75
+#: src/ScanListPanel.cpp:92
 msgid "Cancel Scans"
 msgstr ""
 
-#: src/ScanListPanel.cpp:104
+#: src/ScanListPanel.cpp:138
 msgid "Clear Scan List"
 msgstr ""
 
-#: src/ScanListPanel.cpp:106
+#: src/ScanListPanel.cpp:139
 msgid "Are you sure you want to clear the scan list?"
 msgstr ""
 
-#: src/ScanListPanel.cpp:107
+#: src/ScanListPanel.cpp:140
 msgid "Clear"
 msgstr ""
 
-#: src/ScanListPanel.cpp:183
+#: src/ScanListPanel.cpp:216
 msgid "Load"
 msgstr ""
 
-#: src/ScanListPanel.cpp:225
+#: src/ScanListPanel.cpp:258
 msgid "Delete Scan"
 msgstr ""
 
-#: src/ScanListPanel.cpp:227
+#: src/ScanListPanel.cpp:260
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
-msgstr ""
-
-#: src/ScanListState.hpp:90
-msgid "<Printer>"
-msgstr ""
-
-#: src/ScanListState.hpp:96
-msgid "<Email>"
 msgstr ""
 
 #: src/ScanOptionsPanel.cpp:28

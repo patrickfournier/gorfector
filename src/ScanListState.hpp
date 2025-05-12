@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gtk/gtk.h>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -9,15 +8,31 @@
 
 namespace Gorfector
 {
+    /**
+     * \class ScanListState
+     * \brief Manages the state of scan lists for different devices, including scan area, scanner settings, and output
+     * settings.
+     *
+     * This class is responsible for maintaining and serializing scan lists for devices. It provides methods to
+     * add, remove, and retrieve scan items, as well as manage the current device's scan list. The state is
+     * serialized using `nlohmann::json` for persistence.
+     */
     class ScanListState final : public ZooLib::StateComponent
     {
+    public:
+        static constexpr const char *k_AddAllParamsKey = "AddAllParams";
+        static constexpr const char *k_ScanListsKey = "ScanLists";
+
+    private:
         static constexpr const char *k_ItemIdKey = "Id";
         static constexpr const char *k_ItemScanAreaHumanKey = "ScanAreaHuman";
         static constexpr const char *k_ItemScanAreaUnitsKey = "ScanAreaUnits";
         static constexpr const char *k_ItemScannerSettingsKey = "ScannerSettings";
         static constexpr const char *k_ItemOutputSettingsKey = "OutputSettings";
+        static constexpr const char *k_ItemScanAreaSettingsKey = "ScanAreaSettings";
 
         std::map<std::string, nlohmann::json> m_ScanLists{};
+        bool m_AddToScanListButtonAddsAllParams{};
 
         std::string m_CurrentDevice{};
         std::vector<nlohmann::json> m_CurrentScanList{};
@@ -61,7 +76,7 @@ namespace Gorfector
 
         void GetScanItemInfos(
                 size_t index, int &id, std::string &units, double &tlx, double &tly, double &brx, double &bry,
-                std::string &outputFilePath) const
+                bool &isScanAreaItem) const
         {
             if (index < m_CurrentScanList.size())
             {
@@ -72,39 +87,31 @@ namespace Gorfector
                 brx = m_CurrentScanList[index][k_ItemScanAreaHumanKey][2].get<double>();
                 bry = m_CurrentScanList[index][k_ItemScanAreaHumanKey][3].get<double>();
 
-                if (m_CurrentScanList[index][k_ItemOutputSettingsKey][OutputOptionsState::k_OutputDestinationKey] ==
-                    OutputOptionsState::OutputDestination::e_File)
-                {
-                    std::filesystem::path outputFilePathObj =
-                            m_CurrentScanList[index][k_ItemOutputSettingsKey][OutputOptionsState::k_OutputDirectoryKey]
-                                    .get<std::string>();
-                    outputFilePathObj /=
-                            m_CurrentScanList[index][k_ItemOutputSettingsKey][OutputOptionsState::k_OutputFileNameKey]
-                                    .get<std::string>();
-                    outputFilePath = outputFilePathObj.string();
-                }
-                else if (
-                        m_CurrentScanList[index][k_ItemOutputSettingsKey][OutputOptionsState::k_OutputDestinationKey] ==
-                        OutputOptionsState::OutputDestination::e_Printer)
-                {
-                    outputFilePath = _("<Printer>");
-                }
-                else if (
-                        m_CurrentScanList[index][k_ItemOutputSettingsKey][OutputOptionsState::k_OutputDestinationKey] ==
-                        OutputOptionsState::OutputDestination::e_Email)
-                {
-                    outputFilePath = _("<Email>");
-                }
-                else
-                {
-                    outputFilePath = "";
-                }
+                isScanAreaItem = IsScanAreaItem(index);
             }
+        }
+
+        [[nodiscard]] bool IsScanAreaItem(size_t index) const
+        {
+            if (index < m_CurrentScanList.size())
+            {
+                return m_CurrentScanList[index].contains(k_ItemScanAreaSettingsKey);
+            }
+            return false;
+        }
+
+        [[nodiscard]] const nlohmann::json *GetScanAreaSettings(size_t index) const
+        {
+            if (index < m_CurrentScanList.size() && m_CurrentScanList[index].contains(k_ItemScanAreaSettingsKey))
+            {
+                return &m_CurrentScanList[index][k_ItemScanAreaSettingsKey];
+            }
+            return nullptr;
         }
 
         [[nodiscard]] const nlohmann::json *GetScannerSettings(size_t index) const
         {
-            if (index < m_CurrentScanList.size())
+            if (index < m_CurrentScanList.size() && m_CurrentScanList[index].contains(k_ItemScannerSettingsKey))
             {
                 return &m_CurrentScanList[index][k_ItemScannerSettingsKey];
             }
@@ -113,11 +120,16 @@ namespace Gorfector
 
         [[nodiscard]] const nlohmann::json *GetOutputSettings(size_t index) const
         {
-            if (index < m_CurrentScanList.size())
+            if (index < m_CurrentScanList.size() && m_CurrentScanList[index].contains(k_ItemOutputSettingsKey))
             {
                 return &m_CurrentScanList[index][k_ItemOutputSettingsKey];
             }
             return nullptr;
+        }
+
+        [[nodiscard]] bool GetAddToScanListButtonAddsAllParams() const
+        {
+            return m_AddToScanListButtonAddsAllParams;
         }
 
         class Updater final : public StateComponent::Updater<ScanListState>
@@ -147,7 +159,7 @@ namespace Gorfector
                 LoadScanListForCurrentDevice();
             }
 
-            void AddScanItem(const DeviceOptionsState *deviceOptions, const OutputOptionsState *outputOptions)
+            void AddCompleteScanItem(const DeviceOptionsState *deviceOptions, const OutputOptionsState *outputOptions)
             {
                 auto itemId = 1;
                 if (!m_StateComponent->m_CurrentScanList.empty())
@@ -170,11 +182,45 @@ namespace Gorfector
                 m_StateComponent->m_CurrentScanList.emplace_back(std::move(scanItem));
             }
 
+            void AddScanAreaItem(const DeviceOptionsState *deviceOptions)
+            {
+                auto itemId = 1;
+                if (!m_StateComponent->m_CurrentScanList.empty())
+                {
+                    auto lastItem = m_StateComponent->m_CurrentScanList.back();
+                    itemId = lastItem[k_ItemIdKey].get<int>() + 1;
+                }
+
+                std::string scanAreaUnits =
+                        deviceOptions->GetScanAreaUnit() == ScanAreaUnit::e_Millimeters ? "mm" : "px";
+                auto scanAreaHuman = deviceOptions->GetScanArea();
+                auto scanItem = nlohmann::json{
+                        {k_ItemIdKey, itemId},
+                        {k_ItemScanAreaUnitsKey, scanAreaUnits},
+                        {k_ItemScanAreaHumanKey,
+                         {scanAreaHuman.MinX(), scanAreaHuman.MinY(), scanAreaHuman.MaxX(), scanAreaHuman.MaxY()}},
+                };
+
+                auto tlx = deviceOptions->GetOption<SANE_Word>(deviceOptions->GetTLXIndex());
+                auto tly = deviceOptions->GetOption<SANE_Word>(deviceOptions->GetTLYIndex());
+                auto brx = deviceOptions->GetOption<SANE_Word>(deviceOptions->GetBRXIndex());
+                auto bry = deviceOptions->GetOption<SANE_Word>(deviceOptions->GetBRYIndex());
+                // To simplify applying the settings, we store the values in the same format as the scan area preset.
+                scanItem[k_ItemScanAreaSettingsKey] = {
+                        {DeviceOptionsState::k_TlxKey, {tlx->GetValue()}},
+                        {DeviceOptionsState::k_TlyKey, {tly->GetValue()}},
+                        {DeviceOptionsState::k_BrxKey, {brx->GetValue()}},
+                        {DeviceOptionsState::k_BryKey, {bry->GetValue()}},
+                };
+                m_StateComponent->m_CurrentScanList.emplace_back(std::move(scanItem));
+            }
+
             void RemoveScanItemAt(size_t index)
             {
                 if (index < m_StateComponent->m_CurrentScanList.size())
                 {
-                    m_StateComponent->m_CurrentScanList.erase(m_StateComponent->m_CurrentScanList.begin() + index);
+                    m_StateComponent->m_CurrentScanList.erase(
+                            m_StateComponent->m_CurrentScanList.begin() + static_cast<long>(index));
                 }
             }
 
@@ -198,16 +244,24 @@ namespace Gorfector
                     LoadScanListForCurrentDevice();
                 }
             }
+
+            void SetAddToScanListAddsAllParams(bool addsAllParams) const
+            {
+                m_StateComponent->m_AddToScanListButtonAddsAllParams = addsAllParams;
+            }
         };
     };
 
     inline void to_json(nlohmann::json &j, const ScanListState &state)
     {
-        to_json(j, state.m_ScanLists);
+        j = nlohmann::json{};
+        j[ScanListState::k_AddAllParamsKey] = state.m_AddToScanListButtonAddsAllParams;
+        j[ScanListState::k_ScanListsKey] = state.m_ScanLists;
     }
 
     inline void from_json(const nlohmann::json &j, ScanListState &state)
     {
-        from_json(j, state.m_ScanLists);
+        j.at(ScanListState::k_AddAllParamsKey).get_to(state.m_AddToScanListButtonAddsAllParams);
+        j.at(ScanListState::k_ScanListsKey).get_to(state.m_ScanLists);
     }
 }

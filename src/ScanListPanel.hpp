@@ -5,6 +5,7 @@
 #include "Commands/LoadScanItemCommand.hpp"
 #include "CreateScanListItemCommand.hpp"
 #include "PresetPanel.hpp"
+#include "SetAddToScanListAddsAllParamsCommand.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/View.hpp"
 
@@ -49,9 +50,12 @@ namespace Gorfector
             m_Dispatcher.RegisterHandler(DeleteScanItemCommand::Execute, m_PanelState);
             m_Dispatcher.RegisterHandler(CreateScanListItemCommand::Execute, m_PanelState);
             m_Dispatcher.RegisterHandler(ClearScanListCommand::Execute, m_PanelState);
+            m_Dispatcher.RegisterHandler(SetAddToScanListAddsAllParamsCommand::Execute, m_PanelState);
         }
 
         void BuildUI();
+        void SetAddScanArea(GSimpleAction *action, GVariant *parameter);
+        void SetAddAllParams(GSimpleAction *action, GVariant *parameter);
         void OnAddToScanListClicked(GtkWidget *widget);
         void OnClearScanListClicked(GtkWidget *widget);
         void OnDeleteListAlertResponse(AdwAlertDialog *alert, gchar *response);
@@ -72,6 +76,7 @@ namespace Gorfector
             m_Dispatcher.UnregisterHandler<DeleteScanItemCommand>();
             m_Dispatcher.UnregisterHandler<CreateScanListItemCommand>();
             m_Dispatcher.UnregisterHandler<ClearScanListCommand>();
+            m_Dispatcher.UnregisterHandler<SetAddToScanListAddsAllParamsCommand>();
 
             m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);

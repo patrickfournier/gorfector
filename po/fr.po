@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-11 20:12-0400\n"
-"PO-Revision-Date: 2025-05-11 20:15-0400\n"
+"POT-Creation-Date: 2025-05-12 10:19-0400\n"
+"PO-Revision-Date: 2025-05-12 10:18-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -90,8 +90,8 @@ msgstr "Le fichier existe déjà"
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
-#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:107
-#: src/ScanListPanel.cpp:228
+#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:140
+#: src/ScanListPanel.cpp:261
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -264,7 +264,7 @@ msgstr "Supprimer ce préréglage"
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr "Voulez-vous vraiment supprimer le préréglage \"%s\"?"
 
-#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:196 src/ScanListPanel.cpp:228
+#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:229 src/ScanListPanel.cpp:261
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -330,54 +330,50 @@ msgstr "Format non pris en charge"
 msgid "Scan List"
 msgstr "Liste de numérisation"
 
-#: src/ScanListPanel.cpp:63
-msgid "Add to List"
-msgstr "Ajouter à la liste"
+#: src/ScanListPanel.cpp:64 src/ScanListPanel.cpp:323
+msgid "Add Scan Area"
+msgstr "Ajouter une zone"
 
-#: src/ScanListPanel.cpp:67
+#: src/ScanListPanel.cpp:65 src/ScanListPanel.cpp:319
+msgid "Add All Params"
+msgstr "Ajouter tous les paramètres"
+
+#: src/ScanListPanel.cpp:74
 msgid "Clear List"
 msgstr "Vider la liste"
 
-#: src/ScanListPanel.cpp:71
+#: src/ScanListPanel.cpp:88
 msgid "Scan All"
 msgstr "Tout numériser"
 
-#: src/ScanListPanel.cpp:75
+#: src/ScanListPanel.cpp:92
 msgid "Cancel Scans"
 msgstr "Annuler les numérisations"
 
-#: src/ScanListPanel.cpp:104
+#: src/ScanListPanel.cpp:138
 msgid "Clear Scan List"
 msgstr "Vider la liste de numérisation"
 
-#: src/ScanListPanel.cpp:106
+#: src/ScanListPanel.cpp:139
 msgid "Are you sure you want to clear the scan list?"
 msgstr "Voulez-vous vraiment vider la liste de numérisation ?"
 
-#: src/ScanListPanel.cpp:107
+#: src/ScanListPanel.cpp:140
 msgid "Clear"
 msgstr "Vider"
 
-#: src/ScanListPanel.cpp:183
+#: src/ScanListPanel.cpp:216
 msgid "Load"
 msgstr "Charger les réglages"
 
-#: src/ScanListPanel.cpp:225
+#: src/ScanListPanel.cpp:258
 msgid "Delete Scan"
 msgstr "Supprimer l'item"
 
-#: src/ScanListPanel.cpp:227
+#: src/ScanListPanel.cpp:260
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr "Voulez-vous vraiment supprimer l'item #%03d ?"
-
-#: src/ScanListState.hpp:90
-msgid "<Printer>"
-msgstr "<Imprimante>"
-
-#: src/ScanListState.hpp:96
-msgid "<Email>"
-msgstr "<Courriel>"
 
 #: src/ScanOptionsPanel.cpp:28
 msgid "px"
@@ -1128,6 +1124,15 @@ msgstr "Bas"
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:173
 msgid "High"
 msgstr "Haut"
+
+#~ msgid "Add to List"
+#~ msgstr "Ajouter à la liste"
+
+#~ msgid "<Printer>"
+#~ msgstr "<Imprimante>"
+
+#~ msgid "<Email>"
+#~ msgstr "<Courriel>"
 
 #~ msgid "View this preset"
 #~ msgstr "Inspecter ce préréglage"

@@ -69,20 +69,35 @@ namespace Gorfector
                 return false;
             }
 
-            auto scannerSettings = m_ScanListState->GetScannerSettings(m_CurrentScanIndex);
-            auto outputSettings = m_ScanListState->GetOutputSettings(m_CurrentScanIndex);
-
-            if (scannerSettings == nullptr || outputSettings == nullptr || scannerSettings->empty() ||
-                outputSettings->empty())
+            if (m_ScanListState->IsScanAreaItem(m_CurrentScanIndex))
             {
-                return false;
+                auto scanAreaSettings = m_ScanListState->GetScanAreaSettings(m_CurrentScanIndex);
+
+                if (scanAreaSettings == nullptr || scanAreaSettings->empty())
+                {
+                    return false;
+                }
+
+                auto deviceOptionsUpdater = DeviceOptionsState::Updater(m_ScanOptions);
+                deviceOptionsUpdater.ApplyScanArea(*scanAreaSettings);
             }
+            else
+            {
+                auto scannerSettings = m_ScanListState->GetScannerSettings(m_CurrentScanIndex);
+                auto outputSettings = m_ScanListState->GetOutputSettings(m_CurrentScanIndex);
 
-            auto deviceOptionsUpdater = DeviceOptionsState::Updater(m_ScanOptions);
-            deviceOptionsUpdater.ApplySettings(*scannerSettings);
+                if (scannerSettings == nullptr || outputSettings == nullptr || scannerSettings->empty() ||
+                    outputSettings->empty())
+                {
+                    return false;
+                }
 
-            auto outputOptionsUpdater = OutputOptionsState::Updater(m_OutputOptions);
-            outputOptionsUpdater.ApplySettings(*outputSettings);
+                auto deviceOptionsUpdater = DeviceOptionsState::Updater(m_ScanOptions);
+                deviceOptionsUpdater.ApplySettings(*scannerSettings);
+
+                auto outputOptionsUpdater = OutputOptionsState::Updater(m_OutputOptions);
+                outputOptionsUpdater.ApplySettings(*outputSettings);
+            }
 
             if (ComputeFileName())
             {
@@ -123,7 +138,7 @@ namespace Gorfector
         {
         }
 
-        bool IsFinished() const
+        [[nodiscard]] bool IsFinished() const
         {
             return m_IsFinished;
         }
