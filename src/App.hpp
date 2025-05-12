@@ -56,7 +56,6 @@ namespace Gorfector
         GtkWidget *m_PreviewButton{};
         GtkWidget *m_ScanButton{};
         GtkWidget *m_CancelButton{};
-        GtkWidget *m_AddToScanListButton{};
 
         ScanProcess *m_ScanProcess{};
 
@@ -100,12 +99,10 @@ namespace Gorfector
             return m_DeviceSelectorState->GetDeviceByName(m_AppState->GetCurrentDeviceName());
         }
 
-        void OnAddToScanListClicked(GtkWidget *);
         void OnScanClicked(GtkWidget *widget);
         void OnCancelClicked(GtkWidget *);
         void OnPreviewClicked(GtkWidget *widget);
 
-        bool CheckFileOutputOptions(const OutputOptionsState *scanOptions) const;
         void ScanToFile(const OutputOptionsState *scanOptions);
         void OnOverwriteAlertResponse(AdwAlertDialog *alert, gchar *response);
         FileWriter *SelectFileWriter(const std::string &path) const;
@@ -200,5 +197,18 @@ namespace Gorfector
         {
             return m_PreviewPanel;
         }
+
+        /**
+         * \brief Validates the file output options provided by the user.
+         *
+         * This method checks if the output directory and file name are valid and ensures
+         * that a suitable file writer can be selected for the specified file name.
+         * If any validation fails, it displays an appropriate error message to the user
+         * and navigates to the relevant UI page for correction.
+         *
+         * \param scanOptions A pointer to the `OutputOptionsState` object containing the file output options.
+         * \return `true` if the file output options are valid, `false` otherwise.
+         */
+        bool CheckFileOutputOptions(const OutputOptionsState *scanOptions) const;
     };
 }

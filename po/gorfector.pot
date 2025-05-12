@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-11 16:04-0400\n"
+"POT-Creation-Date: 2025-05-11 20:12-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,76 +31,73 @@ msgstr ""
 msgid "Cancel Scan"
 msgstr ""
 
-#: src/App.cpp:176
-msgid "Add to Scan List"
-msgstr ""
-
-#: src/App.cpp:251
+#: src/App.cpp:243
 msgid "Select Device..."
 msgstr ""
 
-#: src/App.cpp:254
+#: src/App.cpp:246
 msgid "Use Scan List"
 msgstr ""
 
-#: src/App.cpp:257
+#: src/App.cpp:249
 msgid "Settings..."
 msgstr ""
 
-#: src/App.cpp:258
+#: src/App.cpp:250
 msgid "About..."
 msgstr ""
 
-#: src/App.cpp:276
+#: src/App.cpp:268
 msgid "Select Device"
 msgstr ""
 
-#: src/App.cpp:300
+#: src/App.cpp:292
 msgid "Settings"
 msgstr ""
 
-#: src/App.cpp:314
+#: src/App.cpp:306
 msgid "An application to scan images."
 msgstr ""
 
-#: src/App.cpp:493
+#: src/App.cpp:481
 msgid "Select a directory where to save the image files."
 msgstr ""
 
-#: src/App.cpp:500
+#: src/App.cpp:488
 msgid "Enter a file name to save the image files."
 msgstr ""
 
-#: src/App.cpp:528
+#: src/App.cpp:516
 msgid "Directory does not exists: {}."
 msgstr ""
 
-#: src/App.cpp:543
+#: src/App.cpp:531
 msgid "File '{}' already exists."
 msgstr ""
 
-#: src/App.cpp:556
+#: src/App.cpp:544
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
-#: src/App.cpp:573
+#: src/App.cpp:561
 msgid "File already exists"
 msgstr ""
 
-#: src/App.cpp:575
+#: src/App.cpp:563
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: src/App.cpp:578 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:175
+#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:107
+#: src/ScanListPanel.cpp:228
 msgid "Cancel"
 msgstr ""
 
-#: src/App.cpp:578 src/OutputOptionsState.hpp:51
+#: src/App.cpp:566 src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr ""
 
-#: src/App.cpp:627
+#: src/App.cpp:615
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -195,23 +192,23 @@ msgstr ""
 msgid "Quality"
 msgstr ""
 
-#: src/PreferencesView.hpp:124
+#: src/PreferencesView.hpp:125
 msgid "Image Formats"
 msgstr ""
 
-#: src/PreferencesView.hpp:132
+#: src/PreferencesView.hpp:133
 msgid "Developer"
 msgstr ""
 
-#: src/PreferencesView.hpp:199
+#: src/PreferencesView.hpp:200
 msgid "General"
 msgstr ""
 
-#: src/PreferencesView.hpp:203
+#: src/PreferencesView.hpp:204
 msgid "Dump SANE options"
 msgstr ""
 
-#: src/PreferencesView.hpp:205
+#: src/PreferencesView.hpp:206
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."
@@ -259,7 +256,7 @@ msgstr ""
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr ""
 
-#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:143 src/ScanListPanel.cpp:175
+#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:196 src/ScanListPanel.cpp:228
 msgid "Delete"
 msgstr ""
 
@@ -321,27 +318,47 @@ msgstr ""
 msgid "Unsupported format"
 msgstr ""
 
-#: src/ScanListPanel.cpp:21
+#: src/ScanListPanel.cpp:23
 msgid "Scan List"
 msgstr ""
 
-#: src/ScanListPanel.cpp:61
+#: src/ScanListPanel.cpp:63
+msgid "Add to List"
+msgstr ""
+
+#: src/ScanListPanel.cpp:67
+msgid "Clear List"
+msgstr ""
+
+#: src/ScanListPanel.cpp:71
 msgid "Scan All"
 msgstr ""
 
-#: src/ScanListPanel.cpp:65
+#: src/ScanListPanel.cpp:75
 msgid "Cancel Scans"
 msgstr ""
 
-#: src/ScanListPanel.cpp:130
+#: src/ScanListPanel.cpp:104
+msgid "Clear Scan List"
+msgstr ""
+
+#: src/ScanListPanel.cpp:106
+msgid "Are you sure you want to clear the scan list?"
+msgstr ""
+
+#: src/ScanListPanel.cpp:107
+msgid "Clear"
+msgstr ""
+
+#: src/ScanListPanel.cpp:183
 msgid "Load"
 msgstr ""
 
-#: src/ScanListPanel.cpp:172
+#: src/ScanListPanel.cpp:225
 msgid "Delete Scan"
 msgstr ""
 
-#: src/ScanListPanel.cpp:174
+#: src/ScanListPanel.cpp:227
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr ""

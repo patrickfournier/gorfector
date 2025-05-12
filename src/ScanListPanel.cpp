@@ -2,8 +2,10 @@
 
 #include <format>
 
+#include "ClearScanListCommand.hpp"
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
+#include "CreateScanListItemCommand.hpp"
 #include "MultiScanProcess.hpp"
 #include "PreviewPanel.hpp"
 
@@ -58,6 +60,24 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_widget_set_margin_end(buttonBox, 0);
     gtk_box_append(GTK_BOX(m_RootWidget), buttonBox);
 
+    m_AddToScanListButton = gtk_button_new_with_label(_("Add to List"));
+    ConnectGtkSignal(this, &ScanListPanel::OnAddToScanListClicked, m_AddToScanListButton, "clicked");
+    gtk_box_append(GTK_BOX(buttonBox), m_AddToScanListButton);
+
+    m_ClearScanListButton = gtk_button_new_with_label(_("Clear List"));
+    ConnectGtkSignal(this, &ScanListPanel::OnClearScanListClicked, m_ClearScanListButton, "clicked");
+    gtk_box_append(GTK_BOX(buttonBox), m_ClearScanListButton);
+
+    auto horizontalSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_widget_set_margin_bottom(horizontalSeparator, 10);
+    gtk_widget_set_margin_top(horizontalSeparator, 10);
+    gtk_widget_set_margin_start(horizontalSeparator, 20);
+    gtk_widget_set_margin_end(horizontalSeparator, 20);
+    gtk_widget_set_hexpand(horizontalSeparator, TRUE);
+    gtk_widget_set_vexpand(horizontalSeparator, FALSE);
+    gtk_widget_set_valign(horizontalSeparator, GTK_ALIGN_CENTER);
+    gtk_box_append(GTK_BOX(buttonBox), horizontalSeparator);
+
     m_ScanListButton = gtk_button_new_with_label(_("Scan All"));
     ConnectGtkSignal(this, &ScanListPanel::OnScanClicked, m_ScanListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_ScanListButton);
@@ -65,6 +85,48 @@ void Gorfector::ScanListPanel::BuildUI()
     m_CancelListButton = gtk_button_new_with_label(_("Cancel Scans"));
     ConnectGtkSignal(this, &ScanListPanel::OnCancelClicked, m_CancelListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_CancelListButton);
+}
+
+void Gorfector::ScanListPanel::OnAddToScanListClicked(GtkWidget *widget)
+{
+    auto scanOptions = m_App->GetDeviceOptions();
+    auto outputOptions = m_App->GetOutputOptions();
+
+    if (scanOptions == nullptr || outputOptions == nullptr)
+    {
+        return;
+    }
+
+    auto destination = outputOptions->GetOutputDestination();
+    if (destination == OutputOptionsState::OutputDestination::e_File)
+    {
+        if (!m_App->CheckFileOutputOptions(outputOptions))
+        {
+            return;
+        }
+    }
+
+    m_Dispatcher.Dispatch(CreateScanListItemCommand(scanOptions, outputOptions));
+}
+
+void Gorfector::ScanListPanel::OnClearScanListClicked(GtkWidget *widget)
+{
+    auto alert = adw_alert_dialog_new(_("Clear Scan List"), nullptr);
+    adw_alert_dialog_format_body(ADW_ALERT_DIALOG(alert), _("Are you sure you want to clear the scan list?"));
+    adw_alert_dialog_add_responses(ADW_ALERT_DIALOG(alert), "cancel", _("Cancel"), "delete", _("Clear"), NULL);
+    adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(alert), "delete", ADW_RESPONSE_DESTRUCTIVE);
+    adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(alert), "cancel");
+    adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(alert), "cancel");
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeleteListAlertResponse, alert, "response");
+    adw_dialog_present(alert, GTK_WIDGET(m_App->GetMainWindow()));
+}
+
+void Gorfector::ScanListPanel::OnDeleteListAlertResponse(AdwAlertDialog *alert, gchar *response)
+{
+    if (strcmp(response, "delete") == 0)
+    {
+        m_Dispatcher.Dispatch(ClearScanListCommand());
+    }
 }
 
 void Gorfector::ScanListPanel::OnScanClicked(GtkWidget *widget)
@@ -149,7 +211,7 @@ GtkWidget *Gorfector::ScanListPanel::CreateScanListItem(const char *itemName)
     gtk_widget_set_margin_end(deleteButton, 3);
     gtk_widget_set_size_request(deleteButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), deleteButton);
-    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeletePresetButtonPressed, deleteButton, "clicked");
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeleteItemButtonPressed, deleteButton, "clicked");
 
     return itemBox;
 }
@@ -163,7 +225,7 @@ void Gorfector::ScanListPanel::OnLoadButtonPressed(GtkButton *button)
     m_Dispatcher.Dispatch(LoadScanItemCommand(scannerSettings, outputSettings));
 }
 
-void Gorfector::ScanListPanel::OnDeletePresetButtonPressed(GtkButton *button)
+void Gorfector::ScanListPanel::OnDeleteItemButtonPressed(GtkButton *button)
 {
     auto listBoxRow = ZooLib::GetParentOfType(GTK_WIDGET(button), GTK_TYPE_LIST_BOX_ROW);
     auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
@@ -177,11 +239,11 @@ void Gorfector::ScanListPanel::OnDeletePresetButtonPressed(GtkButton *button)
     adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(alert), "cancel");
     adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(alert), "cancel");
     g_object_set_data(G_OBJECT(alert), "ScanItemIndex", GINT_TO_POINTER(rowId));
-    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeleteAlertResponse, alert, "response");
+    ZooLib::ConnectGtkSignal(this, &ScanListPanel::OnDeleteItemAlertResponse, alert, "response");
     adw_dialog_present(alert, GTK_WIDGET(m_App->GetMainWindow()));
 }
 
-void Gorfector::ScanListPanel::OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response)
+void Gorfector::ScanListPanel::OnDeleteItemAlertResponse(AdwAlertDialog *alert, gchar *response)
 {
     if (strcmp(response, "delete") == 0)
     {
@@ -226,4 +288,17 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
 
     gtk_list_box_bind_model(
             GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
+
+    if (scanCount == 0)
+    {
+        gtk_widget_set_sensitive(m_ScanListButton, false);
+        gtk_widget_set_sensitive(m_ClearScanListButton, false);
+        gtk_widget_set_sensitive(m_CancelListButton, false);
+    }
+    else
+    {
+        gtk_widget_set_sensitive(m_ScanListButton, true);
+        gtk_widget_set_sensitive(m_ClearScanListButton, true);
+        gtk_widget_set_sensitive(m_CancelListButton, true);
+    }
 }

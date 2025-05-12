@@ -1,7 +1,9 @@
 #pragma once
 
+#include "ClearScanListCommand.hpp"
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
+#include "CreateScanListItemCommand.hpp"
 #include "PresetPanel.hpp"
 #include "ViewUpdateObserver.hpp"
 #include "ZooLib/View.hpp"
@@ -20,6 +22,8 @@ namespace Gorfector
         std::vector<std::string> m_ScanListItemNames{};
 
         GtkWidget *m_RootWidget{};
+        GtkWidget *m_AddToScanListButton{};
+        GtkWidget *m_ClearScanListButton{};
         GtkWidget *m_ScanListButton{};
         GtkWidget *m_CancelListButton{};
         GtkWidget *m_ListBox{};
@@ -43,9 +47,14 @@ namespace Gorfector
             m_App->GetObserverManager()->AddObserver(m_CurrentDeviceObserver);
 
             m_Dispatcher.RegisterHandler(DeleteScanItemCommand::Execute, m_PanelState);
+            m_Dispatcher.RegisterHandler(CreateScanListItemCommand::Execute, m_PanelState);
+            m_Dispatcher.RegisterHandler(ClearScanListCommand::Execute, m_PanelState);
         }
 
         void BuildUI();
+        void OnAddToScanListClicked(GtkWidget *widget);
+        void OnClearScanListClicked(GtkWidget *widget);
+        void OnDeleteListAlertResponse(AdwAlertDialog *alert, gchar *response);
         void OnScanClicked(GtkWidget *widget);
         void OnCancelClicked(GtkWidget *widget);
 
@@ -61,6 +70,8 @@ namespace Gorfector
         {
             m_Dispatcher.UnregisterHandler<LoadScanItemCommand>();
             m_Dispatcher.UnregisterHandler<DeleteScanItemCommand>();
+            m_Dispatcher.UnregisterHandler<CreateScanListItemCommand>();
+            m_Dispatcher.UnregisterHandler<ClearScanListCommand>();
 
             m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
@@ -79,8 +90,8 @@ namespace Gorfector
 
         GtkWidget *CreateScanListItem(const char *itemName);
         void OnLoadButtonPressed(GtkButton *button);
-        void OnDeletePresetButtonPressed(GtkButton *button);
-        void OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response);
+        void OnDeleteItemButtonPressed(GtkButton *button);
+        void OnDeleteItemAlertResponse(AdwAlertDialog *alert, gchar *response);
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;
     };
