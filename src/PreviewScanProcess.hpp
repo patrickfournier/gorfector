@@ -79,10 +79,17 @@ namespace Gorfector
 
             if (m_PreviewState != nullptr)
             {
+                // Get actual resolution.
+                auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetResolutionIndex());
+                SANE_Int resolution;
+                m_Device->GetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution);
+                auto previewResolution =
+                        resolutionDescription->type == SANE_TYPE_FIXED ? SANE_UNFIX(resolution) : resolution;
+
                 auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
                 previewPanelUpdater.PrepareForScan(
                         m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines,
-                        m_ScanParameters.depth, m_ScanParameters.format);
+                        m_ScanParameters.depth, m_ScanParameters.format, previewResolution);
             }
 
             return true;

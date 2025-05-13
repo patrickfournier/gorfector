@@ -137,26 +137,24 @@ void Gorfector::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void 
  * Computes a scan area from display pixel values.
  * @param deltaX The change in X direction, in display pixels.
  * @param deltaY The change in Y direction, in display pixels.
- * @param outScanArea The new scan area in SA units.
+ * @param outScanArea The new scan area in mm.
  */
 void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const
 {
-    auto width = m_PreviewState->GetScannedPixelsPerLine() * m_ZoomFactor;
-    auto height = m_PreviewState->GetScannedImageHeight() * m_ZoomFactor;
-
-    if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr || width == 0 || height == 0)
+    auto resolution = m_PreviewState->GetPreviewResolution();
+    if (m_App == nullptr || m_App->GetDeviceOptions() == nullptr || resolution <= 1.)
     {
         outScanArea = Rect<double>{0, 0, 0, 0};
         return;
     }
 
-    // Assuming GetMaxScanArea() top-left is always (0, 0)
-    auto maxScanArea = m_App->GetDeviceOptions()->GetMaxScanArea();
-    double scaleW = maxScanArea.width / width; // SA units per display pixel
-    double scaleH = maxScanArea.height / height; // SA units per display pixel
-
+    auto scale = 25.4 / (resolution * m_ZoomFactor);
     auto pan = m_PreviewState->GetPreviewPanOffset();
-    auto originalScanArea = m_OriginalScanArea - pan;
+    auto originalScanArea = m_PixelScanArea - pan;
+
+    auto maxScanArea = m_App->GetDeviceOptions()->GetMaxScanArea();
+    auto maxWidth = maxScanArea.width / scale;
+    auto maxHeight = maxScanArea.height / scale;
 
     switch (m_DragMode)
     {
@@ -165,21 +163,21 @@ void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect
             deltaY = std::min(deltaY, originalScanArea.height);
             deltaY = std::max(deltaY, -originalScanArea.y);
 
-            outScanArea.x = originalScanArea.x * scaleW;
-            outScanArea.y = (originalScanArea.y + deltaY) * scaleH;
-            outScanArea.width = originalScanArea.width * scaleW;
-            outScanArea.height = (originalScanArea.height - deltaY) * scaleH;
+            outScanArea.x = originalScanArea.x * scale;
+            outScanArea.y = (originalScanArea.y + deltaY) * scale;
+            outScanArea.width = originalScanArea.width * scale;
+            outScanArea.height = (originalScanArea.height - deltaY) * scale;
             break;
         }
         case DragMode::Bottom:
         {
             deltaY = std::max(deltaY, -originalScanArea.height);
-            deltaY = std::min(deltaY, height - originalScanArea.y - originalScanArea.height);
+            deltaY = std::min(deltaY, maxHeight - originalScanArea.y - originalScanArea.height);
 
-            outScanArea.x = originalScanArea.x * scaleW;
-            outScanArea.y = originalScanArea.y * scaleH;
-            outScanArea.width = originalScanArea.width * scaleW;
-            outScanArea.height = (originalScanArea.height + deltaY) * scaleH;
+            outScanArea.x = originalScanArea.x * scale;
+            outScanArea.y = originalScanArea.y * scale;
+            outScanArea.width = originalScanArea.width * scale;
+            outScanArea.height = (originalScanArea.height + deltaY) * scale;
             break;
         }
         case DragMode::Left:
@@ -187,21 +185,21 @@ void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect
             deltaX = std::min(deltaX, originalScanArea.width);
             deltaX = std::max(deltaX, -originalScanArea.x);
 
-            outScanArea.x = (originalScanArea.x + deltaX) * scaleW;
-            outScanArea.y = originalScanArea.y * scaleH;
-            outScanArea.width = (originalScanArea.width - deltaX) * scaleW;
-            outScanArea.height = originalScanArea.height * scaleH;
+            outScanArea.x = (originalScanArea.x + deltaX) * scale;
+            outScanArea.y = originalScanArea.y * scale;
+            outScanArea.width = (originalScanArea.width - deltaX) * scale;
+            outScanArea.height = originalScanArea.height * scale;
             break;
         }
         case DragMode::Right:
         {
             deltaX = std::max(deltaX, -originalScanArea.width);
-            deltaX = std::min(deltaX, width - originalScanArea.x - originalScanArea.width);
+            deltaX = std::min(deltaX, maxWidth - originalScanArea.x - originalScanArea.width);
 
-            outScanArea.x = originalScanArea.x * scaleW;
-            outScanArea.y = originalScanArea.y * scaleH;
-            outScanArea.width = (originalScanArea.width + deltaX) * scaleW;
-            outScanArea.height = originalScanArea.height * scaleH;
+            outScanArea.x = originalScanArea.x * scale;
+            outScanArea.y = originalScanArea.y * scale;
+            outScanArea.width = (originalScanArea.width + deltaX) * scale;
+            outScanArea.height = originalScanArea.height * scale;
             break;
         }
         case DragMode::TopLeft:
@@ -211,23 +209,23 @@ void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect
             deltaY = std::min(deltaY, originalScanArea.height);
             deltaY = std::max(deltaY, -originalScanArea.y);
 
-            outScanArea.x = (originalScanArea.x + deltaX) * scaleW;
-            outScanArea.y = (originalScanArea.y + deltaY) * scaleH;
-            outScanArea.width = (originalScanArea.width - deltaX) * scaleW;
-            outScanArea.height = (originalScanArea.height - deltaY) * scaleH;
+            outScanArea.x = (originalScanArea.x + deltaX) * scale;
+            outScanArea.y = (originalScanArea.y + deltaY) * scale;
+            outScanArea.width = (originalScanArea.width - deltaX) * scale;
+            outScanArea.height = (originalScanArea.height - deltaY) * scale;
             break;
         }
         case DragMode::TopRight:
         {
             deltaX = std::max(deltaX, -originalScanArea.width);
-            deltaX = std::min(deltaX, width - originalScanArea.x - originalScanArea.width);
+            deltaX = std::min(deltaX, maxWidth - originalScanArea.x - originalScanArea.width);
             deltaY = std::min(deltaY, originalScanArea.height);
             deltaY = std::max(deltaY, -originalScanArea.y);
 
-            outScanArea.x = originalScanArea.x * scaleW;
-            outScanArea.y = (originalScanArea.y + deltaY) * scaleH;
-            outScanArea.width = (originalScanArea.width + deltaX) * scaleW;
-            outScanArea.height = (originalScanArea.height - deltaY) * scaleH;
+            outScanArea.x = originalScanArea.x * scale;
+            outScanArea.y = (originalScanArea.y + deltaY) * scale;
+            outScanArea.width = (originalScanArea.width + deltaX) * scale;
+            outScanArea.height = (originalScanArea.height - deltaY) * scale;
             break;
         }
         case DragMode::BottomLeft:
@@ -235,55 +233,55 @@ void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect
             deltaX = std::min(deltaX, originalScanArea.width);
             deltaX = std::max(deltaX, -originalScanArea.x);
             deltaY = std::max(deltaY, -originalScanArea.height);
-            deltaY = std::min(deltaY, height - originalScanArea.y - originalScanArea.height);
+            deltaY = std::min(deltaY, maxHeight - originalScanArea.y - originalScanArea.height);
 
-            outScanArea.x = (originalScanArea.x + deltaX) * scaleW;
-            outScanArea.y = originalScanArea.y * scaleH;
-            outScanArea.width = (originalScanArea.width - deltaX) * scaleW;
-            outScanArea.height = (originalScanArea.height + deltaY) * scaleH;
+            outScanArea.x = (originalScanArea.x + deltaX) * scale;
+            outScanArea.y = originalScanArea.y * scale;
+            outScanArea.width = (originalScanArea.width - deltaX) * scale;
+            outScanArea.height = (originalScanArea.height + deltaY) * scale;
             break;
         }
         case DragMode::BottomRight:
         {
             deltaX = std::max(deltaX, -originalScanArea.width);
-            deltaX = std::min(deltaX, width - originalScanArea.x - originalScanArea.width);
+            deltaX = std::min(deltaX, maxWidth - originalScanArea.x - originalScanArea.width);
             deltaY = std::max(deltaY, -originalScanArea.height);
-            deltaY = std::min(deltaY, height - originalScanArea.y - originalScanArea.height);
+            deltaY = std::min(deltaY, maxHeight - originalScanArea.y - originalScanArea.height);
 
-            outScanArea.x = originalScanArea.x * scaleW;
-            outScanArea.y = originalScanArea.y * scaleH;
-            outScanArea.width = (originalScanArea.width + deltaX) * scaleW;
-            outScanArea.height = (originalScanArea.height + deltaY) * scaleH;
+            outScanArea.x = originalScanArea.x * scale;
+            outScanArea.y = originalScanArea.y * scale;
+            outScanArea.width = (originalScanArea.width + deltaX) * scale;
+            outScanArea.height = (originalScanArea.height + deltaY) * scale;
             break;
         }
         case DragMode::Move:
         {
             deltaX = std::max(deltaX, -originalScanArea.x);
-            deltaX = std::min(deltaX, width - originalScanArea.x - originalScanArea.width);
+            deltaX = std::min(deltaX, maxWidth - originalScanArea.x - originalScanArea.width);
             deltaY = std::max(deltaY, -originalScanArea.y);
-            deltaY = std::min(deltaY, height - originalScanArea.y - originalScanArea.height);
+            deltaY = std::min(deltaY, maxHeight - originalScanArea.y - originalScanArea.height);
 
-            outScanArea.x = (originalScanArea.x + deltaX) * scaleW;
-            outScanArea.y = (originalScanArea.y + deltaY) * scaleH;
-            outScanArea.width = originalScanArea.width * scaleW;
-            outScanArea.height = originalScanArea.height * scaleH;
+            outScanArea.x = (originalScanArea.x + deltaX) * scale;
+            outScanArea.y = (originalScanArea.y + deltaY) * scale;
+            outScanArea.width = originalScanArea.width * scale;
+            outScanArea.height = originalScanArea.height * scale;
             break;
         }
         case DragMode::Draw:
         default:
         {
-            deltaX = std::min(deltaX, width - m_DragStartX);
+            deltaX = std::min(deltaX, maxWidth - m_DragStartX);
             deltaX = std::max(deltaX, -m_DragStartX);
-            deltaY = std::min(deltaY, height - m_DragStartY);
+            deltaY = std::min(deltaY, maxHeight - m_DragStartY);
             deltaY = std::max(deltaY, -m_DragStartY);
 
             auto dragStartX = m_DragStartX - pan.x;
             auto dragStartY = m_DragStartY - pan.y;
 
-            outScanArea.x = std::min(dragStartX, dragStartX + deltaX) * scaleW;
-            outScanArea.y = std::min(dragStartY, dragStartY + deltaY) * scaleH;
-            outScanArea.width = std::max(dragStartX, dragStartX + deltaX) * scaleW - outScanArea.x;
-            outScanArea.height = std::max(dragStartY, dragStartY + deltaY) * scaleH - outScanArea.y;
+            outScanArea.x = std::min(dragStartX, dragStartX + deltaX) * scale;
+            outScanArea.y = std::min(dragStartY, dragStartY + deltaY) * scale;
+            outScanArea.width = std::max(dragStartX, dragStartX + deltaX) * scale - outScanArea.x;
+            outScanArea.height = std::max(dragStartY, dragStartY + deltaY) * scale - outScanArea.y;
             break;
         }
     }
@@ -320,28 +318,23 @@ void Gorfector::PreviewPanel::ComputeScanArea(double deltaX, double deltaY, Rect
 }
 
 /**
- * Maps a scan area to display pixel coordinates.
+ * Maps a scan area in mm to display pixel coordinates.
  * @param scanArea The scan area to be mapped, in SA units.
  * @param outPixelArea The output pixel area.
  * @returns True if the mapping was successful, false otherwise.
  */
 bool Gorfector::PreviewPanel::ScanAreaToPixels(const Rect<double> &scanArea, Rect<double> &outPixelArea) const
 {
-    const auto width = m_PreviewState->GetScannedPixelsPerLine();
-    const auto height = m_PreviewState->GetScannedImageHeight();
-
-    if (m_App != nullptr && m_App->GetDeviceOptions() != nullptr && width != 0 && height != 0 && m_ZoomFactor != 0.0)
+    auto resolution = m_PreviewState->GetPreviewResolution();
+    if (resolution > 1. && m_ZoomFactor != 0.0)
     {
-        auto maxScanArea = m_App->GetDeviceOptions()->GetMaxScanArea();
-        double scaleW = (static_cast<double>(width) * m_ZoomFactor) / maxScanArea.width; // display pixels per SA unit
-        double scaleH = (static_cast<double>(height) * m_ZoomFactor) / maxScanArea.height; // display pixels per SA unit
-
         auto panOffset = m_PreviewState->GetPreviewPanOffset();
+        auto scale = m_ZoomFactor * resolution / 25.4;
 
-        outPixelArea.x = scanArea.x * scaleW + panOffset.x;
-        outPixelArea.y = scanArea.y * scaleH + panOffset.y;
-        outPixelArea.width = scanArea.width * scaleW;
-        outPixelArea.height = scanArea.height * scaleH;
+        outPixelArea.x = scanArea.x * scale + panOffset.x;
+        outPixelArea.y = scanArea.y * scale + panOffset.y;
+        outPixelArea.width = scanArea.width * scale;
+        outPixelArea.height = scanArea.height * scale;
 
         return true;
     }
@@ -429,9 +422,9 @@ void Gorfector::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
     if (isShiftAndMaybeAlt)
     {
         if (auto deviceOptions = m_App->GetDeviceOptions();
-            deviceOptions != nullptr && ScanAreaToPixels(deviceOptions->GetScanArea(), m_OriginalScanArea))
+            deviceOptions != nullptr && ScanAreaToPixels(deviceOptions->GetScanArea(), m_PixelScanArea))
         {
-            auto cursorRegion = GetScanAreaCursorRegion(m_OriginalScanArea, m_DragStartX, m_DragStartY);
+            auto cursorRegion = GetScanAreaCursorRegion(m_PixelScanArea, m_DragStartX, m_DragStartY);
             switch (cursorRegion)
             {
                 case ScanAreaCursorRegions::Top:
@@ -475,7 +468,7 @@ void Gorfector::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
         }
         else
         {
-            m_OriginalScanArea = Rect<double>{0, 0, 0, 0};
+            m_PixelScanArea = Rect<double>{0, 0, 0, 0};
             m_DragMode = DragMode::Draw;
         }
 

@@ -91,7 +91,7 @@ namespace Gorfector
 
         Point<double> m_PanOffset{};
         double m_ZoomFactor{};
-
+        double m_Resolution{};
         Rect<double> m_ScanArea{};
 
         uint64_t m_ImageSize{}; // size, in bytes, of the image
@@ -155,6 +155,11 @@ namespace Gorfector
             {
                 free(m_Image);
             }
+        }
+
+        [[nodiscard]] double GetPreviewResolution() const
+        {
+            return m_Resolution;
         }
 
         [[nodiscard]] Point<double> GetPreviewPanOffset() const
@@ -350,14 +355,16 @@ namespace Gorfector
                 changeset->Set(PreviewStateChangeset::TypeFlag::ScanArea);
             }
 
-            void
-            PrepareForScan(int pixelsPerLine, int bytesPerLine, int imageHeight, int bitDepth, SANE_Frame pixelFormat)
+            void PrepareForScan(
+                    int pixelsPerLine, int bytesPerLine, int imageHeight, int bitDepth, SANE_Frame pixelFormat,
+                    double resolution)
             {
                 m_StateComponent->m_PixelsPerLine = pixelsPerLine;
                 m_StateComponent->m_BytesPerLine = bytesPerLine;
                 m_StateComponent->m_ImageHeight = imageHeight;
                 m_StateComponent->m_BitDepth = bitDepth;
                 m_StateComponent->m_PixelFormat = pixelFormat;
+                m_StateComponent->m_Resolution = resolution;
 
                 const uint64_t requestedSize = bytesPerLine * imageHeight;
                 if (m_StateComponent->m_Image != nullptr && m_StateComponent->m_ImageSize != requestedSize)

@@ -62,7 +62,7 @@ namespace Gorfector
         double m_DragStartY{};
         DragMode m_DragMode{};
         Point<double> m_OriginalPan{};
-        Rect<double> m_OriginalScanArea{};
+        Rect<double> m_PixelScanArea{};
         Point<double> m_LastMousePosition{};
 
         PreviewPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app);
