@@ -33,12 +33,10 @@ jobs:
         sudo apt-get install libxdo-dev libxdo3
 
     - name: Configure Meson
-      env:
       run: meson setup --prefix ${{github.workspace}}/gorfector --buildtype release ${{github.workspace}}/buildDir
 
     - name: Build and Install
       working-directory: ${{github.workspace}}/buildDir
-      env:
       run: meson install
 
     - name: Run tests
