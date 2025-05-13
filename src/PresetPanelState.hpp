@@ -88,8 +88,15 @@ namespace Gorfector
 
         [[nodiscard]] const nlohmann::json *GetPreset(const std::string &presetId) const
         {
-            auto it = std::ranges::find_if(m_Presets, [&presetId](const nlohmann::json &preset) {
-                return preset[k_PresetNameKey] == presetId;
+            auto it = std::ranges::find_if(m_Presets, [presetId](const nlohmann::json &preset) {
+                auto it = preset.find(k_PresetNameKey);
+                if (it != preset.end())
+                {
+                    std::string name;
+                    it->get_to(name);
+                    return name == presetId;
+                }
+                return false;
             });
             if (it != m_Presets.end())
             {
