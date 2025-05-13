@@ -289,7 +289,7 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
     auto scanCount = m_PanelState->GetScanListSize();
     const char **names = new const char *[scanCount + 1];
     std::string units{};
-    int itemId;
+    int itemId{};
     double tlx{}, tly{}, brx{}, bry{};
     bool isScanAreaItem{};
     m_ScanListItemNames.clear();
