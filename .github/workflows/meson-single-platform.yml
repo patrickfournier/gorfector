@@ -13,9 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Init submodules
-      run: git submodule update --init --recursive
-
     - name: Install tools
       run: |
         sudo apt-get update
@@ -37,15 +34,11 @@ jobs:
 
     - name: Configure Meson
       env:
-        CC: clang
-        CXX: clang++
       run: meson setup --prefix ${{github.workspace}}/gorfector --buildtype release ${{github.workspace}}/buildDir
 
     - name: Build and Install
       working-directory: ${{github.workspace}}/buildDir
       env:
-        CC: clang
-        CXX: clang++
       run: meson install
 
     - name: Run tests
