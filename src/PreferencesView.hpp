@@ -95,6 +95,11 @@ namespace Gorfector
         GtkWidget *m_JpegQuality{};
 
         /**
+         * \brief UI element for enabling dumping of SANE options to stdout.
+         */
+        GtkWidget *m_DumpSaneOptions{};
+
+        /**
          * \brief Observer for updating the view based on state changes.
          */
         ViewUpdateObserver<PreferencesView, TiffWriterState, JpegWriterState, PngWriterState> *m_ViewUpdateObserver;
@@ -200,14 +205,15 @@ namespace Gorfector
             adw_preferences_group_set_title(ADW_PREFERENCES_GROUP(prefGroup), _("General"));
             adw_preferences_page_add(ADW_PREFERENCES_PAGE(parent), ADW_PREFERENCES_GROUP(prefGroup));
 
-            auto checkbox = adw_switch_row_new();
-            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(checkbox), _("Dump SANE options"));
+            m_DumpSaneOptions = adw_switch_row_new();
+            adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_DumpSaneOptions), _("Dump SANE options"));
             adw_action_row_set_subtitle(
-                    ADW_ACTION_ROW(checkbox), _("When selecting a scanner, dump its SANE options to stdout. This is "
-                                                "useful for creating scanner config files."));
-            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), checkbox);
+                    ADW_ACTION_ROW(m_DumpSaneOptions),
+                    _("When selecting a scanner, dump its SANE options to stdout. This is "
+                      "useful for creating scanner config files."));
+            adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_DumpSaneOptions);
             ZooLib::ConnectGtkSignalWithParamSpecs(
-                    this, &PreferencesView::OnDumpSaneOptionsChanged, checkbox, "notify::active");
+                    this, &PreferencesView::OnDumpSaneOptionsChanged, m_DumpSaneOptions, "notify::active");
 
             m_Dispatcher.RegisterHandler(SetDumpSaneOptions::Execute, m_DeviceSelectorState);
         }
@@ -314,6 +320,8 @@ namespace Gorfector
             adw_spin_row_set_value(
                     ADW_SPIN_ROW(m_PngCompressionLevel), m_PngWriterStateComponent->GetCompressionLevel());
             adw_spin_row_set_value(ADW_SPIN_ROW(m_JpegQuality), m_JpegWriterStateComponent->GetQuality());
+
+            adw_switch_row_set_active(ADW_SWITCH_ROW(m_DumpSaneOptions), m_DeviceSelectorState->IsDumpSaneEnabled());
         }
     };
 

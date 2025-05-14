@@ -176,6 +176,15 @@ namespace Gorfector
         }
 
         /**
+         * \brief Enables or disables the dumping of SANE options.
+         * \return True if dumping is enabled, false otherwise.
+         */
+        [[nodiscard]] bool IsDumpSaneEnabled() const
+        {
+            return m_DumpSane;
+        }
+
+        /**
          * \brief Constructs a `DeviceSelectorState` instance and initializes the device list.
          *
          * This constructor initializes the `DeviceSelectorState` by fetching the list of devices

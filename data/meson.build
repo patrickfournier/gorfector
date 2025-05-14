@@ -16,5 +16,5 @@ install_data(
 
 install_data(
     'gorfector.png',
-    install_dir: join_paths(datadir, 'icons', 'hicolor/48x48/apps')
+    install_dir: join_paths(datadir, 'icons/hicolor/48x48/apps')
 )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 23:11-0400\n"
+"POT-Creation-Date: 2025-05-13 21:28-0400\n"
 "PO-Revision-Date: 2025-05-12 10:18-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -198,23 +198,23 @@ msgstr "Paramètres JPEG"
 msgid "Quality"
 msgstr "Qualité"
 
-#: src/PreferencesView.hpp:125
+#: src/PreferencesView.hpp:130
 msgid "Image Formats"
 msgstr "Formats d'image"
 
-#: src/PreferencesView.hpp:133
+#: src/PreferencesView.hpp:138
 msgid "Developer"
 msgstr "Développeur"
 
-#: src/PreferencesView.hpp:200
+#: src/PreferencesView.hpp:205
 msgid "General"
 msgstr "Général"
 
-#: src/PreferencesView.hpp:204
+#: src/PreferencesView.hpp:209
 msgid "Dump SANE options"
 msgstr "Imprimer les options SANE"
 
-#: src/PreferencesView.hpp:206
+#: src/PreferencesView.hpp:211
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."
