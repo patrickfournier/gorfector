@@ -1,0 +1,55 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="scanning">
+
+    <info>
+        <desc>How to scan images.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Scanning
+    </title>
+
+    <p>
+        <app>Gorfector</app> has two modes of operation: single image mode and scan list mode.
+        Single image mode is the simplest mode and is used to scan a single image from a document.
+        In scan list mode, you can define multiple scan areas on a single document and scan them all at once, creating
+        multiple image files.
+    </p>
+
+    <steps>
+        <title>Scanning a single image</title>
+        <item><p>Make sure scan list mode is off: click on the menu button and uncheck the <gui style="menuItem">Use Scan List</gui> item.</p></item>
+        <item><p>Click on the <gui style="button">Preview</gui> button to do a quick first scan of your document.</p></item>
+        <item><p>Set the scan area by pressing the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image.
+            See <link xref="cropping"/> for more information about setting the scan area.</p></item>
+        <item><p>Adjust any other settings you want to change (resolution, color mode, etc.) in the <gui>Basic</gui> and <gui>Advanced</gui> tabs.</p></item>
+        <item><p>Click on the <gui>Output</gui> tab and decide where the scanned image should be sent (file, email or printer).
+            See <link xref="file_params"/> for more information about these settings.</p></item>
+        <item><p>If the scanned image should be saved in a file, make sure to select a path and enter a file name.</p></item>
+        <item><p>Click on the <gui style="button">Scan</gui> button to start the scan.</p></item>
+    </steps>
+
+    <steps>
+        <title>Scanning a series of images</title>
+        <item><p>Make sure scan list mode is on: click on the menu button and check the <gui style="menuItem">Use Scan List</gui> item.</p></item>
+        <item><p>Click on the <gui style="button">Preview</gui> button to do a quick first scan of your document.</p></item>
+        <item><p>Set a first scan area by pressing the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image.
+            See <link xref="cropping"/> for more information about setting the scan area.</p></item>
+        <item><p>Click on the <gui style="button">Add Scan Area</gui> / <gui style="button">Add All Params</gui> button to add a scan to the list.
+            Use <gui style="button">Add Scan Area</gui> if you want to keep all other scan parameters intact. On the other hand, if you want the
+            scan item to set all scan parameters (resolution, color mode, etc.) to the current values, use <gui style="button">Add All Params</gui>.</p></item>
+        <item><p>Repeat the last two steps to add more items to the scan list.</p></item>
+        <item><p>Click on the <gui>Output</gui> tab and decide where the scanned images should be sent (file, email or printer).
+            See <link xref="file_params"/> for more information about these settings.</p></item>
+        <item><p>If the scanned images should be saved in files, make sure to select a path and enter a file name.</p></item>
+        <item><p>Click on the <gui style="button">Scan</gui> button to start the scan.</p></item>
+    </steps>
+</page>

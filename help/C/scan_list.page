@@ -1,0 +1,58 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="scan_list">
+
+    <info>
+        <desc>Multiple images from one document.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Scan Lists
+    </title>
+
+    <p>
+        Sometimes, you may want to scan multiple images from the same document. For example, if you are scanning a strip
+        of film, you may want to scan each frame separately. <app>Gorfector</app> allows you to do this by creating a
+        scan list. A scan list is a list of scan areas that you can define on the same document. Each scan area can
+        have its own settings (resolution, color mode, etc.) or can use the current settings.
+    </p>
+
+    <p>
+        To create a scan list, you need to enable scan list mode. You can do this by clicking on the menu button in
+        the top right corner of the <app>Gorfector</app> window and checking the <gui style="menuItem">Use Scan List</gui> item.
+        This will enable scan list mode and will add a new section to the right of the main window, called <gui>Scan List</gui>.
+    </p>
+
+    <p>
+        There are two types of scan list items that you can create: a <gui>Scan Area</gui> item or an <gui>All params</gui> item.
+        A <gui>Scan Area</gui> item uses a rectangle you define on the preview. When scanned, it uses the scan settings (e.g., resolution, color mode)
+        currently active in the <gui>Basic</gui>, <gui>Advanced</gui>, and <gui>Output</gui> tabs.
+        An <gui>All params</gui> item also uses a defined rectangle, but it additionally saves a snapshot of all scan settings
+        from these tabs at the moment it's added to the list. When scanned, this item applies its saved settings.
+    </p>
+
+    <p>
+        To add a scan area to the scan list, click on the <gui style="button">Add</gui> button. This button has a drop-down menu
+        that allows you to select the type of scan area you want to add. When you are done adding scan areas, you can click on
+        the <gui style="button">Scan</gui> button to scan all items.
+    </p>
+
+    <p>
+        You can load a scan list item by clicking on the associated <gui style="button">Load</gui> button; likewise, you can
+        remove a scan list item by clicking on the <gui style="button">Remove</gui> button. Items cannot be reordered nor can
+        they be modified.
+    </p>
+
+    <p>
+        The scan list is saved in the application settings, so if you close the application and reopen it later, the scan
+        list will be restored. Scan lists are bound to the scanner you are using, so if you select a different scanner,
+        a different scan list will be shown.
+    </p>
+</page>

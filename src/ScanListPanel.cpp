@@ -246,7 +246,8 @@ void Gorfector::ScanListPanel::OnLoadButtonPressed(GtkButton *button)
     auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(listBoxRow));
     auto scannerSettings = m_PanelState->GetScannerSettings(rowId);
     auto outputSettings = m_PanelState->GetOutputSettings(rowId);
-    m_Dispatcher.Dispatch(LoadScanItemCommand(scannerSettings, outputSettings));
+    auto scanAreaSettings = m_PanelState->GetScanAreaSettings(rowId);
+    m_Dispatcher.Dispatch(LoadScanItemCommand(scannerSettings, outputSettings, scanAreaSettings));
 }
 
 void Gorfector::ScanListPanel::OnDeleteItemButtonPressed(GtkButton *button)

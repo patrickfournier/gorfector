@@ -24,15 +24,24 @@ namespace Gorfector
          */
         const nlohmann::json *m_OutputSettings;
 
+        /**
+         * \brief Pointer to the JSON object containing scan area settings.
+         */
+        const nlohmann::json *m_ScanAreaSettings;
+
     public:
         /**
          * \brief Constructor for the LoadScanItemCommand.
          * \param scannerSettings Pointer to the JSON object with scanner settings.
          * \param outputSettings Pointer to the JSON object with output settings.
+         * \param scanAreaSettings Pointer to the JSON object with scan area settings.
          */
-        explicit LoadScanItemCommand(const nlohmann::json *scannerSettings, const nlohmann::json *outputSettings)
+        explicit LoadScanItemCommand(
+                const nlohmann::json *scannerSettings, const nlohmann::json *outputSettings,
+                const nlohmann::json *scanAreaSettings)
             : m_ScannerSettings(scannerSettings)
             , m_OutputSettings(outputSettings)
+            , m_ScanAreaSettings(scanAreaSettings)
         {
         }
 
@@ -46,15 +55,20 @@ namespace Gorfector
         Execute(const LoadScanItemCommand &command, DeviceOptionsState *deviceOptions,
                 OutputOptionsState *outputOptions)
         {
-            if (!command.m_ScannerSettings->empty())
+            if (command.m_ScannerSettings != nullptr && !command.m_ScannerSettings->empty())
             {
                 auto deviceOptionsUpdater = DeviceOptionsState::Updater(deviceOptions);
                 deviceOptionsUpdater.ApplySettings(*command.m_ScannerSettings);
             }
-            if (!command.m_OutputSettings->empty())
+            if (command.m_OutputSettings != nullptr && !command.m_OutputSettings->empty())
             {
                 auto outputOptionsUpdater = OutputOptionsState::Updater(outputOptions);
                 outputOptionsUpdater.ApplySettings(*command.m_OutputSettings);
+            }
+            if (command.m_ScanAreaSettings != nullptr && !command.m_ScanAreaSettings->empty())
+            {
+                auto deviceOptionsUpdater = DeviceOptionsState::Updater(deviceOptions);
+                deviceOptionsUpdater.ApplyScanArea(*command.m_ScanAreaSettings);
             }
         }
     };

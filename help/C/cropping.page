@@ -1,0 +1,34 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="cropping">
+
+    <info>
+        <desc>How to set the scan area for an image.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Cropping
+    </title>
+
+    <p>
+        Once you have done a preview scan, you can set the area for the final scan by holding the <key>Shift</key> key and drawing
+        a rectangle with the mouse on the preview image.
+        The rectangle you draw will be the area that is scanned. You can adjust the rectangle by clicking and
+        dragging its corners or edges while holding the <key>Shift</key> key.
+        You can also move the rectangle by clicking and dragging it while holding the <keyseq><key>Shift</key><key>Alt</key></keyseq> keys.
+    </p>
+    <p>You can pan and zoom the preview image for better precision: pan by dragging the image with the mouse and zoom using
+        <keyseq><key>Ctrl</key><key>Mouse Wheel</key></keyseq>.</p>
+    <p>
+        You can also set the scan area by entering the coordinates of the rectangle in the <gui>Scan Area</gui>
+        section of the <gui>Basic</gui> parameter tab.
+        Some scanners may offer additional cropping options, such as selecting a size from a predefined list of common media sizes
+    </p>
+</page>

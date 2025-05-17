@@ -247,6 +247,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
             ->EndSection()
             ->BeginSection()
             ->AddMenuItem(_("Settings..."), "app.preferences")
+            ->AddMenuItem(_("Help..."), "app.help")
             ->AddMenuItem(_("About..."), "app.about")
             ->EndSection();
 
@@ -254,6 +255,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     BindMethodToAction<Application>("quit", &Application::Quit, this);
     BindCommandToToggleAction<ToggleUseScanList>("scanlist", m_AppState->GetUseScanList(), m_AppState);
     BindMethodToAction<App>("preferences", &App::ShowPreferenceDialog, this);
+    BindMethodToAction<App>("help", &App::ShowHelp, this);
     BindMethodToAction<App>("about", &App::ShowAboutDialog, this);
 
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
@@ -291,6 +293,12 @@ void Gorfector::App::ShowPreferenceDialog(GSimpleAction *action, GVariant *param
 
     adw_dialog_set_title(dialog, _("Settings"));
     adw_dialog_present(dialog, m_MainWindow);
+}
+
+void Gorfector::App::ShowHelp(GSimpleAction *action, GVariant *parameter)
+{
+    auto launcher = gtk_uri_launcher_new("help:gorfector");
+    gtk_uri_launcher_launch(launcher, GTK_WINDOW(m_MainWindow), nullptr, nullptr, nullptr);
 }
 
 void Gorfector::App::ShowAboutDialog(GSimpleAction *action, GVariant *parameter)

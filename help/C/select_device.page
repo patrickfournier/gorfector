@@ -1,0 +1,36 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="select_device">
+
+    <info>
+        <desc>Choose which device to use for scanning.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Selecting a Scanner
+    </title>
+
+    <p>
+        On startup, <app>Gorfector</app> will attempt to detect the scanners connected to your computer and will select the first
+        scanner it finds. If you have multiple scanners connected and want to use a different one, click on
+        the button menu in the top right corner of the <app>Gorfector</app> window and select the <gui style="menuItem">Select Device</gui> item.
+        This will open a dialog that lists all the scanners connected to your computer. Select the scanner you want to
+        use and close the dialog.
+    </p>
+    <p>
+        If you have a scanner connected to your computer and <app>Gorfector</app> does not detect it, make sure that the scanner is
+        turned on and that the drivers are installed. You can use the <gui style="button">Refresh Scanner List</gui> button in the dialog to refresh the list of
+        scanners (it can take a few seconds before the scanner registers itself).
+    </p>
+    <p>
+        If the scanner you want to use is connected to a different computer on the network, turn on the <gui style="checkbox">Include Network Scanners</gui>
+        switch to enable detection of network scanners and click the <gui style="button">Refresh Scanner List</gui> button.
+    </p>
+</page>

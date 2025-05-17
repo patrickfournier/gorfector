@@ -1,0 +1,54 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="file_params">
+
+    <info>
+        <desc>Choose where to save the scanned images.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Output Options
+    </title>
+
+    <p>
+        Scanned images can be sent to a file, email or printer. The output options are set in the "Output" tab of the main window.
+        If the image is to be saved to a file, there are additional parameters to fill out:
+    </p>
+
+    <terms>
+        <item>
+            <title><gui>Location</gui></title>
+            <p>Path to the directory where the scanned images will be saved. You can use the "Browse" button to select a directory.</p>
+        </item>
+        <item>
+            <title><gui>Create Missing Directories</gui></title>
+            <p>If this option is checked, <app>Gorfector</app> will create the directory and its parents, if they do not exist.</p>
+        </item>
+        <item>
+            <title><gui>File Name</gui></title>
+            <p>File name for the scanned image. The extension of the file name will determine the format of the image.</p>
+        </item>
+        <item>
+            <title>If File Exists</title>
+            <p>What to do if the file already exists. The options are: <gui>Increment Counter</gui>, <gui>Overwrite</gui> or <gui>Cancel Scan</gui>.</p>
+            <list>
+                <item><p><gui>Increment Counter</gui>: if the file name ends with a numeric string (e.g., <file>my_file_001.tiff</file>), the number will be incremented
+                until there is no existing file with that name.</p></item>
+                <item><p><gui>Overwrite</gui>: the file will be overwritten.</p></item>
+                <item><p><gui>Cancel Scan</gui>: the scan will be canceled.</p></item>
+            </list>
+        </item>
+    </terms>
+
+    <p>
+        You can set the compression options of the different image formats in the application settings, accessible from
+        the menu button in the top right corner of the window.
+    </p>
+</page>

@@ -63,12 +63,13 @@ To compile **Gorfector**, you need to have the following tools installed:
 - Gettext
 - `libxml2-utils`
 - `desktop-file-utils`
+- `itstool`
 - a compiler that supports C++23 (e.g., GCC 13, the default compiler on Ubuntu 24.04)
 
 On Ubuntu, you can install these tools with the following command:
 
 ```bash
-  sudo apt install build-essential meson gettext libxml2-utils desktop-file-utils
+  sudo apt install build-essential meson gettext libxml2-utils desktop-file-utils itstool
 ```
 
 Then you will need to install the following dependencies:

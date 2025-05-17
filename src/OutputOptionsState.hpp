@@ -48,7 +48,7 @@ namespace Gorfector
             e_Cancel ///< Cancel the operation.
         };
         const char *const k_FileExistsActionList[4]{
-                _("Increase Counter"), _("Overwrite"), _("Cancel Scan"),
+                _("Increment Counter"), _("Overwrite"), _("Cancel Scan"),
                 nullptr}; ///< List of file exists action names.
 
     private:

@@ -1,0 +1,53 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="topic"
+      id="presets">
+
+    <info>
+        <desc>Saving and reusing scanning settings.</desc>
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <link type="guide" xref="index"/>
+    </info>
+
+    <title>
+        Presets
+    </title>
+
+    <p>
+        <app>Gorfector</app> enables you to save the current scanning settings as a preset. You can later load this
+        preset to restore the settings.
+    </p>
+
+    <p>
+        At the bottom left of the main window, there is a drawer titled <gui>Presets</gui>. Clicking on the title
+        will open the drawer, revealing a list of saved presets. Initially, this list is empty. You can add presets
+        to the list by clicking on the <gui style="button">+</gui> button in the top-right corner of the drawer. This opens a dialog
+        where you can enter a name for the preset and select which of the following settings you want to save:
+    </p>
+
+    <terms>
+        <item>
+            <title><gui>Scanner Settings</gui></title>
+            <p>All the settings from the <gui>Basic</gui> and <gui>Advanced</gui> tabs, excluding the scan area.
+            These presets are specific to the scanner you are using, so if you select a different scanner, a different set of
+            presets will be shown.</p>
+        </item>
+        <item>
+            <title><gui>Scan Area</gui></title>
+            <p>The scan area.</p>
+        </item>
+        <item>
+            <title><gui>Output Settings</gui></title>
+            <p>The settings from the <gui>Output</gui> tab.</p>
+        </item>
+    </terms>
+
+    <p>
+        Once you have saved a preset, you can load it by selecting it in the list and clicking on the <gui style="button">Apply</gui> button.
+        You can also inspect, rename or delete a preset by clicking on the corresponding button beside the preset name.
+    </p>
+</page>

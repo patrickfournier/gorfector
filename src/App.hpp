@@ -115,6 +115,7 @@ namespace Gorfector
         void ShowAboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
         void ShowSelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
         void ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter);
+        void ShowHelp(GSimpleAction *action, GVariant *parameter);
 
     public:
         static App *Create(int argc, char **argv, bool testMode = false)

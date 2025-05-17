@@ -1,0 +1,22 @@
+<page xmlns="http://projectmallard.org/1.0/" xmlns:its="http://www.w3.org/2005/11/its"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/2005/11/its https://www.w3.org/TR/its/schemas/its20.rng"
+      type="guide"
+      id="index">
+
+    <info>
+        <title type="link" role="trail">Gorfector Manual</title>
+        <title type="text">Gorfector Manual</title>
+        <title type="link">Gorfector Manual</title>
+
+        <credit type="author" its:translate="no">
+            <name>Patrick Fournier</name>
+        </credit>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+    </info>
+
+    <title>
+        <media type="image" its:translate="no" width="48px" height="48px"
+               src="figures/gorfector.png"/>Gorfector Manual
+    </title>
+</page>

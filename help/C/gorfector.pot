@@ -1,0 +1,361 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2025-05-16 22:59-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
+msgctxt "_"
+msgid "translator-credits"
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/cropping.page:8
+msgid "How to set the scan area for an image."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/cropping.page:16
+msgid "Cropping"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:20
+msgid "Once you have done a preview scan, you can set the area for the final scan by holding the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image. The rectangle you draw will be the area that is scanned. You can adjust the rectangle by clicking and dragging its corners or edges while holding the <key>Shift</key> key. You can also move the rectangle by clicking and dragging it while holding the <keyseq><key>Shift</key><key>Alt</key></keyseq> keys."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:27
+msgid "You can pan and zoom the preview image for better precision: pan by dragging the image with the mouse and zoom using <keyseq><key>Ctrl</key><key>Mouse Wheel</key></keyseq>."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:29
+msgid "You can also set the scan area by entering the coordinates of the rectangle in the <gui>Scan Area</gui> section of the <gui>Basic</gui> parameter tab. Some scanners may offer additional cropping options, such as selecting a size from a predefined list of common media sizes"
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/file_params.page:8
+msgid "Choose where to save the scanned images."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/file_params.page:16
+msgid "Output Options"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/file_params.page:20
+msgid "Scanned images can be sent to a file, email or printer. The output options are set in the \"Output\" tab of the main window. If the image is to be saved to a file, there are additional parameters to fill out:"
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:27
+msgid "<gui>Location</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:28
+msgid "Path to the directory where the scanned images will be saved. You can use the \"Browse\" button to select a directory."
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:31
+msgid "<gui>Create Missing Directories</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:32
+msgid "If this option is checked, <app>Gorfector</app> will create the directory and its parents, if they do not exist."
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:35
+msgid "<gui>File Name</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:36
+msgid "File name for the scanned image. The extension of the file name will determine the format of the image."
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:39
+msgid "If File Exists"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:40
+msgid "What to do if the file already exists. The options are: <gui>Increment Counter</gui>, <gui>Overwrite</gui> or <gui>Cancel Scan</gui>."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:42
+msgid "<gui>Increment Counter</gui>: if the file name ends with a numeric string (e.g., <file>my_file_001.tiff</file>), the number will be incremented until there is no existing file with that name."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:44
+msgid "<gui>Overwrite</gui>: the file will be overwritten."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:45
+msgid "<gui>Cancel Scan</gui>: the scan will be canceled."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/file_params.page:50
+msgid "You can set the compression options of the different image formats in the application settings, accessible from the menu button in the top right corner of the window."
+msgstr ""
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:8
+msgctxt "link:trail"
+msgid "Gorfector Manual"
+msgstr ""
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:9
+msgctxt "text"
+msgid "Gorfector Manual"
+msgstr ""
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:10
+msgctxt "link"
+msgid "Gorfector Manual"
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/index.page:18
+msgid "<_:media-1/>Gorfector Manual"
+msgstr ""
+
+#. (itstool) path: p/link
+#: ../help/C/legal.xml:4
+msgid "Creative Commons Attribution-ShareAlike 4.0 International"
+msgstr ""
+
+#. (itstool) path: license/p
+#: ../help/C/legal.xml:3
+msgid "This work is licensed under a <_:link-1/>."
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/presets.page:8
+msgid "Saving and reusing scanning settings."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/presets.page:16
+msgid "Presets"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:20
+msgid "<app>Gorfector</app> enables you to save the current scanning settings as a preset. You can later load this preset to restore the settings."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:25
+msgid "At the bottom left of the main window, there is a drawer titled <gui>Presets</gui>. Clicking on the title will open the drawer, revealing a list of saved presets. Initially, this list is empty. You can add presets to the list by clicking on the <gui style=\"button\">+</gui> button in the top-right corner of the drawer. This opens a dialog where you can enter a name for the preset and select which of the following settings you want to save:"
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:34
+msgid "<gui>Scanner Settings</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:35
+msgid "All the settings from the <gui>Basic</gui> and <gui>Advanced</gui> tabs, excluding the scan area. These presets are specific to the scanner you are using, so if you select a different scanner, a different set of presets will be shown."
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:40
+msgid "<gui>Scan Area</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:41
+msgid "The scan area."
+msgstr ""
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:44
+msgid "<gui>Output Settings</gui>"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:45
+msgid "The settings from the <gui>Output</gui> tab."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:49
+msgid "Once you have saved a preset, you can load it by selecting it in the list and clicking on the <gui style=\"button\">Apply</gui> button. You can also inspect, rename or delete a preset by clicking on the corresponding button beside the preset name."
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/scan_list.page:8
+msgid "Multiple images from one document."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/scan_list.page:16
+msgid "Scan Lists"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:20
+msgid "Sometimes, you may want to scan multiple images from the same document. For example, if you are scanning a strip of film, you may want to scan each frame separately. <app>Gorfector</app> allows you to do this by creating a scan list. A scan list is a list of scan areas that you can define on the same document. Each scan area can have its own settings (resolution, color mode, etc.) or can use the current settings."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:27
+msgid "To create a scan list, you need to enable scan list mode. You can do this by clicking on the menu button in the top right corner of the <app>Gorfector</app> window and checking the <gui style=\"menuItem\">Use Scan List</gui> item. This will enable scan list mode and will add a new section to the right of the main window, called <gui>Scan List</gui>."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:33
+msgid "There are two types of scan list items that you can create: a <gui>Scan Area</gui> item or an <gui>All params</gui> item. A <gui>Scan Area</gui> item uses a rectangle you define on the preview. When scanned, it uses the scan settings (e.g., resolution, color mode) currently active in the <gui>Basic</gui>, <gui>Advanced</gui>, and <gui>Output</gui> tabs. An <gui>All params</gui> item also uses a defined rectangle, but it additionally saves a snapshot of all scan settings from these tabs at the moment it's added to the list. When scanned, this item applies its saved settings."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:41
+msgid "To add a scan area to the scan list, click on the <gui style=\"button\">Add</gui> button. This button has a drop-down menu that allows you to select the type of scan area you want to add. When you are done adding scan areas, you can click on the <gui style=\"button\">Scan</gui> button to scan all items."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:47
+msgid "You can load a scan list item by clicking on the associated <gui style=\"button\">Load</gui> button; likewise, you can remove a scan list item by clicking on the <gui style=\"button\">Remove</gui> button. Items cannot be reordered nor can they be modified."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:53
+msgid "The scan list is saved in the application settings, so if you close the application and reopen it later, the scan list will be restored. Scan lists are bound to the scanner you are using, so if you select a different scanner, a different scan list will be shown."
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/scanning.page:8
+msgid "How to scan images."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/scanning.page:16
+msgid "Scanning"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/scanning.page:20
+msgid "<app>Gorfector</app> has two modes of operation: single image mode and scan list mode. Single image mode is the simplest mode and is used to scan a single image from a document. In scan list mode, you can define multiple scan areas on a single document and scan them all at once, creating multiple image files."
+msgstr ""
+
+#. (itstool) path: steps/title
+#: ../help/C/scanning.page:28
+msgid "Scanning a single image"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:29
+msgid "Make sure scan list mode is off: click on the menu button and uncheck the <gui style=\"menuItem\">Use Scan List</gui> item."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:30
+#: ../help/C/scanning.page:43
+msgid "Click on the <gui style=\"button\">Preview</gui> button to do a quick first scan of your document."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:31
+msgid "Set the scan area by pressing the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image. See <link xref=\"cropping\"/> for more information about setting the scan area."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:33
+msgid "Adjust any other settings you want to change (resolution, color mode, etc.) in the <gui>Basic</gui> and <gui>Advanced</gui> tabs."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:34
+msgid "Click on the <gui>Output</gui> tab and decide where the scanned image should be sent (file, email or printer). See <link xref=\"file_params\"/> for more information about these settings."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:36
+msgid "If the scanned image should be saved in a file, make sure to select a path and enter a file name."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:37
+#: ../help/C/scanning.page:53
+msgid "Click on the <gui style=\"button\">Scan</gui> button to start the scan."
+msgstr ""
+
+#. (itstool) path: steps/title
+#: ../help/C/scanning.page:41
+msgid "Scanning a series of images"
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:42
+msgid "Make sure scan list mode is on: click on the menu button and check the <gui style=\"menuItem\">Use Scan List</gui> item."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:44
+msgid "Set a first scan area by pressing the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image. See <link xref=\"cropping\"/> for more information about setting the scan area."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:46
+msgid "Click on the <gui style=\"button\">Add Scan Area</gui> / <gui style=\"button\">Add All Params</gui> button to add a scan to the list. Use <gui style=\"button\">Add Scan Area</gui> if you want to keep all other scan parameters intact. On the other hand, if you want the scan item to set all scan parameters (resolution, color mode, etc.) to the current values, use <gui style=\"button\">Add All Params</gui>."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:49
+msgid "Repeat the last two steps to add more items to the scan list."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:50
+msgid "Click on the <gui>Output</gui> tab and decide where the scanned images should be sent (file, email or printer). See <link xref=\"file_params\"/> for more information about these settings."
+msgstr ""
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:52
+msgid "If the scanned images should be saved in files, make sure to select a path and enter a file name."
+msgstr ""
+
+#. (itstool) path: info/desc
+#: ../help/C/select_device.page:8
+msgid "Choose which device to use for scanning."
+msgstr ""
+
+#. (itstool) path: page/title
+#: ../help/C/select_device.page:16
+msgid "Selecting a Scanner"
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:20
+msgid "On startup, <app>Gorfector</app> will attempt to detect the scanners connected to your computer and will select the first scanner it finds. If you have multiple scanners connected and want to use a different one, click on the button menu in the top right corner of the <app>Gorfector</app> window and select the <gui style=\"menuItem\">Select Device</gui> item. This will open a dialog that lists all the scanners connected to your computer. Select the scanner you want to use and close the dialog."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:27
+msgid "If you have a scanner connected to your computer and <app>Gorfector</app> does not detect it, make sure that the scanner is turned on and that the drivers are installed. You can use the <gui style=\"button\">Refresh Scanner List</gui> button in the dialog to refresh the list of scanners (it can take a few seconds before the scanner registers itself)."
+msgstr ""
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:32
+msgid "If the scanner you want to use is connected to a different computer on the network, turn on the <gui style=\"checkbox\">Include Network Scanners</gui> switch to enable detection of network scanners and click the <gui style=\"button\">Refresh Scanner List</gui> button."
+msgstr ""
+
