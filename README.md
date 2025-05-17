@@ -17,6 +17,7 @@ other scanners so we can improve compatibility.
 - User defined presets
 - Output to file (TIFF, PNG, JPEG), to email or to printer
 - Adwaita GTK3 user interface
+- Saves pixels straight from the scanner: no image processing is done
 
 # Improving Gorfector
 

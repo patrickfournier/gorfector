@@ -21,6 +21,7 @@ jobs:
         sudo apt-get install libxml2-utils
         sudo apt-get install xvfb
         sudo apt-get install desktop-file-utils
+        sudo apt-get install itstool
 
     - name: Install dependencies
       run: |
