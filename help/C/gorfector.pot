@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-05-16 22:59-0400\n"
+"POT-Creation-Date: 2025-05-17 22:51-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,7 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: ../help/C/scan_list.page:47
-msgid "You can load a scan list item by clicking on the associated <gui style=\"button\">Load</gui> button; likewise, you can remove a scan list item by clicking on the <gui style=\"button\">Remove</gui> button. Items cannot be reordered nor can they be modified."
+msgid "You can load a scan list item by clicking on the associated <gui style=\"button\">Load</gui> button; likewise, you can remove a scan list item by clicking on the <gui style=\"button\">Remove</gui> button. Below the scan list, there are two buttons to move the selected item up or down in the list."
 msgstr ""
 
 #. (itstool) path: page/p

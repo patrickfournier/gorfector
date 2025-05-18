@@ -6,6 +6,7 @@
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
 #include "CreateScanListItemCommand.hpp"
+#include "MoveScanListItemCommand.hpp"
 #include "MultiScanProcess.hpp"
 #include "PreviewPanel.hpp"
 
@@ -43,6 +44,7 @@ void Gorfector::ScanListPanel::BuildUI()
 
     const char *scanListClasses[] = {"boxed-list", nullptr};
     m_ListBox = gtk_list_box_new();
+    gtk_list_box_set_selection_mode(GTK_LIST_BOX(m_ListBox), GTK_SELECTION_SINGLE);
     gtk_widget_set_margin_bottom(m_ListBox, 3);
     gtk_widget_set_margin_top(m_ListBox, 3);
     gtk_widget_set_margin_start(m_ListBox, 3);
@@ -51,7 +53,28 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_widget_set_vexpand(m_ListBox, FALSE);
     gtk_widget_set_valign(m_ListBox, GTK_ALIGN_START);
     gtk_widget_set_css_classes(m_ListBox, scanListClasses);
+    ConnectGtkSignal(this, &ScanListPanel::OnItemSelected, m_ListBox, "row-selected");
     gtk_viewport_set_child(GTK_VIEWPORT(viewport), m_ListBox);
+
+    auto upDownBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_margin_top(upDownBox, 10);
+    gtk_widget_set_halign(upDownBox, GTK_ALIGN_END);
+    gtk_box_append(GTK_BOX(m_RootWidget), upDownBox);
+
+    m_MoveItemUpButton = gtk_button_new();
+    gtk_widget_set_css_classes(m_MoveItemUpButton, s_ButtonClasses);
+    gtk_button_set_icon_name(GTK_BUTTON(m_MoveItemUpButton), "go-up-symbolic");
+    gtk_widget_set_tooltip_text(m_MoveItemUpButton, _("Move Item Up"));
+    ConnectGtkSignal(this, &ScanListPanel::OnMoveItemUpListClicked, m_MoveItemUpButton, "clicked");
+    gtk_box_append(GTK_BOX(upDownBox), m_MoveItemUpButton);
+
+    m_MoveItemDownButton = gtk_button_new();
+    gtk_widget_set_css_classes(m_MoveItemDownButton, s_ButtonClasses);
+    gtk_button_set_icon_name(GTK_BUTTON(m_MoveItemDownButton), "go-down-symbolic");
+    gtk_widget_set_tooltip_text(m_MoveItemDownButton, _("Move Item Down"));
+    ConnectGtkSignal(this, &ScanListPanel::OnMoveItemDownListClicked, m_MoveItemDownButton, "clicked");
+    gtk_box_append(GTK_BOX(upDownBox), m_MoveItemDownButton);
+
 
     auto buttonBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
     gtk_widget_set_margin_bottom(buttonBox, 20);
@@ -72,6 +95,7 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_box_append(GTK_BOX(buttonBox), m_AddToScanListButton);
 
     m_ClearScanListButton = gtk_button_new_with_label(_("Clear List"));
+    gtk_widget_set_css_classes(m_ClearScanListButton, s_ButtonClasses);
     ConnectGtkSignal(this, &ScanListPanel::OnClearScanListClicked, m_ClearScanListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_ClearScanListButton);
 
@@ -86,12 +110,57 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_box_append(GTK_BOX(buttonBox), horizontalSeparator);
 
     m_ScanListButton = gtk_button_new_with_label(_("Scan All"));
+    gtk_widget_set_css_classes(m_ScanListButton, s_ButtonClasses);
     ConnectGtkSignal(this, &ScanListPanel::OnScanClicked, m_ScanListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_ScanListButton);
 
     m_CancelListButton = gtk_button_new_with_label(_("Cancel Scans"));
+    gtk_widget_set_css_classes(m_CancelListButton, s_ButtonClasses);
     ConnectGtkSignal(this, &ScanListPanel::OnCancelClicked, m_CancelListButton, "clicked");
     gtk_box_append(GTK_BOX(buttonBox), m_CancelListButton);
+}
+
+void Gorfector::ScanListPanel::OnItemSelected(GtkListBox *listBox, GtkListBoxRow *row)
+{
+    if (m_BlockOnItemSelected)
+    {
+        return;
+    }
+
+    int rowId = -1;
+    if (row != nullptr)
+    {
+        rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(row));
+    }
+    if (rowId != m_PanelState->GetSelectedIndex())
+    {
+        auto updater = ScanListState::Updater(m_PanelState);
+        updater.SetSelectedIndex(rowId);
+    }
+}
+
+void Gorfector::ScanListPanel::OnMoveItemUpListClicked(GtkWidget *widget)
+{
+    auto selectedRow = gtk_list_box_get_selected_row(GTK_LIST_BOX(m_ListBox));
+    if (selectedRow == nullptr)
+    {
+        return;
+    }
+
+    auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(selectedRow));
+    m_Dispatcher.Dispatch(MoveScanListItemCommand(rowId, -1));
+}
+
+void Gorfector::ScanListPanel::OnMoveItemDownListClicked(GtkWidget *widget)
+{
+    auto selectedRow = gtk_list_box_get_selected_row(GTK_LIST_BOX(m_ListBox));
+    if (selectedRow == nullptr)
+    {
+        return;
+    }
+
+    auto rowId = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(selectedRow));
+    m_Dispatcher.Dispatch(MoveScanListItemCommand(rowId, 1));
 }
 
 void Gorfector::ScanListPanel::SetAddScanArea(GSimpleAction *action, GVariant *parameter)
@@ -282,58 +351,96 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
     if (m_PanelState == nullptr)
         return;
 
-    m_Dispatcher.UnregisterHandler<LoadScanItemCommand>();
-    m_Dispatcher.RegisterHandler(LoadScanItemCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
+    bool forceUpdate = lastSeenVersions[0] == 0;
 
-    m_ScanListItemNames.clear();
-
-    auto scanCount = m_PanelState->GetScanListSize();
-    const char **names = new const char *[scanCount + 1];
-    std::string units{};
-    int itemId{};
-    double tlx{}, tly{}, brx{}, bry{};
-    bool isScanAreaItem{};
-    m_ScanListItemNames.clear();
-    for (size_t i = 0; i < scanCount; ++i)
+    auto changeset = m_PanelState->GetAggregatedChangeset(lastSeenVersions[0]);
+    if (!forceUpdate && (changeset == nullptr || !changeset->HasAnyChange()))
     {
-        m_PanelState->GetScanItemInfos(i, itemId, units, tlx, tly, brx, bry, isScanAreaItem);
-        auto type = isScanAreaItem ? "◰" : "▤";
-        auto labelText = std::format(
-                "{} <b>#{:03}</b> <small>({:.2f}; {:.2f}) - ({:.2f}; {:.2f}) {}</small>", type, itemId, tlx, tly, brx,
-                bry, units);
-        m_ScanListItemNames.push_back(labelText);
-    }
-    for (size_t i = 0; i < scanCount; ++i)
-    {
-        names[i] = m_ScanListItemNames[i].c_str();
-    }
-    names[scanCount] = nullptr;
-
-    auto scanListModel = gtk_string_list_new(names);
-    delete[] names;
-
-    gtk_list_box_bind_model(
-            GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
-
-    if (m_PanelState->GetAddToScanListButtonAddsAllParams())
-    {
-        adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add All Params"));
-    }
-    else
-    {
-        adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add Scan Area"));
+        return;
     }
 
-    if (scanCount == 0)
+    if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ListContent))
     {
-        gtk_widget_set_sensitive(m_ScanListButton, false);
-        gtk_widget_set_sensitive(m_ClearScanListButton, false);
-        gtk_widget_set_sensitive(m_CancelListButton, false);
+        m_BlockOnItemSelected = true;
+
+        m_Dispatcher.UnregisterHandler<LoadScanItemCommand>();
+        m_Dispatcher.RegisterHandler(
+                LoadScanItemCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
+
+        m_ScanListItemNames.clear();
+
+        auto scanCount = m_PanelState->GetScanListSize();
+        const char **names = new const char *[scanCount + 1];
+        std::string units{};
+        int itemId{};
+        double tlx{}, tly{}, brx{}, bry{};
+        bool isScanAreaItem{};
+        m_ScanListItemNames.clear();
+        for (size_t i = 0; i < scanCount; ++i)
+        {
+            m_PanelState->GetScanItemInfos(i, itemId, units, tlx, tly, brx, bry, isScanAreaItem);
+            auto type = isScanAreaItem ? "◰" : "▤";
+            auto labelText = std::format(
+                    "{} <b>#{:03}</b> <small>({:.2f}; {:.2f}) - ({:.2f}; {:.2f}) {}</small>", type, itemId, tlx, tly,
+                    brx, bry, units);
+            m_ScanListItemNames.push_back(labelText);
+        }
+        for (size_t i = 0; i < scanCount; ++i)
+        {
+            names[i] = m_ScanListItemNames[i].c_str();
+        }
+        names[scanCount] = nullptr;
+
+        auto scanListModel = gtk_string_list_new(names);
+        delete[] names;
+
+        gtk_list_box_bind_model(
+                GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
+
+        if (scanCount == 0)
+        {
+            gtk_widget_set_sensitive(m_ScanListButton, false);
+            gtk_widget_set_sensitive(m_ClearScanListButton, false);
+            gtk_widget_set_sensitive(m_CancelListButton, false);
+        }
+        else
+        {
+            gtk_widget_set_sensitive(m_ScanListButton, true);
+            gtk_widget_set_sensitive(m_ClearScanListButton, true);
+            gtk_widget_set_sensitive(m_CancelListButton, true);
+        }
+
+        m_BlockOnItemSelected = false;
     }
-    else
+
+    if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ButtonAction))
     {
-        gtk_widget_set_sensitive(m_ScanListButton, true);
-        gtk_widget_set_sensitive(m_ClearScanListButton, true);
-        gtk_widget_set_sensitive(m_CancelListButton, true);
+        if (m_PanelState->GetAddToScanListButtonAddsAllParams())
+        {
+            adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add All Params"));
+        }
+        else
+        {
+            adw_split_button_set_label(ADW_SPLIT_BUTTON(m_AddToScanListButton), _("Add Scan Area"));
+        }
+    }
+
+    if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::SelectedItem))
+    {
+        GtkListBoxRow *selectedRow = nullptr;
+        auto selectedIndex = m_PanelState->GetSelectedIndex();
+        if (selectedIndex >= 0)
+        {
+            selectedRow = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), selectedIndex);
+            gtk_widget_set_sensitive(m_MoveItemUpButton, true);
+            gtk_widget_set_sensitive(m_MoveItemDownButton, true);
+        }
+        else
+        {
+            gtk_widget_set_sensitive(m_MoveItemUpButton, false);
+            gtk_widget_set_sensitive(m_MoveItemDownButton, false);
+        }
+
+        gtk_list_box_select_row(GTK_LIST_BOX(m_ListBox), selectedRow);
     }
 }

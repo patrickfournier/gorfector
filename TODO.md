@@ -1,9 +1,9 @@
 # TODO
 
 - Rotate preview
-- Reorder scan list
 - Have toolbar for pan/select modes
 - Histogram
+- Define aspect ratio
 
 # CI
 - Pre-merge checks

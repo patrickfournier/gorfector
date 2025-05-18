@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-13 21:28-0400\n"
-"PO-Revision-Date: 2025-05-12 10:18-0400\n"
+"POT-Creation-Date: 2025-05-17 22:50-0400\n"
+"PO-Revision-Date: 2025-05-17 22:55-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -46,60 +46,64 @@ msgid "Settings..."
 msgstr "Paramètres..."
 
 #: src/App.cpp:250
+msgid "Help..."
+msgstr "Aide..."
+
+#: src/App.cpp:251
 msgid "About..."
 msgstr "À propos..."
 
-#: src/App.cpp:268
+#: src/App.cpp:270
 msgid "Select Device"
 msgstr "Sélectionner le périphérique"
 
-#: src/App.cpp:292
+#: src/App.cpp:294
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/App.cpp:306
+#: src/App.cpp:314
 msgid "An application to scan images."
 msgstr "Une application pour numériser des images."
 
-#: src/App.cpp:481
+#: src/App.cpp:489
 msgid "Select a directory where to save the image files."
 msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
-#: src/App.cpp:488
+#: src/App.cpp:496
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
-#: src/App.cpp:516
+#: src/App.cpp:524
 msgid "Directory does not exists: {}."
 msgstr "Le répertoire '{}' n'existe pas."
 
-#: src/App.cpp:531
+#: src/App.cpp:539
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
-#: src/App.cpp:544
+#: src/App.cpp:552
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr "Impossible de trouver un nom unique en incrémentant '{}'."
 
-#: src/App.cpp:561
+#: src/App.cpp:569
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: src/App.cpp:563
+#: src/App.cpp:571
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
-#: src/App.cpp:566 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:140
-#: src/ScanListPanel.cpp:261
+#: src/App.cpp:574 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
+#: src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/App.cpp:566 src/OutputOptionsState.hpp:51
+#: src/App.cpp:574 src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr "Écraser"
 
-#: src/App.cpp:615
+#: src/App.cpp:623
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -151,7 +155,7 @@ msgid "Email"
 msgstr "Courriel"
 
 #: src/OutputOptionsState.hpp:51
-msgid "Increase Counter"
+msgid "Increment Counter"
 msgstr "Incrémenter"
 
 #: src/PreferencesView.cpp:6
@@ -214,7 +218,7 @@ msgstr "Général"
 msgid "Dump SANE options"
 msgstr "Imprimer les options SANE"
 
-#: src/PreferencesView.hpp:211
+#: src/PreferencesView.hpp:212
 msgid ""
 "When selecting a scanner, dump its SANE options to stdout. This is useful "
 "for creating scanner config files."
@@ -264,7 +268,7 @@ msgstr "Supprimer ce préréglage"
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr "Voulez-vous vraiment supprimer le préréglage \"%s\"?"
 
-#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:229 src/ScanListPanel.cpp:261
+#: src/PresetPanel.cpp:89 src/ScanListPanel.cpp:298 src/ScanListPanel.cpp:331
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -326,51 +330,59 @@ msgstr "Progrès: "
 msgid "Unsupported format"
 msgstr "Format non pris en charge"
 
-#: src/ScanListPanel.cpp:23
+#: src/ScanListPanel.cpp:24
 msgid "Scan List"
 msgstr "Liste de numérisation"
 
-#: src/ScanListPanel.cpp:64 src/ScanListPanel.cpp:323
+#: src/ScanListPanel.cpp:67
+msgid "Move Item Up"
+msgstr "Monter"
+
+#: src/ScanListPanel.cpp:74
+msgid "Move Item Down"
+msgstr "Descendre"
+
+#: src/ScanListPanel.cpp:87 src/ScanListPanel.cpp:423
 msgid "Add Scan Area"
 msgstr "Ajouter une zone"
 
-#: src/ScanListPanel.cpp:65 src/ScanListPanel.cpp:319
+#: src/ScanListPanel.cpp:88 src/ScanListPanel.cpp:419
 msgid "Add All Params"
 msgstr "Ajouter tous les paramètres"
 
-#: src/ScanListPanel.cpp:74
+#: src/ScanListPanel.cpp:97
 msgid "Clear List"
 msgstr "Vider la liste"
 
-#: src/ScanListPanel.cpp:88
+#: src/ScanListPanel.cpp:112
 msgid "Scan All"
 msgstr "Tout numériser"
 
-#: src/ScanListPanel.cpp:92
+#: src/ScanListPanel.cpp:117
 msgid "Cancel Scans"
 msgstr "Annuler les numérisations"
 
-#: src/ScanListPanel.cpp:138
+#: src/ScanListPanel.cpp:207
 msgid "Clear Scan List"
 msgstr "Vider la liste de numérisation"
 
-#: src/ScanListPanel.cpp:139
+#: src/ScanListPanel.cpp:208
 msgid "Are you sure you want to clear the scan list?"
 msgstr "Voulez-vous vraiment vider la liste de numérisation ?"
 
-#: src/ScanListPanel.cpp:140
+#: src/ScanListPanel.cpp:209
 msgid "Clear"
 msgstr "Vider"
 
-#: src/ScanListPanel.cpp:216
+#: src/ScanListPanel.cpp:285
 msgid "Load"
 msgstr "Charger les réglages"
 
-#: src/ScanListPanel.cpp:258
+#: src/ScanListPanel.cpp:328
 msgid "Delete Scan"
 msgstr "Supprimer l'item"
 
-#: src/ScanListPanel.cpp:260
+#: src/ScanListPanel.cpp:330
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr "Voulez-vous vraiment supprimer l'item #%03d ?"

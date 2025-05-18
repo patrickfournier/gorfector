@@ -46,8 +46,8 @@
 
     <p>
         You can load a scan list item by clicking on the associated <gui style="button">Load</gui> button; likewise, you can
-        remove a scan list item by clicking on the <gui style="button">Remove</gui> button. Items cannot be reordered nor can
-        they be modified.
+        remove a scan list item by clicking on the <gui style="button">Remove</gui> button. Below the scan list, there are
+        two buttons to move the selected item up or down in the list.
     </p>
 
     <p>

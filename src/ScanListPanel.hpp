@@ -4,6 +4,7 @@
 #include "Commands/DeleteScanItemCommand.hpp"
 #include "Commands/LoadScanItemCommand.hpp"
 #include "CreateScanListItemCommand.hpp"
+#include "MoveScanListItemCommand.hpp"
 #include "PresetPanel.hpp"
 #include "SetAddToScanListAddsAllParamsCommand.hpp"
 #include "ViewUpdateObserver.hpp"
@@ -28,8 +29,12 @@ namespace Gorfector
         GtkWidget *m_ScanListButton{};
         GtkWidget *m_CancelListButton{};
         GtkWidget *m_ListBox{};
+        GtkWidget *m_MoveItemUpButton{};
+        GtkWidget *m_MoveItemDownButton{};
 
         ScanProcess *m_ScanProcess{};
+
+        bool m_BlockOnItemSelected{};
 
         ScanListPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
             : m_App(app)
@@ -51,9 +56,13 @@ namespace Gorfector
             m_Dispatcher.RegisterHandler(CreateScanListItemCommand::Execute, m_PanelState);
             m_Dispatcher.RegisterHandler(ClearScanListCommand::Execute, m_PanelState);
             m_Dispatcher.RegisterHandler(SetAddToScanListAddsAllParamsCommand::Execute, m_PanelState);
+            m_Dispatcher.RegisterHandler(MoveScanListItemCommand::Execute, m_PanelState);
         }
 
         void BuildUI();
+        void OnItemSelected(GtkListBox *listBox, GtkListBoxRow *row);
+        void OnMoveItemUpListClicked(GtkWidget *widget);
+        void OnMoveItemDownListClicked(GtkWidget *widget);
         void SetAddScanArea(GSimpleAction *action, GVariant *parameter);
         void SetAddAllParams(GSimpleAction *action, GVariant *parameter);
         void OnAddToScanListClicked(GtkWidget *widget);
@@ -77,6 +86,7 @@ namespace Gorfector
             m_Dispatcher.UnregisterHandler<CreateScanListItemCommand>();
             m_Dispatcher.UnregisterHandler<ClearScanListCommand>();
             m_Dispatcher.UnregisterHandler<SetAddToScanListAddsAllParamsCommand>();
+            m_Dispatcher.UnregisterHandler<MoveScanListItemCommand>();
 
             m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
