@@ -101,15 +101,14 @@ namespace Gorfector
                 device->Close();
 
             device = GetDeviceByName(deviceName);
+
+            m_SelectedDeviceName = k_NullDeviceName;
             if (device != nullptr)
             {
-                m_SelectedDeviceName = deviceName;
-                // FIXME: can throw
-                device->Open();
-            }
-            else
-            {
-                m_SelectedDeviceName = k_NullDeviceName;
+                if (device->Open())
+                {
+                    m_SelectedDeviceName = deviceName;
+                }
             }
 
             if (m_DumpSane && (m_SelectedDeviceName != k_NullDeviceName))

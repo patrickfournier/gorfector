@@ -47,14 +47,15 @@ namespace Gorfector
             return *this;
         }
 
-        void Open()
+        bool Open()
         {
             SANE_Status status = sane_open(m_Device->name, &m_Handle);
             if (status != SANE_STATUS_GOOD)
             {
                 m_Handle = nullptr;
-                throw SaneException("Failed to open device.");
+                return false;
             }
+            return true;
         }
 
         void Close()
