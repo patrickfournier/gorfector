@@ -1,0 +1,661 @@
+# French translations for gorfector manual.
+# Copyright (C) 2025 Listed translators
+# This file is distributed under the license
+# Creative Commons Attribution-ShareAlike 4.0 International https://creativecommons.org/licenses/by-sa/4.0/
+#
+# Patrick Fournier <>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gorfector master\n"
+"POT-Creation-Date: 2025-05-19 00:06-0400\n"
+"PO-Revision-Date: 2025-05-19 12:08-0400\n"
+"Last-Translator: Patrick Fournier <>\n"
+"Language-Team: French - Canada\n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 46.0\n"
+"Report-Msgid-Bugs-To: https://github.com/patrickfournier/gorfector/issues\n"
+
+#. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
+msgctxt "_"
+msgid "translator-credits"
+msgstr "Patrick Fournier, 2025"
+
+#. (itstool) path: info/desc
+#: ../help/C/cropping.page:8
+msgid "How to set the scan area for an image."
+msgstr "Comment définir la zone de numérisation d'une image."
+
+#. (itstool) path: page/title
+#: ../help/C/cropping.page:16
+msgid "Cropping"
+msgstr "Recadrage"
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:20
+msgid ""
+"Once you have done a preview scan, you can set the area for the final scan "
+"by holding the <key>Shift</key> key and drawing a rectangle with the mouse "
+"on the preview image. The rectangle you draw will be the area that is "
+"scanned. You can adjust the rectangle by clicking and dragging its corners "
+"or edges while holding the <key>Shift</key> key. You can also move the "
+"rectangle by clicking and dragging it while holding the <keyseq><key>Shift</"
+"key><key>Alt</key></keyseq> keys."
+msgstr ""
+"Après avoir effectué un aperçu de numérisation, vous pouvez définir la zone "
+"de numérisation finale en maintenant la touche <key>Shift</key> enfoncée et en "
+"dessinant un rectangle avec la souris sur l'image d'aperçu. Le rectangle que "
+"vous dessinez sera la zone qui sera numérisée. Vous pouvez ajuster le "
+"rectangle en cliquant et en faisant glisser ses coins ou ses bords tout en "
+"maintenant la touche <key>Shift</key> enfoncée. Vous pouvez également déplacer le "
+"rectangle en cliquant et en le faisant glisser tout en maintenant les "
+"touches <keyseq><key>Shift</key><key>Alt</key></keyseq> enfoncées."
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:27
+msgid ""
+"You can pan and zoom the preview image for better precision: pan by dragging "
+"the image with the mouse and zoom using <keyseq><key>Ctrl</key><key>Mouse "
+"Wheel</key></keyseq>."
+msgstr ""
+"Pour plus de précison, vous pouvez déplacer et zoomer l'image d'aperçu : "
+"déplacez l'image avec la souris et zoomez en utilisant "
+"<keyseq><key>Ctrl</key><key>Molette de la souris</key></keyseq>."
+
+#. (itstool) path: page/p
+#: ../help/C/cropping.page:29
+msgid ""
+"You can also set the scan area by entering the coordinates of the rectangle "
+"in the <gui>Scan Area</gui> section of the <gui>Basic</gui> parameter tab. "
+"Some scanners may offer additional cropping options, such as selecting a "
+"size from a predefined list of common media sizes"
+msgstr ""
+"Vous pouvez également définir la zone de numérisation en entrant les "
+"coordonnées du rectangle dans la section <gui>Zone de numérisation</gui> de "
+"l'onglet <gui>Basique</gui>. Certains scanners peuvent offrir des options de "
+"recadrage supplémentaires, telles que la sélection d'une taille parmi une "
+"liste prédéfinie de tailles de supports courantes."
+
+#. (itstool) path: info/desc
+#: ../help/C/file_params.page:8
+msgid "Choose where to save the scanned images."
+msgstr "Choisir où enregistrer les images numérisées."
+
+#. (itstool) path: page/title
+#: ../help/C/file_params.page:16
+msgid "Output Options"
+msgstr "Options de sortie"
+
+#. (itstool) path: page/p
+#: ../help/C/file_params.page:20
+msgid ""
+"Scanned images can be sent to a file, email or printer. The output options "
+"are set in the <gui>Output</gui> tab of the main window. If the image is to "
+"be saved to a file, there are additional parameters to fill out:"
+msgstr ""
+"Les images numérisées peuvent être envoyées vers un fichier, un e-mail ou "
+"une imprimante. Les options de sortie sont définies dans l'onglet "
+"<gui>Sortie</gui> de la fenêtre principale. Si l'image doit être enregistrée "
+"dans un fichier, vous devez renseigner quelques paramètres supplémentaires :"
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:27
+msgid "<gui>Location</gui>"
+msgstr "<gui>Emplacement</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:28
+msgid ""
+"Path to the directory where the scanned images will be saved. You can use "
+"the <gui style=\"button\">Browse</gui> button to select a directory."
+msgstr ""
+"Chemin vers le répertoire où les images numérisées seront enregistrées. Vous "
+"pouvez utiliser le bouton <gui style=\"button\">Parcourir</gui> pour "
+"sélectionner un répertoire."
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:31
+msgid "<gui>Create Missing Directories</gui>"
+msgstr "<gui>Créer les répertoires manquants</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:32
+msgid ""
+"If this option is checked, <app>Gorfector</app> will create the directory "
+"and its parents, if they do not exist."
+msgstr ""
+"Si cette option est cochée, <app>Gorfector</app> créera le répertoire et ses "
+"parents, s'ils n'existent pas."
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:35
+msgid "<gui>File Name</gui>"
+msgstr "<gui>Nom du fichier</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:36
+msgid ""
+"File name for the scanned image. The extension of the file name will "
+"determine the format of the image."
+msgstr ""
+"Nom de fichier pour l'image numérisée. L'extension du nom de fichier "
+"déterminera le format de l'image."
+
+#. (itstool) path: item/title
+#: ../help/C/file_params.page:39
+msgid "If File Exists"
+msgstr "Si le fichier existe"
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:40
+msgid ""
+"What to do if the file already exists. The options are: <gui>Increment "
+"Counter</gui>, <gui>Overwrite</gui> or <gui>Cancel Scan</gui>."
+msgstr ""
+"Quoi faire si le fichier existe déjà. Les options sont : <gui>Incrémenter</"
+"gui>, <gui>Écraser</gui> ou <gui>Annuler la numérisation</gui>."
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:42
+msgid ""
+"<gui>Increment Counter</gui>: if the file name ends with a numeric string (e."
+"g., <file>my_file_001.tiff</file>), the number will be incremented until "
+"there is no existing file with that name."
+msgstr ""
+"<gui>Incrémenter</gui> : si le nom du fichier se termine par une chaîne "
+"numérique (par exemple, <file>mon_fichier_001.tiff</file>), le nombre sera "
+"incrémenté jusqu'à ce qu'il n'y ait pas de fichier existant avec ce nom."
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:44
+msgid "<gui>Overwrite</gui>: the file will be overwritten."
+msgstr "<gui>Écraser</gui> : le fichier sera écrasé."
+
+#. (itstool) path: item/p
+#: ../help/C/file_params.page:45
+msgid "<gui>Cancel Scan</gui>: the scan will be canceled."
+msgstr "<gui>Annuler la numérisation</gui> : la numérisation sera annulée."
+
+#. (itstool) path: page/p
+#: ../help/C/file_params.page:50
+msgid ""
+"You can set the compression options of the different image formats in the "
+"application settings, accessible from the menu button in the top right "
+"corner of the window."
+msgstr ""
+"Vous pouvez définir les options de compression des différents formats d'image "
+"dans les paramètres de l'application, accessibles depuis le bouton menu dans "
+"le coin supérieur droit de la fenêtre."
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:8
+msgctxt "link:trail"
+msgid "Gorfector Manual"
+msgstr "Manuel de Gorfector"
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:9
+msgctxt "text"
+msgid "Gorfector Manual"
+msgstr "Manuel de Gorfector"
+
+#. (itstool) path: info/title
+#: ../help/C/index.page:10
+msgctxt "link"
+msgid "Gorfector Manual"
+msgstr "Manuel de Gorfector"
+
+#. (itstool) path: page/title
+#: ../help/C/index.page:18
+msgid "<_:media-1/>Gorfector Manual"
+msgstr "<_:media-1/>Manuel de Gorfector"
+
+#. (itstool) path: p/link
+#: ../help/C/legal.xml:4
+msgid "Creative Commons Attribution-ShareAlike 4.0 International"
+msgstr ""
+"Creative Commons Attribution - Partage dans les mêmes conditions 4.0 "
+"International"
+
+#. (itstool) path: license/p
+#: ../help/C/legal.xml:3
+msgid "This work is licensed under a <_:link-1/>."
+msgstr "Ce manuel est sous licence <_:link-1/>."
+
+#. (itstool) path: info/desc
+#: ../help/C/presets.page:8
+msgid "Saving and reusing scanning settings."
+msgstr "Enregistrer et réutiliser les paramètres de numérisation."
+
+#. (itstool) path: page/title
+#: ../help/C/presets.page:16
+msgid "Presets"
+msgstr "Préréglages"
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:20
+msgid ""
+"<app>Gorfector</app> enables you to save the current scanning settings as a "
+"preset. You can later load this preset to restore the settings."
+msgstr ""
+"<app>Gorfector</app> vous permet d'enregistrer les paramètres de "
+"numérisation actuels en tant que préréglage. Vous pouvez ensuite charger ce "
+"préréglage pour restaurer les paramètres."
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:25
+msgid ""
+"At the bottom left of the main window, there is a drawer titled "
+"<gui>Presets</gui>. Clicking on the title will open the drawer, revealing a "
+"list of saved presets. Initially, this list is empty. You can add presets to "
+"the list by clicking on the <gui style=\"button\">+</gui> button in the top-"
+"right corner of the drawer. This opens a dialog where you can enter a name "
+"for the preset and select which of the following settings you want to save:"
+msgstr ""
+"En bas à gauche de la fenêtre principale se trouve un tiroir intitulé "
+"<gui>Préréglages</gui>. En cliquant sur le titre, le tiroir s'ouvre, "
+"révélant une liste de préréglages enregistrés. Au départ, cette liste est "
+"vide. Vous pouvez ajouter des préréglages à la liste en cliquant sur le "
+"bouton <gui style=\"button\">+</gui> dans le coin supérieur droit du tiroir. "
+"Un dialogue s'affichera ; vous pourrez entrer un nom pour le préréglage et "
+"sélectionner les paramètres à enregistrer :"
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:34
+msgid "<gui>Scanner Settings</gui>"
+msgstr "<gui>Paramètres du périphérique</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:35
+msgid ""
+"All the settings from the <gui>Basic</gui> and <gui>Advanced</gui> tabs, "
+"excluding the scan area. These presets are specific to the scanner you are "
+"using, so if you select a different scanner, a different set of presets will "
+"be shown."
+msgstr ""
+"Tous les paramètres des onglets <gui>Basique</gui> et <gui>Avancé</gui>, à "
+"l'exception de la zone de numérisation. Ces préréglages sont spécifiques au "
+"scanner que vous utilisez, donc si vous sélectionnez un autre scanner, un "
+"autre ensemble de préréglages sera affiché."
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:40
+msgid "<gui>Scan Area</gui>"
+msgstr "<gui>Zone de numérisation</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:41
+msgid "The scan area."
+msgstr "La zone de numérisation."
+
+#. (itstool) path: item/title
+#: ../help/C/presets.page:44
+msgid "<gui>Output Settings</gui>"
+msgstr "<gui>Paramètres de sortie</gui>"
+
+#. (itstool) path: item/p
+#: ../help/C/presets.page:45
+msgid "The settings from the <gui>Output</gui> tab."
+msgstr "Les paramètres de l'onglet <gui>Sortie</gui>."
+
+#. (itstool) path: page/p
+#: ../help/C/presets.page:49
+msgid ""
+"Once you have saved a preset, you can load it by selecting it in the list "
+"and clicking on the <gui style=\"button\">Apply</gui> button. You can also "
+"inspect, rename or delete a preset by clicking on the corresponding button "
+"beside the preset name."
+msgstr ""
+"Une fois que vous avez enregistré un préréglage, vous pouvez le charger en "
+"le sélectionnant dans la liste et en cliquant sur le bouton <gui "
+"style=\"button\">Appliquer</gui>. Vous pouvez également inspecter, renommer "
+"ou supprimer un préréglage en cliquant sur le bouton correspondant à côté du "
+"nom du préréglage."
+
+#. (itstool) path: info/desc
+#: ../help/C/scan_list.page:8
+msgid "Multiple images from one document."
+msgstr "Plusieurs images d'un même document."
+
+#. (itstool) path: page/title
+#: ../help/C/scan_list.page:16
+msgid "Scan Lists"
+msgstr "Listes de numérisation"
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:20
+msgid ""
+"Sometimes, you may want to scan multiple images from the same document. For "
+"example, if you are scanning a strip of film, you may want to scan each "
+"frame separately. <app>Gorfector</app> allows you to do this by creating a "
+"scan list. A scan list is a list of scan areas that you can define on the "
+"same document. Each scan area can have its own settings (resolution, color "
+"mode, etc.) or can use the current settings."
+msgstr ""
+"Vous pourriez vouloir numériser plusieurs images du même document. Par "
+"exemple, si vous numérisez une bande de pellicule photo, vous voudrez "
+"probablement numériser chaque image séparément. <app>Gorfector</app> vous "
+"permet de le faire en créant une liste de numérisation. Une liste de "
+"numérisation est une liste de zones de numérisation que vous pouvez définir "
+"sur le même document. Chaque zone de numérisation peut avoir ses propres "
+"paramètres (résolution, mode couleur, etc.) ou peut utiliser les paramètres "
+"courants."
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:27
+msgid ""
+"To create a scan list, you need to enable scan list mode. You can do this by "
+"clicking on the menu button in the top right corner of the <app>Gorfector</"
+"app> window and checking the <gui style=\"menuItem\">Use Scan List</gui> "
+"item. This will enable scan list mode and will add a new section to the "
+"right of the main window, called <gui>Scan List</gui>."
+msgstr ""
+"Pour créer une liste de numérisation, vous devez activer le mode liste de "
+"numérisation en cliquant sur le bouton menu dans le "
+"coin supérieur droit de la fenêtre <app>Gorfector</app> et en cochant <gui "
+"style=\"menuItem\">Liste de numérisation</gui>. Cela "
+"ajoutera une nouvelle section <gui>Liste de numérisation</"
+"gui> à la droite de la fenêtre principale."
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:33
+msgid ""
+"There are two types of scan list items that you can create: a <gui>Scan "
+"Area</gui> item or an <gui>All params</gui> item. A <gui>Scan Area</gui> "
+"item uses a rectangle you define on the preview. When scanned, it uses the "
+"scan settings (e.g., resolution, color mode) currently active in the "
+"<gui>Basic</gui>, <gui>Advanced</gui>, and <gui>Output</gui> tabs. An "
+"<gui>All params</gui> item also uses a defined rectangle, but it "
+"additionally saves a snapshot of all scan settings from these tabs at the "
+"moment it's added to the list. When scanned, this item applies its saved "
+"settings."
+msgstr ""
+"Vous pouvez créer deux types d'éléments de liste de numérisation : un "
+"élément <gui>Zone de numérisation</gui> ou un élément <gui>Tous les "
+"paramètres</gui>. Un élément <gui>Zone de numérisation</gui> n'enregistre "
+"que le rectangle définissant la zone à numériser. Les autres paramètres de "
+"numérisation (par exemple, la résolution, le mode couleur) seront ceux "
+"définis dans les onglets <gui>Basique</gui>, <gui>Avancé</gui> et "
+"<gui>Sortie</gui> au moment de la numérisation. Un élément <gui>Tous les paramètres</gui> quant à lui "
+"enregistre et applique tous les paramètres de numérisation."
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:41
+msgid ""
+"To add a scan area to the scan list, click on the <gui style=\"button\">Add</"
+"gui> button. This button has a drop-down menu that allows you to select the "
+"type of scan area you want to add. When you are done adding scan areas, you "
+"can click on the <gui style=\"button\">Scan</gui> button to scan all items."
+msgstr ""
+"Pour ajouter une zone de numérisation à la liste de numérisation, cliquez "
+"sur le bouton <gui style=\"button\">Ajouter</gui>. Ce bouton a un menu "
+"déroulant qui vous permet de sélectionner le type de zone de numérisation "
+"que vous souhaitez ajouter. Lorsque vous avez terminé l'ajout de zones de "
+"numérisation, vous pouvez cliquer sur le bouton <gui "
+"style=\"button\">Numériser</gui> pour numériser tous les éléments."
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:47
+msgid ""
+"You can load a scan list item by clicking on the associated <gui "
+"style=\"button\">Load</gui> button; likewise, you can remove a scan list "
+"item by clicking on the <gui style=\"button\">Remove</gui> button. Below the "
+"scan list, there are two buttons to move the selected item up or down in the "
+"list."
+msgstr ""
+"Vous pouvez charger un élément de liste de numérisation en cliquant sur le "
+"bouton <gui style=\"button\">Charger</gui> de cet élément ; de même, vous pouvez "
+"supprimer un élément de liste de numérisation en cliquant sur son bouton <gui "
+"style=\"button\">Supprimer</gui>. Sous la liste de numérisation se trouvent "
+"deux boutons pour déplacer l'élément sélectionné vers le haut ou vers le bas "
+"de la liste."
+
+#. (itstool) path: page/p
+#: ../help/C/scan_list.page:53
+msgid ""
+"The scan list is saved in the application settings, so if you close the "
+"application and reopen it later, the scan list will be restored. Scan lists "
+"are bound to the scanner you are using, so if you select a different "
+"scanner, a different scan list will be shown."
+msgstr ""
+"La liste de numérisation est enregistrée dans les paramètres de "
+"l'application, donc si vous fermez l'application et la rouvrez plus tard, la "
+"liste de numérisation sera restaurée. Les listes de numérisation sont liées "
+"au scanner que vous utilisez, donc si vous sélectionnez un autre scanner, "
+"une autre liste de numérisation sera affichée."
+
+#. (itstool) path: info/desc
+#: ../help/C/scanning.page:8
+msgid "How to scan images."
+msgstr "Comment numériser des images."
+
+#. (itstool) path: page/title
+#: ../help/C/scanning.page:16
+msgid "Scanning"
+msgstr "Numérisation"
+
+#. (itstool) path: page/p
+#: ../help/C/scanning.page:20
+msgid ""
+"<app>Gorfector</app> has two modes of operation: single image mode and scan "
+"list mode. Single image mode is the simplest mode and is used to scan a "
+"single image from a document. In scan list mode, you can define multiple "
+"scan areas on a single document and scan them all at once, creating multiple "
+"image files."
+msgstr ""
+"<app>Gorfector</app> a deux modes de fonctionnement : le mode numérisation "
+"unique et le mode liste de numérisation. Le mode numérisation unique est le "
+"mode le plus simple et est utilisé pour numériser une seule image d'un "
+"document. En mode liste de numérisation, vous pouvez définir plusieurs zones "
+"de numérisation sur un même document et les numériser toutes en même temps, "
+"créant ainsi plusieurs fichiers image."
+
+#. (itstool) path: steps/title
+#: ../help/C/scanning.page:28
+msgid "Scanning a single image"
+msgstr "Numérisation d'une image unique"
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:29
+msgid ""
+"Make sure scan list mode is off: click on the menu button and uncheck the "
+"<gui style=\"menuItem\">Use Scan List</gui> item."
+msgstr ""
+"Assurez-vous que le mode liste de numérisation est désactivé : cliquez sur "
+"le bouton menu et décochez l'élément <gui style=\"menuItem\">Liste de "
+"numérisation</gui>."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:30 ../help/C/scanning.page:43
+msgid ""
+"Click on the <gui style=\"button\">Preview</gui> button to do a quick first "
+"scan of your document."
+msgstr ""
+"Appuyez sur le bouton <gui style=\"button\">Aperçu</gui> pour obtenir un "
+"premier aperçu de votre document."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:31
+msgid ""
+"Set the scan area by pressing the <key>Shift</key> key and drawing a "
+"rectangle with the mouse on the preview image. See <link xref=\"cropping\"/> "
+"for more information about setting the scan area."
+msgstr ""
+"Définissez la zone de numérisation en maintenant la touche <key>Shift</key> enfoncée "
+"et en dessinant un rectangle avec la souris sur l'image d'aperçu. Voir <link "
+"xref=\"cropping\"/> pour plus d'informations sur la définition de la zone de "
+"numérisation."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:33
+msgid ""
+"Adjust any other settings you want to change (resolution, color mode, etc.) "
+"in the <gui>Basic</gui> and <gui>Advanced</gui> tabs."
+msgstr ""
+"Ajustez tous les autres paramètres que vous souhaitez modifier  (résolution, "
+"mode couleur, etc.) dans les onglets <gui>Basique</gui> et <gui>Avancé</gui>."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:34
+msgid ""
+"Click on the <gui>Output</gui> tab and decide where the scanned image should "
+"be sent (file, email or printer). See <link xref=\"file_params\"/> for more "
+"information about these settings."
+msgstr ""
+"Sélectionnez l'onglet <gui>Sortie</gui> et décidez où l'image numérisée doit "
+"être envoyée (fichier, e-mail ou imprimante). Voir <link "
+"xref=\"file_params\"/> pour plus d'informations sur ces paramètres."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:36
+msgid ""
+"If the scanned image should be saved in a file, make sure to select a path "
+"and enter a file name."
+msgstr ""
+"Si l'image numérisée doit être enregistrée dans un fichier, assurez-vous de "
+"sélectionner un chemin et d'entrer un nom de fichier."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:37 ../help/C/scanning.page:53
+msgid "Click on the <gui style=\"button\">Scan</gui> button to start the scan."
+msgstr ""
+"Appuyez sur le bouton <gui style=\"button\">Numériser</gui> pour commencer "
+"la numérisation."
+
+#. (itstool) path: steps/title
+#: ../help/C/scanning.page:41
+msgid "Scanning a series of images"
+msgstr "Numérisation d'une série d'images"
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:42
+msgid ""
+"Make sure scan list mode is on: click on the menu button and check the <gui "
+"style=\"menuItem\">Use Scan List</gui> item."
+msgstr ""
+"Assurez-vous que le mode liste de numérisation est activé : cliquez sur le "
+"bouton menu et cochez l'élément <gui style=\"menuItem\">Liste de "
+"numérisation</gui>."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:44
+msgid ""
+"Set a first scan area by pressing the <key>Shift</key> key and drawing a "
+"rectangle with the mouse on the preview image. See <link xref=\"cropping\"/> "
+"for more information about setting the scan area."
+msgstr ""
+"Définissez une première zone de numérisation en maintenant la touche "
+"<key>Shift</key> enfoncée et en dessinant un rectangle avec la souris sur "
+"l'image d'aperçu. Voir <link xref=\"cropping\"/> pour plus d'informations "
+"sur la définition de la zone de numérisation."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:46
+msgid ""
+"Click on the <gui style=\"button\">Add Scan Area</gui> / <gui "
+"style=\"button\">Add All Params</gui> button to add a scan to the list. Use "
+"<gui style=\"button\">Add Scan Area</gui> if you want to keep all other scan "
+"parameters intact. On the other hand, if you want the scan item to set all "
+"scan parameters (resolution, color mode, etc.) to the current values, use "
+"<gui style=\"button\">Add All Params</gui>."
+msgstr ""
+"Appuyez sur le bouton <gui style=\"button\">Ajouter une zone</gui> / <gui "
+"style=\"button\">Ajouter tous les paramètres</gui> pour ajouter une "
+"numérisation à la liste. Utilisez <gui style=\"button\">Ajouter une zone</"
+"gui> si vous souhaitez seulement définir la zone de numérisation et "
+"laisser les autres paramètres de numérisation "
+"inchangés. Au contraire, si vous souhaitez que l'élément de numérisation "
+"définisse tous les paramètres de numérisation (résolution, mode couleur, "
+"etc.), utilisez <gui style=\"button\">Ajouter tous les paramètres</gui>."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:49
+msgid "Repeat the last two steps to add more items to the scan list."
+msgstr ""
+"Répétez les deux étapes précédentes pour ajouter d'autres éléments à la "
+"liste de numérisation."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:50
+msgid ""
+"Click on the <gui>Output</gui> tab and decide where the scanned images "
+"should be sent (file, email or printer). See <link xref=\"file_params\"/> "
+"for more information about these settings."
+msgstr ""
+"Sélectionnez l'onglet <gui>Sortie</gui> et décidez où les images numérisées "
+"doivent être envoyées (fichier, e-mail ou imprimante). Voir <link "
+"xref=\"file_params\"/> pour plus d'informations sur ces paramètres."
+
+#. (itstool) path: item/p
+#: ../help/C/scanning.page:52
+msgid ""
+"If the scanned images should be saved in files, make sure to select a path "
+"and enter a file name."
+msgstr ""
+"Si les images numérisées doivent être enregistrées dans des fichiers, "
+"assurez-vous de sélectionner un chemin et d'entrer un nom de fichier."
+
+#. (itstool) path: info/desc
+#: ../help/C/select_device.page:8
+msgid "Choose which device to use for scanning."
+msgstr "Choisir un appareil pour la numérisation."
+
+#. (itstool) path: page/title
+#: ../help/C/select_device.page:16
+msgid "Selecting a Scanner"
+msgstr "Sélectionner un scanner"
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:20
+msgid ""
+"On startup, <app>Gorfector</app> will attempt to detect the scanners "
+"connected to your computer and will select the first scanner it finds. If "
+"you have multiple scanners connected and want to use a different one, click "
+"on the button menu in the top right corner of the <app>Gorfector</app> "
+"window and select the <gui style=\"menuItem\">Select Device</gui> item. This "
+"will open a dialog that lists all the scanners connected to your computer. "
+"Select the scanner you want to use and close the dialog."
+msgstr ""
+"Au démarrage, <app>Gorfector</app> tentera de détecter les scanners "
+"connectés à votre ordinateur et sélectionnera le premier scanner "
+"trouvé. Si vous avez plusieurs scanners connectés et que vous souhaitez "
+"choisir lequel utiliser, cliquez sur le bouton menu dans le coin supérieur "
+"droit de la fenêtre principale et sélectionnez l'élément <gui "
+"style=\"menuItem\">Sélectionner le périphérique</gui>. Cela ouvrira une "
+"boîte de dialogue qui liste les scanners connectés à votre "
+"ordinateur. Sélectionnez le scanner que vous souhaitez utiliser et fermez la "
+"boîte de dialogue."
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:27
+msgid ""
+"If you have a scanner connected to your computer and <app>Gorfector</app> "
+"does not detect it, make sure that the scanner is turned on and that the "
+"drivers are installed. You can use the <gui style=\"button\">Refresh Scanner "
+"List</gui> button in the dialog to refresh the list of scanners (it can take "
+"a few seconds before the scanner registers itself)."
+msgstr ""
+"Si vous avez un scanner connecté à votre ordinateur et que <app>Gorfector</"
+"app> ne le détecte pas, assurez-vous que le scanner est allumé et que les "
+"pilotes sont installés. Vous pouvez utiliser le bouton <gui "
+"style=\"button\">Rafraîchir la liste des scanners</gui> pour actualiser la "
+"liste des scanners (cela peut prendre quelques secondes avant que le scanner "
+"ne s'enregistre)."
+
+#. (itstool) path: page/p
+#: ../help/C/select_device.page:32
+msgid ""
+"If the scanner you want to use is connected to a different computer on the "
+"network, turn on the <gui style=\"checkbox\">Include Network Scanners</gui> "
+"switch to enable detection of network scanners and click the <gui "
+"style=\"button\">Refresh Scanner List</gui> button."
+msgstr ""
+"Si le scanner que vous souhaitez utiliser est connecté à un autre ordinateur "
+"sur le réseau, activez l'interrupteur <gui style=\"checkbox\">Inclure les "
+"scanners réseau</gui> pour activer la détection des scanners réseau et "
+"cliquez sur le bouton <gui style=\"button\">Rafraîchir la liste des "
+"scanners</gui>."

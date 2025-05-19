@@ -1,13 +1,13 @@
-# French translations for PACKAGE package.
-# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# patrick <patrick@patrickfournier.com>, 2025.
+# French translations for gorfector package.
+# Copyright (C) 2025 Listed translators
+# This file is distributed under the same license as the gorfector package.
+#
 # Patrick Fournier <>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.1\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: gorfector master\n"
+"Report-Msgid-Bugs-To: https://github.com/patrickfournier/gorfector/issues\n"
 "POT-Creation-Date: 2025-05-18 22:32-0400\n"
 "PO-Revision-Date: 2025-05-18 22:33-0400\n"
 "Last-Translator: Patrick Fournier <>\n"

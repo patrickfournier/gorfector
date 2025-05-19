@@ -18,14 +18,14 @@
     </title>
 
     <p>
-        Scanned images can be sent to a file, email or printer. The output options are set in the "Output" tab of the main window.
+        Scanned images can be sent to a file, email or printer. The output options are set in the <gui>Output</gui> tab of the main window.
         If the image is to be saved to a file, there are additional parameters to fill out:
     </p>
 
     <terms>
         <item>
             <title><gui>Location</gui></title>
-            <p>Path to the directory where the scanned images will be saved. You can use the "Browse" button to select a directory.</p>
+            <p>Path to the directory where the scanned images will be saved. You can use the <gui style="button">Browse</gui> button to select a directory.</p>
         </item>
         <item>
             <title><gui>Create Missing Directories</gui></title>

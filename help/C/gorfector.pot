@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-05-17 22:51-0400\n"
+"POT-Creation-Date: 2025-05-19 00:06-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: ../help/C/file_params.page:20
-msgid "Scanned images can be sent to a file, email or printer. The output options are set in the \"Output\" tab of the main window. If the image is to be saved to a file, there are additional parameters to fill out:"
+msgid "Scanned images can be sent to a file, email or printer. The output options are set in the <gui>Output</gui> tab of the main window. If the image is to be saved to a file, there are additional parameters to fill out:"
 msgstr ""
 
 #. (itstool) path: item/title
@@ -61,7 +61,7 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: ../help/C/file_params.page:28
-msgid "Path to the directory where the scanned images will be saved. You can use the \"Browse\" button to select a directory."
+msgid "Path to the directory where the scanned images will be saved. You can use the <gui style=\"button\">Browse</gui> button to select a directory."
 msgstr ""
 
 #. (itstool) path: item/title
