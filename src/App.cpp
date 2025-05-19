@@ -118,7 +118,7 @@ GtkWidget *Gorfector::App::BuildUI()
 {
     auto *display = gdk_display_get_default();
     auto *cssProvider = gtk_css_provider_new();
-    std::string cssPath = std::string("/com/patrickfournier/gorfector/gorfector.css");
+    std::string cssPath = std::string("/com/patrickfournier/gorfector/css/gorfector.css");
     gtk_css_provider_load_from_resource(cssProvider, cssPath.c_str());
     gtk_style_context_add_provider_for_display(
             display, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
@@ -304,14 +304,10 @@ void Gorfector::App::ShowHelp(GSimpleAction *action, GVariant *parameter)
 void Gorfector::App::ShowAboutDialog(GSimpleAction *action, GVariant *parameter)
 {
     auto dialogWindow = adw_about_dialog_new();
-    adw_about_dialog_set_application_icon(
-            ADW_ABOUT_DIALOG(dialogWindow),
-            // FIXME should use the icon in resources, but does not work
-            "scanner-symbolic");
+    adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(dialogWindow), GetApplicationId().c_str());
     adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), k_ApplicationName);
     adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), "0.1");
-    adw_about_dialog_set_comments(
-            ADW_ABOUT_DIALOG(dialogWindow), _("An application to scan images.")); // FIXME: could be more detailed
+    adw_about_dialog_set_comments(ADW_ABOUT_DIALOG(dialogWindow), _("An application to scan images."));
     adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(dialogWindow), GTK_LICENSE_GPL_3_0);
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(dialogWindow), "Patrick Fournier");
 

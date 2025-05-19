@@ -280,7 +280,7 @@ GtkWidget *Gorfector::ScanListPanel::CreateScanListItem(const char *itemName)
     gtk_box_append(GTK_BOX(itemBox), labelItem);
 
     auto loadButton = gtk_button_new();
-    gtk_button_set_icon_name(GTK_BUTTON(loadButton), "playlist-symbolic");
+    gtk_button_set_icon_name(GTK_BUTTON(loadButton), "apply-symbolic");
     gtk_widget_set_name(loadButton, "apply-button");
     gtk_widget_set_tooltip_text(loadButton, _("Load"));
     gtk_widget_set_halign(loadButton, GTK_ALIGN_END);

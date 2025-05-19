@@ -133,7 +133,7 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_box_append(GTK_BOX(itemBox), labelItem);
 
     auto applyButton = gtk_button_new();
-    gtk_button_set_icon_name(GTK_BUTTON(applyButton), "playlist-symbolic");
+    gtk_button_set_icon_name(GTK_BUTTON(applyButton), "apply-symbolic");
     gtk_widget_set_name(applyButton, "apply-button");
     gtk_widget_set_tooltip_text(applyButton, _("Apply this preset"));
     gtk_widget_set_halign(applyButton, GTK_ALIGN_END);

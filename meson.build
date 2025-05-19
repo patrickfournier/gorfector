@@ -22,6 +22,7 @@ else
 endif
 
 gettext_package = meson.project_name()
+podir = join_paths(meson.project_source_root(), 'po')
 
 datadir = join_paths(get_option('prefix'), get_option('datadir'))
 
@@ -54,11 +55,10 @@ cxxflags = [
 ]
 
 subdir('scanners')
-subdir('po')
-subdir('resources')
-subdir('src')
 subdir('data')
 subdir('help')
+subdir('po')
+subdir('src')
 
 gnome.post_install(
         gtk_update_icon_cache: true,

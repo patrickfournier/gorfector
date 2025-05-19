@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-17 22:50-0400\n"
+"POT-Creation-Date: 2025-05-18 22:32-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:4
+msgid "Gorfector"
+msgstr ""
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:5 src/App.cpp:314
+msgid "An application to scan images."
+msgstr ""
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/com.patrickfournier.gorfector.desktop.in.in:7
+msgid "scan;scanner;"
+msgstr ""
 
 #: src/App.cpp:161
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:40
@@ -57,10 +70,6 @@ msgstr ""
 
 #: src/App.cpp:294
 msgid "Settings"
-msgstr ""
-
-#: src/App.cpp:314
-msgid "An application to scan images."
 msgstr ""
 
 #: src/App.cpp:489
@@ -334,11 +343,11 @@ msgstr ""
 msgid "Move Item Down"
 msgstr ""
 
-#: src/ScanListPanel.cpp:87 src/ScanListPanel.cpp:423
+#: src/ScanListPanel.cpp:87 src/ScanListPanel.cpp:424
 msgid "Add Scan Area"
 msgstr ""
 
-#: src/ScanListPanel.cpp:88 src/ScanListPanel.cpp:419
+#: src/ScanListPanel.cpp:88 src/ScanListPanel.cpp:420
 msgid "Add All Params"
 msgstr ""
 

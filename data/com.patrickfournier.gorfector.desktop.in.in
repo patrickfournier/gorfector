@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Gorfector
+Comment=An application to scan images.
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+Keywords=scan;scanner;
+# Translators: Do NOT translate or transliterate this text (this is an icon file name)!
+Icon=@icon@
+StartupNotify=true
+Exec=gorfector

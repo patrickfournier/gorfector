@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/com/patrickfournier/gorfector">
+        <file>css/gorfector.css</file>
+    </gresource>
+    <gresource prefix="/com/patrickfournier/gorfector/icons/scalable/actions/">
+        <file alias="apply-symbolic.svg" preprocess="xml-stripblanks">icons/hicolor/scalable/actions/pip-out-symbolic.svg</file>
+    </gresource>
+</gresources>

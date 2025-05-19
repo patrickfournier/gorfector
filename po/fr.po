@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-17 22:50-0400\n"
-"PO-Revision-Date: 2025-05-17 22:55-0400\n"
+"POT-Creation-Date: 2025-05-18 22:32-0400\n"
+"PO-Revision-Date: 2025-05-18 22:33-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -18,6 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Gtranslator 46.0\n"
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:4
+msgid "Gorfector"
+msgstr "Gorfector"
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:5 src/App.cpp:314
+msgid "An application to scan images."
+msgstr "Une application pour numériser des images."
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/com.patrickfournier.gorfector.desktop.in.in:7
+msgid "scan;scanner;"
+msgstr "numériser;numérisation;scanner"
 
 #: src/App.cpp:161
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:40
@@ -60,10 +73,6 @@ msgstr "Sélectionner le périphérique"
 #: src/App.cpp:294
 msgid "Settings"
 msgstr "Paramètres"
-
-#: src/App.cpp:314
-msgid "An application to scan images."
-msgstr "Une application pour numériser des images."
 
 #: src/App.cpp:489
 msgid "Select a directory where to save the image files."
@@ -342,11 +351,11 @@ msgstr "Monter"
 msgid "Move Item Down"
 msgstr "Descendre"
 
-#: src/ScanListPanel.cpp:87 src/ScanListPanel.cpp:423
+#: src/ScanListPanel.cpp:87 src/ScanListPanel.cpp:424
 msgid "Add Scan Area"
 msgstr "Ajouter une zone"
 
-#: src/ScanListPanel.cpp:88 src/ScanListPanel.cpp:419
+#: src/ScanListPanel.cpp:88 src/ScanListPanel.cpp:420
 msgid "Add All Params"
 msgstr "Ajouter tous les paramètres"
 
