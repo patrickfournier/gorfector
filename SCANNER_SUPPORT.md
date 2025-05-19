@@ -16,15 +16,20 @@ The good news is that you can create a JSON file to define how the parameters ar
 ## Creating a scanner support file
 
 To create a support file for your scanner, open a terminal and run `gorfector --dev` to activate the developer mode. After the program starts,
-click to the menu button, open the "Settings" dialog and select the "Developer" tab. There, enable the 
+click the menu button, open the "Settings" dialog and select the "Developer" tab. There, enable the 
 "Dump SANE Options" switch. Now, whenever you select a scanner, its options will be dumped to the standard output.
 To see this, select the "Select Device" item under the menu button. In the dialog that opens, select your scanner (if 
 it is already selected, deselect it by choosing 'None,' then re-select your scanner). Copy the JSON output to a file and save it as 
-`scanners/<scanner_manufacturer>/<scanner_model>.json`. You can now edit the file to define the parameter presentation.
+`<repo_root>/scanners/<scanner_manufacturer>/<scanner_model>.json`.
+
+Before creating a new scanner support file, you should compare the `option_hash` value with the one from 
+existing scanner support files. If there is already a file with the same hash, you should probably modify that file instead of adding
+a new one. To make an existing file be used for a new scanner, open the file and add the model and vendor to the `devices`
+list.
 
 ## Editing the scanner support file
 
-Open the file in any text editor.
+To edit the file and define the parameter presentation, open the file in any text editor.
 
 - To rename a parameter, edit its `title` field.
 - To change the description of a parameter, edit its `description` field.
@@ -38,13 +43,14 @@ Open the file in any text editor.
 
 Some things to keep in mind:
 
-- You cannot change the parameter grouping.
-- You cannot change the parameter ordering.
+- You cannot change how parameters are grouped in the UI.
+- You cannot change how parameters are ordered in the UI.
 - **Do not change the parameter `id` field.**
 - The `x-resolution`, `y-resolution`, `resolution`, `tl-x`, `tl-y`, `br-x` and `br-y` parameters are automatically 
   put in the "Common Options" groups of the "Basic" tab. You cannot change this behavior.
 - To ensure consistency and reduce the amount of translation work, use the same titles and descriptions as the 
-  other scanners for parameters that serve the same purposes. Look at the other JSON files in the `scanners` directory for examples.
+  other scanners for parameters that serve the same purposes. Look at the other JSON files in the `scanners` directory 
+  for inspiration.
 
 ## Add the file to the build system
 
