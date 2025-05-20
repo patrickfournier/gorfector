@@ -1,15 +1,14 @@
 # French translations for gorfector package.
 # Copyright (C) 2025 Listed translators
 # This file is distributed under the same license as the gorfector package.
-#
 # Patrick Fournier <>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
-"Report-Msgid-Bugs-To: https://github.com/patrickfournier/gorfector/issues\n"
-"POT-Creation-Date: 2025-05-18 22:32-0400\n"
-"PO-Revision-Date: 2025-05-18 22:33-0400\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-20 11:35-0400\n"
+"PO-Revision-Date: 2025-05-20 11:34-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -19,16 +18,87 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Gtranslator 46.0\n"
 
-#: data/com.patrickfournier.gorfector.desktop.in.in:4
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:5
+#: data/com.patrickfournier.gorfector.desktop.in.in:6
 msgid "Gorfector"
 msgstr "Gorfector"
 
-#: data/com.patrickfournier.gorfector.desktop.in.in:5 src/App.cpp:314
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:6
+msgid "An application to scan documents"
+msgstr "Une application pour numériser des images"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:16
+msgid ""
+"General Observable Record Freight Extractor (<em>Gorfector</em>) is an image "
+"scanning software. Being relatively new, it has not been tested with a lot "
+"of scanners yet. Currently, it is known to work with:"
+msgstr ""
+"General Observable Record Freight Extractor (<em>Gorfector</em>) est un "
+"logiciel de numérisation d'images. Étant relativement nouveau, il n'a été "
+"testé qu'avec :"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:21
+msgid "Epson Perfection V600 Photo"
+msgstr "Epson Perfection V600 Photo"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:23
+msgid ""
+"However, it should work with any scanner that supports the SANE protocol. "
+"Please report any issues you encounter with other scanners so we can improve "
+"compatibility."
+msgstr ""
+"Cependant, il devrait fonctionner avec n'importe quel scanner qui prend en "
+"charge le protocole SANE. Veuillez signaler tout problème que vous "
+"rencontrez avec d'autres scanners afin que nous puissions améliorer la "
+"compatibilité."
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:27
+msgid "Features"
+msgstr "Fonctionnalités"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:31
+msgid "User-friendly scan parameter presentation"
+msgstr "Présentation conviviale des paramètres de numérisation"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:32
+msgid "Zoomable, high-resolution previews"
+msgstr "Aperçus haute résolution zoomables"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:33
+msgid "Batch scanning of a single document (useful for scanning negatives)"
+msgstr ""
+"Numérisation par lots de plusieurs extraits d'un document (utile pour "
+"numériser des négatifs)"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:34
+msgid "User defined presets"
+msgstr "Préréglages définis par l'utilisateur"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:35
+msgid "Output to file (TIFF, PNG, JPEG), to email or to printer"
+msgstr ""
+"Sortie vers un fichier (TIFF, PNG, JPEG), par courriel ou vers une imprimante"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:36
+msgid "Saves pixels straight from the scanner: no image processing is done"
+msgstr ""
+"Enregistre les pixels directement du scanner: aucun traitement d'image n'est "
+"effectué"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:47
+msgid "Creating a preset"
+msgstr "Création d'un nouveau préréglage"
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:51
+msgid "Using the scan list"
+msgstr "Utilisation de la liste de numérisation"
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:7 src/App.cpp:311
 msgid "An application to scan images."
 msgstr "Une application pour numériser des images."
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/com.patrickfournier.gorfector.desktop.in.in:7
+#: data/com.patrickfournier.gorfector.desktop.in.in:10
 msgid "scan;scanner;"
 msgstr "numériser;numérisation;scanner"
 
@@ -66,53 +136,53 @@ msgstr "Aide..."
 msgid "About..."
 msgstr "À propos..."
 
-#: src/App.cpp:270
+#: src/App.cpp:271
 msgid "Select Device"
 msgstr "Sélectionner le périphérique"
 
-#: src/App.cpp:294
+#: src/App.cpp:295
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/App.cpp:489
+#: src/App.cpp:486
 msgid "Select a directory where to save the image files."
 msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
-#: src/App.cpp:496
+#: src/App.cpp:493
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
-#: src/App.cpp:524
+#: src/App.cpp:521
 msgid "Directory does not exists: {}."
 msgstr "Le répertoire '{}' n'existe pas."
 
-#: src/App.cpp:539
+#: src/App.cpp:536
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
-#: src/App.cpp:552
+#: src/App.cpp:549
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr "Impossible de trouver un nom unique en incrémentant '{}'."
 
-#: src/App.cpp:569
+#: src/App.cpp:566
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: src/App.cpp:571
+#: src/App.cpp:568
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
-#: src/App.cpp:574 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
+#: src/App.cpp:571 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
 #: src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/App.cpp:574 src/OutputOptionsState.hpp:51
+#: src/App.cpp:571 src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr "Écraser"
 
-#: src/App.cpp:623
+#: src/App.cpp:620
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -903,9 +973,8 @@ msgid "Bottom-right y position of scan area."
 msgstr "Coordonnée y du coin inférieur droit de la zone de numérisation."
 
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:108
-#, fuzzy
 msgid "Select an area to scan based on well-known media sizes. (DEPRECATED)"
-msgstr "Définir la zone à numériser à une taille de support courantes."
+msgstr ""
 
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:109
 msgid "Selects the scan source."

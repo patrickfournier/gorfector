@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>@APP_ID@</id>
+
+    <name>Gorfector</name>
+    <summary>An application to scan documents</summary>
+
+    <metadata_license>FSFAP</metadata_license>
+    <project_license>GPL-3.0-only</project_license>
+
+    <recommends>
+        <display_length compare="ge">1024</display_length>
+    </recommends>
+
+    <description>
+        <p>
+            General Observable Record Freight Extractor (<em>Gorfector</em>) is an image scanning software.
+            Being relatively new, it has not been tested with a lot of scanners yet. Currently, it is known to work with:
+        </p>
+        <ul>
+            <li>Epson Perfection V600 Photo</li>
+        </ul>
+        <p>
+            However, it should work with any scanner that supports the SANE protocol.
+            Please report any issues you encounter with other scanners so we can improve compatibility.
+        </p>
+        <p>
+            Features
+        </p>
+        <ul>
+            <li>User-friendly scan parameter presentation</li>
+            <li>Zoomable, high-resolution previews</li>
+            <li>Batch scanning of a single document (useful for scanning negatives)</li>
+            <li>User defined presets</li>
+            <li>Output to file (TIFF, PNG, JPEG), to email or to printer</li>
+            <li>Saves pixels straight from the scanner: no image processing is done</li>
+        </ul>
+    </description>
+
+    <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://github.com/patrickfournier/gorfector/tree/main/data/metainfo/main.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://github.com/patrickfournier/gorfector/tree/main/data/metainfo/preset.png</image>
+            <caption>Creating a preset</caption>
+        </screenshot>
+        <screenshot>
+            <image>https://github.com/patrickfournier/gorfector/tree/main/data/metainfo/scan_list.png</image>
+            <caption>Using the scan list</caption>
+        </screenshot>
+    </screenshots>
+</component>

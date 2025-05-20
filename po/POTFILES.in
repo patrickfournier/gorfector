@@ -1,3 +1,4 @@
+data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in
 data/com.patrickfournier.gorfector.desktop.in.in
 
 src/Commands/DevMode/SetDumpSaneOptions.hpp

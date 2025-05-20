@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-18 22:32-0400\n"
+"POT-Creation-Date: 2025-05-20 11:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,75 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/com.patrickfournier.gorfector.desktop.in.in:4
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:5
+#: data/com.patrickfournier.gorfector.desktop.in.in:6
 msgid "Gorfector"
 msgstr ""
 
-#: data/com.patrickfournier.gorfector.desktop.in.in:5 src/App.cpp:314
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:6
+msgid "An application to scan documents"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:16
+msgid ""
+"General Observable Record Freight Extractor (<em>Gorfector</em>) is an image "
+"scanning software. Being relatively new, it has not been tested with a lot "
+"of scanners yet. Currently, it is known to work with:"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:21
+msgid "Epson Perfection V600 Photo"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:23
+msgid ""
+"However, it should work with any scanner that supports the SANE protocol. "
+"Please report any issues you encounter with other scanners so we can improve "
+"compatibility."
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:27
+msgid "Features"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:31
+msgid "User-friendly scan parameter presentation"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:32
+msgid "Zoomable, high-resolution previews"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:33
+msgid "Batch scanning of a single document (useful for scanning negatives)"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:34
+msgid "User defined presets"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:35
+msgid "Output to file (TIFF, PNG, JPEG), to email or to printer"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:36
+msgid "Saves pixels straight from the scanner: no image processing is done"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:47
+msgid "Creating a preset"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:51
+msgid "Using the scan list"
+msgstr ""
+
+#: data/com.patrickfournier.gorfector.desktop.in.in:7 src/App.cpp:311
 msgid "An application to scan images."
 msgstr ""
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/com.patrickfournier.gorfector.desktop.in.in:7
+#: data/com.patrickfournier.gorfector.desktop.in.in:10
 msgid "scan;scanner;"
 msgstr ""
 
@@ -64,53 +123,53 @@ msgstr ""
 msgid "About..."
 msgstr ""
 
-#: src/App.cpp:270
+#: src/App.cpp:271
 msgid "Select Device"
 msgstr ""
 
-#: src/App.cpp:294
+#: src/App.cpp:295
 msgid "Settings"
 msgstr ""
 
-#: src/App.cpp:489
+#: src/App.cpp:486
 msgid "Select a directory where to save the image files."
 msgstr ""
 
-#: src/App.cpp:496
+#: src/App.cpp:493
 msgid "Enter a file name to save the image files."
 msgstr ""
 
-#: src/App.cpp:524
+#: src/App.cpp:521
 msgid "Directory does not exists: {}."
 msgstr ""
 
-#: src/App.cpp:539
+#: src/App.cpp:536
 msgid "File '{}' already exists."
 msgstr ""
 
-#: src/App.cpp:552
+#: src/App.cpp:549
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
-#: src/App.cpp:569
+#: src/App.cpp:566
 msgid "File already exists"
 msgstr ""
 
-#: src/App.cpp:571
+#: src/App.cpp:568
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: src/App.cpp:574 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
+#: src/App.cpp:571 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
 #: src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr ""
 
-#: src/App.cpp:574 src/OutputOptionsState.hpp:51
+#: src/App.cpp:571 src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr ""
 
-#: src/App.cpp:623
+#: src/App.cpp:620
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"

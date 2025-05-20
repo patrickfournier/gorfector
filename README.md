@@ -1,6 +1,6 @@
 # Gorfector
 
-G-Observable Record Freight Extractor (**Gorfector**) is an image scanning software.
+General Observable Record Freight Extractor (**Gorfector**) is an image scanning software.
 
 Being relatively new, it has not been tested with a lot of scanners yet. Currently, it is known to work with:
 
