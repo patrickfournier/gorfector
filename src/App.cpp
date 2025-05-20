@@ -258,6 +258,7 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     BindMethodToAction<App>("help", &App::ShowHelp, this);
     BindMethodToAction<App>("about", &App::ShowAboutDialog, this);
 
+    SetAcceleratorForAction("app.scanlist", {"<Ctrl>L"});
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
     SetAcceleratorForAction("app.undo", {"<Ctrl>Z"});
     SetAcceleratorForAction("app.redo", {"<Ctrl><Shift>Z"});
