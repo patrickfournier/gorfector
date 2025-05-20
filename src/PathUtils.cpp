@@ -15,7 +15,7 @@ void Gorfector::IncrementPath(std::filesystem::path &path)
     int counter;
     std::string fileNameFormat;
 
-    auto counterRegex = std::regex("(.+)([.-_])([0-9]+)$");
+    auto counterRegex = std::regex("(.+)([.\\-_])([0-9]+)$");
     std::smatch match;
     if (std::regex_match(filename, match, counterRegex) && match.size() == 4)
     {
