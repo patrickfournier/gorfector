@@ -41,6 +41,7 @@
     <screenshots>
         <screenshot type="default">
             <image>https://github.com/patrickfournier/gorfector/tree/main/data/metainfo/main.png</image>
+            <caption>The main window</caption>
         </screenshot>
         <screenshot>
             <image>https://github.com/patrickfournier/gorfector/tree/main/data/metainfo/preset.png</image>
@@ -51,4 +52,9 @@
             <caption>Using the scan list</caption>
         </screenshot>
     </screenshots>
+    <url type="homepage">https://github.com/patrickfournier/gorfector/</url>
+    <developer id="com.patrickfournier">
+        <name>Patrick Fournier</name>
+    </developer>
+    <content_rating type="oars-1.1" />
 </component>
