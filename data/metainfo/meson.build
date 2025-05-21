@@ -1,9 +1,12 @@
+metainfo_conf = configuration_data()
+metainfo_conf.set('APP_ID', app_id)
+
 metainfo_file = 'com.patrickfournier.gorfector.metainfo.xml.in.in'
 metainfo_file = i18n.merge_file(
     input: configure_file(
         input: 'com.patrickfournier.gorfector.metainfo.xml.in.in',
         output: 'com.patrickfournier.gorfector.metainfo.xml.in',
-        configuration: conf,
+        configuration: metainfo_conf,
     ),
     output: app_id + '.metainfo.xml',
     type: 'xml',
