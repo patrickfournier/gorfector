@@ -1,4 +1,4 @@
-iconsdir = join_paths('icons', 'hicolor', '48x48', 'apps')
+iconsdir = join_paths('icons', 'hicolor', '64x64', 'apps')
 install_data(
     join_paths(iconsdir, '@0@.png'.format(app_id)),
     install_dir: join_paths(datadir, iconsdir)
