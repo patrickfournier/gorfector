@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 11:35-0400\n"
+"POT-Creation-Date: 2025-05-21 11:43-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,12 +72,20 @@ msgstr ""
 msgid "Saves pixels straight from the scanner: no image processing is done"
 msgstr ""
 
-#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:47
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:44
+msgid "The main window"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:48
 msgid "Creating a preset"
 msgstr ""
 
-#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:51
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:52
 msgid "Using the scan list"
+msgstr ""
+
+#: data/metainfo/com.patrickfournier.gorfector.metainfo.xml.in.in:57
+msgid "Patrick Fournier"
 msgstr ""
 
 #: data/com.patrickfournier.gorfector.desktop.in.in:7 src/App.cpp:311
