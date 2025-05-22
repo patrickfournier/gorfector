@@ -13,8 +13,8 @@ scanner_strings = custom_target('scanner_strings',
     command: ['strextractor.sh', '@CURRENT_SOURCE_DIR@', '@BUILD_ROOT@/scanners/scanner_strings.h'],
 )
 
-install_data(
-    scanner_files,
+install_subdir(
+    'epson',
     install_dir: join_paths(datadir, app_id, 'scanners'),
     install_mode: 'rw-r--r--',
 )

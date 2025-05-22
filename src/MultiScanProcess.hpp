@@ -1,9 +1,9 @@
 #pragma once
 
-#include "PathUtils.hpp"
 #include "ScanProcess.hpp"
 #include "SingleScanProcess.hpp"
 #include "Writers/FileWriter.hpp"
+#include "ZooLib/PathUtils.hpp"
 
 namespace Gorfector
 {
@@ -45,7 +45,7 @@ namespace Gorfector
                     }
                     case OutputOptionsState::FileExistsAction::e_IncrementCounter:
                     {
-                        IncrementPath(m_ImageFilePath);
+                        ZooLib::IncrementPath(m_ImageFilePath);
                         if (std::filesystem::exists(m_ImageFilePath))
                         {
                             return false;

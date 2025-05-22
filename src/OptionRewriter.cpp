@@ -4,7 +4,6 @@
 #include <glib.h>
 
 #include "App.hpp"
-#include "DeviceOptionsState.hpp"
 
 void Gorfector::OptionRewriter::Dump(SaneDevice *device)
 {
@@ -150,7 +149,7 @@ void UpdateIndexRecursively(
         }
         else if (entry.path().extension() == ".json")
         {
-            auto scannerFilePath = entry.path();
+            const auto &scannerFilePath = entry.path();
             if (std::filesystem::exists(scannerFilePath) &&
                 std::filesystem::last_write_time(scannerFilePath) > indexModifiedTime)
             {
@@ -167,7 +166,8 @@ void UpdateIndexRecursively(
                 {
                     auto vendor = device["vendor"].get<std::string>();
                     auto model = device["model"].get<std::string>();
-                    AddToIndex(index, vendor, model, canonical(scannerFilePath).string());
+                    auto path = ZooLib::UnrelocatePath(scannerFilePath);
+                    AddToIndex(index, vendor, model, canonical(path).string());
                 }
             }
         }
@@ -216,12 +216,10 @@ Gorfector::OptionRewriter::OptionRewriter(
 }
 
 void Gorfector::OptionRewriter::LoadOptionDescriptionFile(
-        const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath,
-        const char *deviceVendor, const char *deviceModel)
+        const std::filesystem::path &userConfigPath, const char *deviceVendor, const char *deviceModel)
 {
     m_OptionInfos.clear();
 
-    auto baseDirectory = systemConfigPath / "scanners";
     auto prefDirectory = userConfigPath / "scanners";
     auto indexFilePath = prefDirectory / "index.json";
 
@@ -247,7 +245,8 @@ void Gorfector::OptionRewriter::LoadOptionDescriptionFile(
             {
                 if (model["name"] == deviceModel)
                 {
-                    optionFilePath = baseDirectory / model["filepath"];
+                    auto filepath = model["filepath"].get<std::string>();
+                    optionFilePath = ZooLib::RelocatePath(filepath);
                     break;
                 }
             }

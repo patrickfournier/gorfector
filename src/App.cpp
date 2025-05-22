@@ -12,7 +12,6 @@
 #include "DeviceSelector.hpp"
 #include "DeviceSelectorObserver.hpp"
 #include "OutputOptionsState.hpp"
-#include "PathUtils.hpp"
 #include "PreferencesView.hpp"
 #include "PresetPanel.hpp"
 #include "PreviewPanel.hpp"
@@ -27,6 +26,7 @@
 #include "ZooLib/AppMenuBarBuilder.hpp"
 #include "ZooLib/ErrorDialog.hpp"
 #include "ZooLib/Gettext.hpp"
+#include "ZooLib/PathUtils.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
 Gorfector::App::App(int argc, char **argv, bool testMode)
@@ -538,7 +538,7 @@ void Gorfector::App::ScanToFile(const OutputOptionsState *scanOptions)
             }
             case OutputOptionsState::FileExistsAction::e_IncrementCounter:
             {
-                IncrementPath(imageFilePath);
+                ZooLib::IncrementPath(imageFilePath);
                 if (std::filesystem::exists(imageFilePath))
                 {
                     m_ScanOptionsPanel->SelectPage(ScanOptionsPanel::Page::e_FileOutput);
@@ -648,14 +648,14 @@ void Gorfector::App::OnScanClicked(GtkWidget *)
     else if (destination == OutputOptionsState::OutputDestination::e_Email)
     {
         auto imageFilePath = GetTemporaryDirectory() / "email_image_0000.jpg";
-        IncrementPath(imageFilePath);
+        ZooLib::IncrementPath(imageFilePath);
         auto fileWriter = FileWriter::GetFormatByType<JpegWriter>();
         StartScan(fileWriter, imageFilePath);
     }
     else if (destination == OutputOptionsState::OutputDestination::e_Printer)
     {
         auto imageFilePath = GetTemporaryDirectory() / "email_image_0000.tif";
-        IncrementPath(imageFilePath);
+        ZooLib::IncrementPath(imageFilePath);
         auto fileWriter = FileWriter::GetFormatByType<TiffWriter>();
         StartScan(fileWriter, imageFilePath);
     }

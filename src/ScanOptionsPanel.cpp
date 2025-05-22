@@ -328,8 +328,7 @@ Gorfector::ScanOptionsPanel::ScanOptionsPanel(
     if (device != nullptr)
     {
         m_Rewriter->LoadOptionDescriptionFile(
-                m_App->GetSystemConfigDirectoryPath(), m_App->GetUserConfigDirectoryPath(), device->GetVendor(),
-                device->GetModel());
+                m_App->GetUserConfigDirectoryPath(), device->GetVendor(), device->GetModel());
     }
 
     m_DeviceOptions = new DeviceOptionsState(m_App->GetState(), m_DeviceName);

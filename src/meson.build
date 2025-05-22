@@ -11,7 +11,6 @@ gorfector_sources = [
     'main.cpp',
     'MultiScanProcess.cpp',
     'OptionRewriter.cpp',
-    'PathUtils.cpp',
     'PreferencesView.cpp',
     'PresetCreateDialog.cpp',
     'PresetPanel.cpp',
@@ -30,6 +29,7 @@ gorfector_sources = [
 
     'ZooLib/Application.cpp',
     'ZooLib/ErrorDialog.cpp',
+    'ZooLib/PathUtils.cpp',
     'ZooLib/State.cpp',
 ]
 

@@ -29,6 +29,7 @@ datadir = join_paths(get_option('prefix'), get_option('datadir'))
 conf = configuration_data()
 conf.set_quoted('APP_ID', app_id)
 conf.set_quoted('VERSION', meson.project_version())
+conf.set_quoted('BIN_DIR', join_paths(get_option('prefix'), get_option('bindir')))
 conf.set_quoted('GETTEXT_PACKAGE', gettext_package)
 conf.set_quoted('DATADIR', datadir)
 conf.set_quoted('GNOMELOCALEDIR',

@@ -90,14 +90,12 @@ namespace Gorfector
 
         /**
          * \brief Loads option descriptions for a specific device based on its vendor and model.
-         * \param systemConfigPath Path to system configuration files.
          * \param userConfigPath Path to user configuration files.
          * \param deviceVendor The vendor name of the device.
          * \param deviceModel The model name of the device.
          */
         void LoadOptionDescriptionFile(
-                const std::filesystem::path &systemConfigPath, const std::filesystem::path &userConfigPath,
-                const char *deviceVendor, const char *deviceModel);
+                const std::filesystem::path &userConfigPath, const char *deviceVendor, const char *deviceModel);
 
         /**
          * \brief Retrieves the title of an option.

@@ -6,6 +6,7 @@
 
 #include "CommandDispatcher.hpp"
 #include "ObserverManager.hpp"
+#include "PathUtils.hpp"
 #include "SignalSupport.hpp"
 #include "State.hpp"
 
@@ -433,7 +434,7 @@ namespace ZooLib
         {
             if (m_SystemConfigDirectoryPath.empty())
             {
-                m_SystemConfigDirectoryPath = std::filesystem::path(DATADIR) / GetApplicationId();
+                m_SystemConfigDirectoryPath = RelocatePath(std::filesystem::path(DATADIR) / GetApplicationId());
             }
 
             return m_SystemConfigDirectoryPath;
