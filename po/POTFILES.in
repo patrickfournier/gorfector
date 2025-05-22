@@ -55,6 +55,8 @@ src/ZooLib/Gettext.hpp
 src/ZooLib/GtkUtils.hpp
 src/ZooLib/Observer.hpp
 src/ZooLib/ObserverManager.hpp
+src/ZooLib/PathUtils.cpp
+src/ZooLib/PathUtils.hpp
 src/ZooLib/SignalSupport.hpp
 src/ZooLib/State.cpp
 src/ZooLib/State.hpp
@@ -83,8 +85,6 @@ src/MultiScanProcess.hpp
 src/OptionRewriter.cpp
 src/OptionRewriter.hpp
 src/OutputOptionsState.hpp
-src/PathUtils.cpp
-src/PathUtils.hpp
 src/Point.hpp
 src/PreferencesView.cpp
 src/PreferencesView.hpp

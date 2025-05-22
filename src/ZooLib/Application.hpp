@@ -197,6 +197,13 @@ namespace ZooLib
             m_Dispatcher.Dispatch<TCommand>(command);
         }
 
+        /**
+         * \brief Creates a desktop entry for the application.
+         *
+         * \param wmClass The window manager class of the application. Use `xprop WM_CLASS` to get the class.
+         */
+        void CreateDesktopEntryForAppImage(const char *wmClass);
+
     public:
         /**
          * Classes deriving from `Application` should make their constructors protected or private and
@@ -439,6 +446,18 @@ namespace ZooLib
             }
 
             return m_SystemConfigDirectoryPath;
+        }
+
+        static bool IsRunningAsAppImage()
+        {
+            const auto mountPoint = getenv("APPDIR");
+            if (mountPoint == nullptr)
+            {
+                return false;
+            }
+
+            return std::filesystem::exists("/proc/self/exe") &&
+                   std::filesystem::read_symlink("/proc/self/exe").string().starts_with(mountPoint);
         }
 
         /**

@@ -94,3 +94,108 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
                 this, nullptr);
     }
 }
+
+void ZooLib::Application::CreateDesktopEntryForAppImage(const char *wmClass)
+{
+    auto mountPoint = getenv("APPDIR");
+    auto xdgDataHome = getenv("XDG_DATA_HOME");
+    std::filesystem::path baseDestinationPath;
+    if (xdgDataHome == nullptr)
+    {
+        auto home = getenv("HOME");
+        baseDestinationPath = std::filesystem::path(home) / ".local" / "share";
+    }
+    else
+    {
+        baseDestinationPath = std::filesystem::path(xdgDataHome);
+    }
+
+    //
+    // Copy icon file
+    //
+    bool foundIcon = true;
+    std::filesystem::path iconDestinationPath;
+
+    auto iconFileName = GetApplicationId() + ".png";
+    auto iconFilePath = std::filesystem::path(mountPoint) / iconFileName;
+    if (!std::filesystem::exists(iconFilePath))
+    {
+        iconFileName = GetApplicationId() + ".svg";
+        iconFilePath = std::filesystem::path(mountPoint) / iconFileName;
+
+        if (!std::filesystem::exists(iconFilePath))
+        {
+            iconFileName = GetApplicationId() + ".xpm";
+            iconFilePath = std::filesystem::path(mountPoint) / iconFileName;
+
+            if (!std::filesystem::exists(iconFilePath))
+            {
+                g_warning("Icon file not found.");
+                foundIcon = false;
+            }
+        }
+    }
+
+    if (foundIcon)
+    {
+        iconFilePath = std::filesystem::canonical(iconFilePath);
+        auto appDirUsrShare = std::filesystem::path(mountPoint) / "usr" / "share";
+
+        auto iconFilePathIt = iconFilePath.begin();
+        for (auto pathIt = appDirUsrShare.begin(); pathIt != appDirUsrShare.end(); ++pathIt)
+        {
+            if (iconFilePathIt == iconFilePath.end() || *pathIt != *iconFilePathIt)
+            {
+                break;
+            }
+
+            ++iconFilePathIt;
+        }
+
+        iconDestinationPath = baseDestinationPath;
+        for (; iconFilePathIt != iconFilePath.end(); ++iconFilePathIt)
+        {
+            iconDestinationPath /= *iconFilePathIt;
+        }
+        std::filesystem::create_directories(iconDestinationPath.parent_path());
+        std::filesystem::copy(iconFilePath, iconDestinationPath, std::filesystem::copy_options::overwrite_existing);
+    }
+
+    //
+    // Modify and copy the desktop file
+    //
+    auto desktopFileName = GetApplicationId() + ".desktop";
+    auto desktopFilePath = std::filesystem::path(mountPoint) / desktopFileName;
+    auto desktopDestinationPath = baseDestinationPath / "applications" / desktopFileName;
+
+    g_autoptr(GError) error = nullptr;
+    g_autoptr(GKeyFile) key_file = g_key_file_new();
+
+    if (!g_key_file_load_from_file(
+                key_file, desktopFilePath.c_str(),
+                static_cast<GKeyFileFlags>(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS), &error))
+    {
+        if (!g_error_matches(error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+            g_warning("Error loading key file: %s", error->message);
+        return;
+    }
+
+
+    g_key_file_set_string(key_file, "Desktop Entry", "StartupWMClass", wmClass);
+
+    if (foundIcon)
+    {
+        g_key_file_set_string(key_file, "Desktop Entry", "Icon", iconDestinationPath.c_str());
+    }
+
+    if (auto appImagePath = getenv("APPIMAGE"); appImagePath != nullptr)
+    {
+        g_key_file_set_string(key_file, "Desktop Entry", "Exec", appImagePath);
+    }
+
+    if (!g_key_file_save_to_file(key_file, desktopDestinationPath.c_str(), &error))
+    {
+        g_warning("Error saving key file: %s", error->message);
+        return;
+    }
+}

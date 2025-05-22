@@ -244,8 +244,14 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
             ->EndSection()
             ->BeginSection()
             ->AddMenuItem(_("Use Scan List"), "app.scanlist")
-            ->EndSection()
-            ->BeginSection()
+            ->EndSection();
+    if (IsRunningAsAppImage())
+    {
+        menuBarBuilder->BeginSection()
+                ->AddMenuItem(_("Create Desktop Entry..."), "app.appimage_desktop_integration")
+                ->EndSection();
+    }
+    menuBarBuilder->BeginSection()
             ->AddMenuItem(_("Settings..."), "app.preferences")
             ->AddMenuItem(_("Help..."), "app.help")
             ->AddMenuItem(_("About..."), "app.about")
@@ -257,6 +263,8 @@ void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
     BindMethodToAction<App>("preferences", &App::ShowPreferenceDialog, this);
     BindMethodToAction<App>("help", &App::ShowHelp, this);
     BindMethodToAction<App>("about", &App::ShowAboutDialog, this);
+
+    BindMethodToAction<App>("appimage_desktop_integration", &App::ShowAppImageDesktopIntegrationDialog, this);
 
     SetAcceleratorForAction("app.scanlist", {"<Ctrl>L"});
     SetAcceleratorForAction("app.quit", {"<Ctrl>Q"});
@@ -332,12 +340,34 @@ void Gorfector::App::ShowAboutDialog(GSimpleAction *action, GVariant *parameter)
     auto dialogWindow = adw_about_dialog_new();
     adw_about_dialog_set_application_icon(ADW_ABOUT_DIALOG(dialogWindow), GetApplicationId().c_str());
     adw_about_dialog_set_application_name(ADW_ABOUT_DIALOG(dialogWindow), k_ApplicationName);
-    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), "0.1");
+    adw_about_dialog_set_version(ADW_ABOUT_DIALOG(dialogWindow), VERSION);
     adw_about_dialog_set_comments(ADW_ABOUT_DIALOG(dialogWindow), _("An application to scan images."));
     adw_about_dialog_set_license_type(ADW_ABOUT_DIALOG(dialogWindow), GTK_LICENSE_GPL_3_0);
     adw_about_dialog_set_developer_name(ADW_ABOUT_DIALOG(dialogWindow), "Patrick Fournier");
 
     adw_dialog_present(ADW_DIALOG(dialogWindow), m_MainWindow);
+}
+
+void Gorfector::App::ShowAppImageDesktopIntegrationDialog(GSimpleAction *action, GVariant *parameter)
+{
+    auto dialogWindow = adw_alert_dialog_new(
+            _("Create Desktop Entry"), _("Do you want to create a desktop entry for Gorfector? This will allow you to "
+                                         "launch Gorfector from your application menu."));
+    adw_alert_dialog_add_responses(ADW_ALERT_DIALOG(dialogWindow), "yes", _("Yes"), "no", _("No"), nullptr);
+    adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(dialogWindow), "no");
+    adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(dialogWindow), "yes");
+    ZooLib::ConnectGtkSignal(this, &App::OnDesktopIntegrationResponse, dialogWindow, "response");
+    adw_dialog_present(ADW_DIALOG(dialogWindow), m_MainWindow);
+}
+
+void Gorfector::App::OnDesktopIntegrationResponse(AdwAlertDialog *alert, gchar *response)
+{
+    if (std::strcmp(response, "yes") == 0)
+    {
+        CreateDesktopEntryForAppImage("Gorfector-x86_64.AppImage");
+    }
+
+    adw_dialog_close(ADW_DIALOG(alert));
 }
 
 const std::string &Gorfector::App::GetSelectorDeviceName() const

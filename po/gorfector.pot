@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 11:43-0400\n"
+"POT-Creation-Date: 2025-05-22 11:59-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,7 @@ msgstr ""
 msgid "Patrick Fournier"
 msgstr ""
 
-#: data/com.patrickfournier.gorfector.desktop.in.in:7 src/App.cpp:311
+#: data/com.patrickfournier.gorfector.desktop.in.in:7 src/App.cpp:344
 msgid "An application to scan images."
 msgstr ""
 
@@ -119,65 +119,87 @@ msgstr ""
 msgid "Use Scan List"
 msgstr ""
 
-#: src/App.cpp:249
+#: src/App.cpp:251
+msgid "Create Desktop Entry..."
+msgstr ""
+
+#: src/App.cpp:255
 msgid "Settings..."
 msgstr ""
 
-#: src/App.cpp:250
+#: src/App.cpp:256
 msgid "Help..."
 msgstr ""
 
-#: src/App.cpp:251
+#: src/App.cpp:257
 msgid "About..."
 msgstr ""
 
-#: src/App.cpp:271
+#: src/App.cpp:279
 msgid "Select Device"
 msgstr ""
 
-#: src/App.cpp:295
+#: src/App.cpp:303
 msgid "Settings"
 msgstr ""
 
-#: src/App.cpp:486
+#: src/App.cpp:354
+msgid "Create Desktop Entry"
+msgstr ""
+
+#: src/App.cpp:354
+msgid ""
+"Do you want to create a desktop entry for Gorfector? This will allow you to "
+"launch Gorfector from your application menu."
+msgstr ""
+
+#: src/App.cpp:356
+msgid "Yes"
+msgstr ""
+
+#: src/App.cpp:356
+msgid "No"
+msgstr ""
+
+#: src/App.cpp:541
 msgid "Select a directory where to save the image files."
 msgstr ""
 
-#: src/App.cpp:493
+#: src/App.cpp:548
 msgid "Enter a file name to save the image files."
 msgstr ""
 
-#: src/App.cpp:521
+#: src/App.cpp:576
 msgid "Directory does not exists: {}."
 msgstr ""
 
-#: src/App.cpp:536
+#: src/App.cpp:591
 msgid "File '{}' already exists."
 msgstr ""
 
-#: src/App.cpp:549
+#: src/App.cpp:604
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
-#: src/App.cpp:566
+#: src/App.cpp:621
 msgid "File already exists"
 msgstr ""
 
-#: src/App.cpp:568
+#: src/App.cpp:623
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: src/App.cpp:571 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
+#: src/App.cpp:626 src/PresetPanel.cpp:89 src/ScanListPanel.cpp:209
 #: src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr ""
 
-#: src/App.cpp:571 src/OutputOptionsState.hpp:51
+#: src/App.cpp:626 src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr ""
 
-#: src/App.cpp:620
+#: src/App.cpp:675
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -306,7 +328,7 @@ msgstr ""
 msgid "Scanners Settings"
 msgstr ""
 
-#: src/PresetCreateDialog.cpp:140 src/ScanOptionsPanel.cpp:463
+#: src/PresetCreateDialog.cpp:140 src/ScanOptionsPanel.cpp:462
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:44
 msgid "Scan Area"
 msgstr ""
@@ -480,56 +502,56 @@ msgstr ""
 msgid "μs"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:417
+#: src/ScanOptionsPanel.cpp:416
 msgid "Basic"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:421
+#: src/ScanOptionsPanel.cpp:420
 #: /home/patrick/src/gorfector/buildDir/scanners/scanner_strings.h:17
 msgid "Advanced"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:426
+#: src/ScanOptionsPanel.cpp:425
 msgid "Output"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:447
+#: src/ScanOptionsPanel.cpp:446
 msgid "Common Options"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:511 src/ScanOptionsPanel.cpp:516
+#: src/ScanOptionsPanel.cpp:510 src/ScanOptionsPanel.cpp:515
 msgid "Destination"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:531
+#: src/ScanOptionsPanel.cpp:530
 msgid "Location"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:532
+#: src/ScanOptionsPanel.cpp:531
 msgid "The directory where the scanned files will be saved."
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:547
+#: src/ScanOptionsPanel.cpp:546
 msgid "Browse for a location."
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:553
+#: src/ScanOptionsPanel.cpp:552
 msgid "Create Missing Directories"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:554
+#: src/ScanOptionsPanel.cpp:553
 msgid "Create directories if they do not exist."
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:563
+#: src/ScanOptionsPanel.cpp:562
 msgid "File Name"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:576
+#: src/ScanOptionsPanel.cpp:575
 msgid "If File Exists"
 msgstr ""
 
-#: src/ScanOptionsPanel.cpp:611
+#: src/ScanOptionsPanel.cpp:610
 msgid "Select Destination"
 msgstr ""
 

@@ -12,6 +12,7 @@ gorfector_resources = gnome.compile_resources(
 
 desktop_conf = configuration_data()
 desktop_conf.set('icon', app_id)
+desktop_conf.set('version', meson.project_version())
 desktop_file = i18n.merge_file(
     type: 'desktop',
     input: configure_file(

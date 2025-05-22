@@ -113,6 +113,8 @@ namespace Gorfector
         [[nodiscard]] int GetSelectorSaneInitId() const;
 
         void ShowAboutDialog(GSimpleAction *action = nullptr, GVariant *parameter = nullptr);
+        void ShowAppImageDesktopIntegrationDialog(GSimpleAction *action, GVariant *parameter);
+        void OnDesktopIntegrationResponse(AdwAlertDialog *alert, gchar *response);
         void ShowSelectDeviceDialog(GSimpleAction *action, GVariant *parameter);
         void ShowPreferenceDialog(GSimpleAction *action, GVariant *parameter);
         void ShowHelp(GSimpleAction *action, GVariant *parameter);

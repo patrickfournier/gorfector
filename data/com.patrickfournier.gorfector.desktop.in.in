@@ -14,3 +14,7 @@ StartupNotify=true
 Exec=gorfector
 Terminal=false
 SingleMainWindow=true
+
+X-AppImage-Name=Gorfector
+X-AppImage-Version=@version@
+X-AppImage-Arch=x86_64
