@@ -40,3 +40,4 @@
 
 # Gettext
 /locale/*/LC_MESSAGES/messages.mo
+/AppDir/*

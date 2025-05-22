@@ -396,10 +396,16 @@ namespace ZooLib
         {
             if (m_TempDirectoryPath.empty())
             {
-                auto xdgRuntimeDir =
-                        std::filesystem::path(g_get_user_runtime_dir()) / "app" / (GetApplicationId() + "_XXXXXX");
+                auto xdgRuntimeDir = std::filesystem::path(g_get_user_runtime_dir()) / "app";
+                if (!std::filesystem::exists(xdgRuntimeDir))
+                {
+                    std::filesystem::create_directories(xdgRuntimeDir);
+                }
+
+                xdgRuntimeDir /= (GetApplicationId() + "_XXXXXX");
                 auto homeTmpStr = strdup(xdgRuntimeDir.c_str());
-                m_TempDirectoryPath = std::filesystem::path(mkdtemp(homeTmpStr));
+                homeTmpStr = mkdtemp(homeTmpStr);
+                m_TempDirectoryPath = std::filesystem::path(homeTmpStr);
                 free(homeTmpStr);
             }
 

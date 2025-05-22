@@ -29,6 +29,6 @@
     <p>
         You can also set the scan area by entering the coordinates of the rectangle in the <gui>Scan Area</gui>
         section of the <gui>Basic</gui> parameter tab.
-        Some scanners may offer additional cropping options, such as selecting a size from a predefined list of common media sizes
+        Some scanners may offer additional cropping options, such as selecting a size from a predefined list of common media sizes.
     </p>
 </page>
