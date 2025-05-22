@@ -298,8 +298,33 @@ void Gorfector::App::ShowPreferenceDialog(GSimpleAction *action, GVariant *param
 
 void Gorfector::App::ShowHelp(GSimpleAction *action, GVariant *parameter)
 {
-    auto launcher = gtk_uri_launcher_new("help:gorfector");
-    gtk_uri_launcher_launch(launcher, GTK_WINDOW(m_MainWindow), nullptr, nullptr, nullptr);
+    auto display = gtk_widget_get_display(m_MainWindow);
+    auto context = gdk_display_get_app_launch_context(display);
+    gdk_app_launch_context_set_timestamp(context, GDK_CURRENT_TIME);
+
+    auto languageNames = g_get_language_names();
+
+    for (auto i = 0; languageNames[i] != nullptr; ++i)
+    {
+        auto lang = languageNames[i];
+
+        auto helpPath = std::filesystem::path(DATADIR) / "help";
+        helpPath /= std::filesystem::path(lang) / "gorfector" / "index.page";
+        helpPath = ZooLib::RelocatePath(helpPath);
+        if (std::filesystem::exists(helpPath))
+        {
+            auto file = g_file_new_for_path(helpPath.c_str());
+            auto fileList = g_list_alloc();
+            fileList->data = file;
+
+            auto appInfo = g_app_info_get_default_for_uri_scheme("help");
+            g_app_info_launch(appInfo, fileList, G_APP_LAUNCH_CONTEXT(context), nullptr);
+
+            g_list_free_full(fileList, g_object_unref);
+
+            break;
+        }
+    }
 }
 
 void Gorfector::App::ShowAboutDialog(GSimpleAction *action, GVariant *parameter)

@@ -426,7 +426,8 @@ namespace ZooLib
          * \brief Gets the system-wide configuration directory path.
          *
          * This method retrieves the path to the system-wide configuration directory for this application.
-         * The path is lazily initialized on first call.
+         * The path is lazily initialized on first call. It is typically located at
+         * /usr/share/[application-id]/ on Linux systems.
          *
          * \return A reference to the system-wide configuration directory path.
          */
