@@ -321,8 +321,11 @@ namespace Gorfector
                     ADW_SPIN_ROW(m_PngCompressionLevel), m_PngWriterStateComponent->GetCompressionLevel());
             adw_spin_row_set_value(ADW_SPIN_ROW(m_JpegQuality), m_JpegWriterStateComponent->GetQuality());
 
-            adw_switch_row_set_active(ADW_SWITCH_ROW(m_DumpSaneOptions), m_DeviceSelectorState->IsDumpSaneEnabled());
+            if (m_DumpSaneOptions != nullptr)
+            {
+                adw_switch_row_set_active(
+                        ADW_SWITCH_ROW(m_DumpSaneOptions), m_DeviceSelectorState->IsDumpSaneEnabled());
+            }
         }
     };
-
 }
