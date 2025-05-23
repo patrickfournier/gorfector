@@ -1,7 +1,6 @@
-fs = import('fs')
-
 xgettext = find_program('xgettext')
 msgmerge = find_program('msgmerge')
+msginit = find_program('msginit')
 msgfmt = find_program('msgfmt')
 
 po_files = [
@@ -127,6 +126,11 @@ input_files = [
     scanner_strings,
 ]
 
+languages = []
+foreach po_file : po_files
+    languages += [po_file.split('.')[0]]
+endforeach
+
 update_pot = custom_target(
     'update_pot',
     output: gettext_package + '.pot',
@@ -141,13 +145,14 @@ update_pot = custom_target(
 
 update_all_po = custom_target(
     'update_all_po',
-    input: [update_pot, 'LINGUAS'],
+    input: update_pot,
     output: po_files,
     command: [
         'meson_helpers/update_all_po.sh',
-        '@INPUT@',
-        '@OUTDIR@',
         '@CURRENT_SOURCE_DIR@',
+        '@OUTDIR@',
+        '@INPUT@',
+        languages,
     ],
 )
 

@@ -4,9 +4,8 @@ src_dir=$1
 output=$2
 
 shift 2
-inputs=$@
 
-xgettext ${inputs} \
+xgettext "$@" \
         --from-code=UTF-8 \
         --add-comments \
         --keyword=_ \

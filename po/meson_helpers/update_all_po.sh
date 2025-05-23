@@ -1,32 +1,12 @@
 #!/bin/bash
 
-pot_file=$1
-linguas_file=$2
-build_dir=$3
-src_dir=$4
+src_dir=$1
+build_dir=$2
+pot_file=$3
 
-# Reads the LINGUAS file and outputs each word, one per line, from non-comment lines.
-# Ignores empty lines and lines starting with # (and optional leading whitespace).
-get_linguas() {
-    if [[ ! -f "${linguas_file}" ]]; then
-        echo "Error: LINGUAS file not found." >&2
-        return 1
-    fi
+shift 3
 
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        # Skip empty lines and lines that start with # (possibly preceded by whitespace)
-        if [[ -n "$line" && ! "$line" =~ ^\s*# ]]; then
-            # Process the line: split into words and print each word on a new line.
-            # $line is intentionally unquoted here to allow word splitting by IFS.
-            for word in $line; do
-                echo "$word"
-            done
-        fi
-    done < "${linguas_file}"
-}
-
-langs=$(get_linguas)
-for lang in $langs; do
+for lang in "$@"; do
     if [[ -f "${build_dir}/${lang}.po" ]]; then
         rm "${build_dir}/${lang}.po"
     fi
