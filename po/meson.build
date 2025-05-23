@@ -146,7 +146,7 @@ update_pot = custom_target(
 update_all_po = custom_target(
     'update_all_po',
     input: update_pot,
-    output: po_files,
+    output: ['LINGUAS', po_files],
     command: [
         'meson_helpers/update_all_po.sh',
         '@CURRENT_SOURCE_DIR@',

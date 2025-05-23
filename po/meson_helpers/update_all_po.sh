@@ -5,8 +5,9 @@ build_dir=$2
 pot_file=$3
 
 shift 3
+langs=$*
 
-for lang in "$@"; do
+for lang in ${langs}; do
     if [[ -f "${build_dir}/${lang}.po" ]]; then
         rm "${build_dir}/${lang}.po"
     fi
@@ -20,3 +21,5 @@ for lang in "$@"; do
     mv "${build_dir}/${lang}.po" "${src_dir}/${lang}.po"
     ln -rs "${src_dir}/${lang}.po" "${build_dir}/${lang}.po"
 done
+
+printf "%s\n" $langs > "${build_dir}/LINGUAS"

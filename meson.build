@@ -11,7 +11,6 @@ project('gorfector',
 )
 
 gnome = import('gnome')
-i18n  = import('i18n')
 
 cx = meson.get_compiler('cpp')
 
@@ -22,7 +21,6 @@ else
 endif
 
 gettext_package = meson.project_name()
-podir = join_paths(meson.project_source_root(), 'po')
 
 datadir = join_paths(get_option('prefix'), get_option('datadir'))
 
@@ -56,9 +54,9 @@ cxxflags = [
 ]
 
 subdir('scanners')
-subdir('data')
 subdir('help')
 subdir('po')
+subdir('data')
 subdir('src')
 
 gnome.post_install(

@@ -2,7 +2,8 @@
 
 out_dir=$1
 package_name=$2
-shift 2
+# linguas_file=$3
+shift 3
 
 echo "Info: Compiling .po files to .mo files"
 
