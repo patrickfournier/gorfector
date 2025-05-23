@@ -10,7 +10,7 @@ scanner_strings = custom_target('scanner_strings',
     output: [
         'scanner_strings.h',
     ],
-    command: ['strextractor.sh', '@CURRENT_SOURCE_DIR@', '@BUILD_ROOT@/scanners/scanner_strings.h'],
+    command: ['strextractor.sh', '@CURRENT_SOURCE_DIR@', '@OUTPUT@'],
 )
 
 install_subdir(

@@ -52,6 +52,7 @@ executable(
         nlohmann_json_dep,
         libsane_dep,
         config_dep,
+        mo_dep,
     ],
     include_directories : [
         root_include,
