@@ -62,13 +62,11 @@ To make the parameter strings available to the translation system, run these com
 (assuming you have set up `meson` to use the `build` directory):
 
 ```bash
-  meson compile scanner_strings -C build
-  meson compile gorfector-pot -C build
   meson compile gorfector-update-po -C build
 ```
 
-This will update the `gorfector.pot` file and all the `*.po` files in the `po` directory. You (or a translator) will 
-now be able to translate the strings in the `*.po` files.
+This will extract the strings from the JSON file, update the `gorfector.pot` file and all the `*.po` files in 
+the `po` directory. You (or a translator) will now be able to translate the strings in the `*.po` files.
 
 ## Testing your changes
 
