@@ -1,6 +1,0 @@
-[submodule "Tests/googletest"]
-	path = Tests/googletest
-	url = https://github.com/google/googletest.git
-[submodule "json"]
-	path = ZooLib/json
-	url = https://github.com/nlohmann/json.git
