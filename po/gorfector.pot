@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 17:34-0400\n"
+"POT-Creation-Date: 2025-05-24 11:51-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,6 +96,10 @@ msgstr ""
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../po/../data/com.patrickfournier.gorfector.desktop.in.in:10
 msgid "scan;scanner;"
+msgstr ""
+
+#: ../po/../src/ZooLib/ErrorDialog.cpp:10
+msgid "Error"
 msgstr ""
 
 #: ../po/../src/App.cpp:161 scanners/scanner_strings.h:40

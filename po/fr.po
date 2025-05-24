@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 17:34-0400\n"
-"PO-Revision-Date: 2025-05-20 11:34-0400\n"
+"POT-Creation-Date: 2025-05-24 11:51-0400\n"
+"PO-Revision-Date: 2025-05-24 11:52-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -110,6 +110,10 @@ msgstr "Une application pour numériser des images."
 #: ../po/../data/com.patrickfournier.gorfector.desktop.in.in:10
 msgid "scan;scanner;"
 msgstr "numériser;numérisation;scanner"
+
+#: ../po/../src/ZooLib/ErrorDialog.cpp:10
+msgid "Error"
+msgstr "Erreur"
 
 #: ../po/../src/App.cpp:161 scanners/scanner_strings.h:40
 #: scanners/scanner_strings.h:41
