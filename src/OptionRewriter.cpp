@@ -166,8 +166,9 @@ void UpdateIndexRecursively(
                 {
                     auto vendor = device["vendor"].get<std::string>();
                     auto model = device["model"].get<std::string>();
-                    auto path = ZooLib::UnrelocatePath(scannerFilePath);
-                    AddToIndex(index, vendor, model, canonical(path).string());
+                    auto path = canonical(scannerFilePath);
+                    path = ZooLib::UnrelocatePath(scannerFilePath);
+                    AddToIndex(index, vendor, model, path.string());
                 }
             }
         }
