@@ -14,7 +14,7 @@ gorfector_sources = [
     'PreferencesView.cpp',
     'PresetCreateDialog.cpp',
     'PresetPanel.cpp',
-    'PresetRenameDialog.cpp',
+    'PresetUpdateDialog.cpp',
     'PresetViewDialog.cpp',
     'PreviewPanel.cpp',
     'PreviewScanProcess.cpp',

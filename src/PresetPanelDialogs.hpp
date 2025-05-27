@@ -29,14 +29,14 @@ namespace Gorfector
     void ShowCreatePresetDialog(GtkWidget *widget, gpointer userData);
 
     /**
-     * \brief Shows the rename preset dialog.
+     * \brief Shows the update preset dialog.
      *
-     * This function creates and displays a dialog for renaming a preset.
+     * This function creates and displays a dialog for renaming or updating a preset.
      *
      * \param widget The widget that triggered the dialog.
      * \param userData Pointer to user data (usually the preset panel).
      */
-    void ShowRenamePresetDialog(GtkWidget *widget, gpointer userData);
+    void ShowUpdatePresetDialog(GtkWidget *widget, gpointer userData);
 
     /**
      * \brief Shows the view preset dialog.

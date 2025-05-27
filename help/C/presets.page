@@ -48,6 +48,8 @@
 
     <p>
         Once you have saved a preset, you can load it by selecting it in the list and clicking on the <gui style="button">Apply</gui> button.
-        You can also inspect, rename or delete a preset by clicking on the corresponding button beside the preset name.
+        You can also inspect, update or delete a preset by clicking on the corresponding button beside the preset name. Updating a preset will
+        overwrite the existing preset with the current settings, without changing its scope (i.e., if the preset was an output settings preset,
+        it will remain an output settings preset after the update).
     </p>
 </page>

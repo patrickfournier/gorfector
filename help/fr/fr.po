@@ -2,15 +2,14 @@
 # Copyright (C) 2025 Listed translators
 # This file is distributed under the license
 # Creative Commons Attribution-ShareAlike 4.0 International https://creativecommons.org/licenses/by-sa/4.0/
-#
 # Patrick Fournier <>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: https://github.com/patrickfournier/gorfector/issues\n"
-"POT-Creation-Date: 2025-05-21 11:43-0400\n"
-"PO-Revision-Date: 2025-05-19 12:08-0400\n"
+"POT-Creation-Date: 2025-05-27 00:12-0400\n"
+"PO-Revision-Date: 2025-05-27 10:55-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -73,7 +72,7 @@ msgid ""
 "You can also set the scan area by entering the coordinates of the rectangle "
 "in the <gui>Scan Area</gui> section of the <gui>Basic</gui> parameter tab. "
 "Some scanners may offer additional cropping options, such as selecting a "
-"size from a predefined list of common media sizes"
+"size from a predefined list of common media sizes."
 msgstr ""
 "Vous pouvez également définir la zone de numérisation en entrant les "
 "coordonnées du rectangle dans la section <gui>Zone de numérisation</gui> de "
@@ -308,14 +307,19 @@ msgstr "Les paramètres de l'onglet <gui>Sortie</gui>."
 msgid ""
 "Once you have saved a preset, you can load it by selecting it in the list "
 "and clicking on the <gui style=\"button\">Apply</gui> button. You can also "
-"inspect, rename or delete a preset by clicking on the corresponding button "
-"beside the preset name."
+"inspect, update or delete a preset by clicking on the corresponding button "
+"beside the preset name. Updating a preset will overwrite the existing preset "
+"with the current settings, without changing its scope (i.e., if the preset "
+"was an output settings preset, it will remain an output settings preset "
+"after the update)."
 msgstr ""
 "Une fois que vous avez enregistré un préréglage, vous pouvez le charger en "
 "le sélectionnant dans la liste et en cliquant sur le bouton <gui "
-"style=\"button\">Appliquer</gui>. Vous pouvez également inspecter, renommer "
+"style=\"button\">Appliquer</gui>. Vous pouvez également inspecter, modifier "
 "ou supprimer un préréglage en cliquant sur le bouton correspondant à côté du "
-"nom du préréglage."
+"nom du préréglage. La mise à jour d'un préréglage écrasera ses valeurs par "
+"les paramètres courants, sans changer son type (i.e. si le préréglage était "
+"un préréglage de sortie, il demeurera un préréglage de sortie)."
 
 #. (itstool) path: info/desc
 #: ../help/C/scan_list.page:8

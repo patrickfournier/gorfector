@@ -3,8 +3,8 @@
 #include "App.hpp"
 #include "Commands/CreatePresetCommand.hpp"
 #include "Commands/DeletePresetCommand.hpp"
-#include "Commands/RenamePresetCommand.hpp"
 #include "Commands/SetPresetExpanded.hpp"
+#include "Commands/UpdatePresetCommand.hpp"
 #include "CurrentDeviceObserver.hpp"
 #include "PresetPanelDialogs.hpp"
 #include "PresetPanelState.hpp"
@@ -51,7 +51,7 @@ namespace Gorfector
             m_Dispatcher.RegisterHandler(SetPresetExpanded::Execute, m_PresetPanelState);
             m_Dispatcher.RegisterHandler(CreatePresetCommand::Execute, m_PresetPanelState);
             m_Dispatcher.RegisterHandler(DeletePresetCommand::Execute, m_PresetPanelState);
-            m_Dispatcher.RegisterHandler(RenamePresetCommand::Execute, m_PresetPanelState);
+            m_Dispatcher.RegisterHandler(UpdatePresetCommand::Execute, m_PresetPanelState);
         }
 
         void OnExpanderExpanded(GtkWidget *widget)
@@ -59,67 +59,9 @@ namespace Gorfector
             m_Dispatcher.Dispatch(SetPresetExpanded(gtk_expander_get_expanded(GTK_EXPANDER(widget))));
         }
 
-    public:
-        /**
-         * \brief Creates a new instance of a `PresetPanel` class.
-         *
-         * This static method allocates and initializes a new `PresetPanel` instance, ensuring that
-         * the `PostCreateView` method is called to set up the destroy signal.
-         *
-         * \param parentDispatcher Pointer to the parent command dispatcher.
-         * \param app Pointer to the application instance.
-         * \return A pointer to the newly created `PresetPanel` instance.
-         */
-        static PresetPanel *Create(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        void
+        GatherPresetValues(nlohmann::json &preset, bool saveScannerSettings, bool saveScanArea, bool saveOutputSettings)
         {
-            auto view = new PresetPanel(parentDispatcher, app);
-            view->PostCreateView();
-            return view;
-        }
-
-        ~PresetPanel() override
-        {
-            m_Dispatcher.UnregisterHandler<SetPresetExpanded>();
-            m_Dispatcher.UnregisterHandler<CreatePresetCommand>();
-            m_Dispatcher.UnregisterHandler<DeletePresetCommand>();
-            m_Dispatcher.UnregisterHandler<RenamePresetCommand>();
-
-            m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
-            m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
-
-            delete m_PresetPanelState;
-        }
-
-        [[nodiscard]] PresetPanelState *GetState() const
-        {
-            return m_PresetPanelState;
-        }
-
-        void BuildUI();
-
-        GtkWidget *CreatePresetListItem(const char *itemName);
-
-        [[nodiscard]] AdwApplicationWindow *GetMainWindow()
-        {
-            return m_App->GetMainWindow();
-        }
-
-        [[nodiscard]] GtkWidget *GetRootWidget() const override
-        {
-            return m_RootWidget;
-        }
-
-        bool IsUniquePresetName(std::string &presetName) const
-        {
-            return m_PresetPanelState->GetPreset(presetName) == nullptr;
-        }
-
-        void CreatePreset(
-                const std::string &presetName, bool saveScannerSettings, bool saveScanArea, bool saveOutputSettings)
-        {
-            auto preset = nlohmann::json{};
-            preset[PresetPanelState::k_PresetNameKey] = presetName;
-
             auto scannerSettings = nlohmann::json{};
             to_json(scannerSettings, *m_App->GetDeviceOptions());
 
@@ -154,24 +96,92 @@ namespace Gorfector
                 preset[PresetPanelState::k_OutputSettingsKey] = {};
                 to_json(preset[PresetPanelState::k_OutputSettingsKey], *m_App->GetOutputOptions());
             }
+        }
 
+    public:
+        /**
+         * \brief Creates a new instance of a `PresetPanel` class.
+         *
+         * This static method allocates and initializes a new `PresetPanel` instance, ensuring that
+         * the `PostCreateView` method is called to set up the destroy signal.
+         *
+         * \param parentDispatcher Pointer to the parent command dispatcher.
+         * \param app Pointer to the application instance.
+         * \return A pointer to the newly created `PresetPanel` instance.
+         */
+        static PresetPanel *Create(ZooLib::CommandDispatcher *parentDispatcher, App *app)
+        {
+            auto view = new PresetPanel(parentDispatcher, app);
+            view->PostCreateView();
+            return view;
+        }
+
+        ~PresetPanel() override
+        {
+            m_Dispatcher.UnregisterHandler<SetPresetExpanded>();
+            m_Dispatcher.UnregisterHandler<CreatePresetCommand>();
+            m_Dispatcher.UnregisterHandler<DeletePresetCommand>();
+            m_Dispatcher.UnregisterHandler<UpdatePresetCommand>();
+
+            m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
+            m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
+
+            delete m_PresetPanelState;
+        }
+
+        [[nodiscard]] PresetPanelState *GetState() const
+        {
+            return m_PresetPanelState;
+        }
+
+        void BuildUI();
+
+        GtkWidget *CreatePresetListItem(const char *itemName);
+
+        [[nodiscard]] AdwApplicationWindow *GetMainWindow()
+        {
+            return m_App->GetMainWindow();
+        }
+
+        [[nodiscard]] GtkWidget *GetRootWidget() const override
+        {
+            return m_RootWidget;
+        }
+
+        void CreatePreset(
+                const std::string &presetName, bool saveScannerSettings, bool saveScanArea, bool saveOutputSettings)
+        {
+            auto preset = nlohmann::json{};
+            preset[PresetPanelState::k_PresetNameKey] = presetName;
+            GatherPresetValues(preset, saveScannerSettings, saveScanArea, saveOutputSettings);
             m_Dispatcher.Dispatch(CreatePresetCommand(preset));
         }
 
         [[nodiscard]] const nlohmann::json *GetPreset(int presetRowIndex) const
         {
-            auto presetName = m_DisplayedPresetNames[presetRowIndex];
-            return m_PresetPanelState->GetPreset(presetName);
+            auto presetId = m_DisplayedPresetNames[presetRowIndex];
+            return m_PresetPanelState->GetPreset(presetId);
         }
 
         void OnApplyPresetButtonPressed(GtkButton *button);
         void OnDeletePresetButtonPressed(GtkButton *button);
         void OnDeleteAlertResponse(AdwAlertDialog *alert, gchar *response);
 
-        void RenamePreset(int presetRowIndex, const std::string &newName)
+        void UpdatePreset(int presetRowIndex, const std::string &newName, bool updateValues)
         {
-            auto presetName = m_DisplayedPresetNames[presetRowIndex];
-            m_Dispatcher.Dispatch(RenamePresetCommand(presetName, newName));
+            auto presetId = m_DisplayedPresetNames[presetRowIndex];
+
+            auto newValues = nlohmann::json{};
+            if (updateValues)
+            {
+                auto preset = m_PresetPanelState->GetPreset(presetId);
+                bool saveScannerSettings = preset->contains(PresetPanelState::k_ScannerSettingsKey);
+                bool saveScanArea = preset->contains(PresetPanelState::k_ScanAreaKey);
+                bool saveOutputSettings = preset->contains(PresetPanelState::k_OutputSettingsKey);
+
+                GatherPresetValues(newValues, saveScannerSettings, saveScanArea, saveOutputSettings);
+            }
+            m_Dispatcher.Dispatch(UpdatePresetCommand(presetId, newName, newValues));
         }
 
         void Update(const std::vector<uint64_t> &lastSeenVersions) override;

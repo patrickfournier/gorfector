@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 16:06-0400\n"
+"POT-Creation-Date: 2025-05-27 10:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -374,7 +374,7 @@ msgid "Inspect this preset"
 msgstr ""
 
 #: ../po/../src/PresetPanel.cpp:164
-msgid "Rename this preset"
+msgid "Update this preset"
 msgstr ""
 
 #: ../po/../src/PresetPanel.cpp:177
@@ -395,16 +395,20 @@ msgstr ""
 msgid "A preset with this name already exists."
 msgstr ""
 
-#: ../po/../src/PresetRenameDialog.cpp:83
-msgid "Rename Preset"
+#: ../po/../src/PresetUpdateDialog.cpp:95
+msgid "Update Preset"
 msgstr ""
 
-#: ../po/../src/PresetRenameDialog.cpp:98
+#: ../po/../src/PresetUpdateDialog.cpp:110
 msgid "Enter a new name for the preset:"
 msgstr ""
 
-#: ../po/../src/PresetRenameDialog.cpp:122
-msgid "Rename"
+#: ../po/../src/PresetUpdateDialog.cpp:120
+msgid "Update preset values"
+msgstr ""
+
+#: ../po/../src/PresetUpdateDialog.cpp:142
+msgid "Update"
 msgstr ""
 
 #: ../po/../src/PresetViewDialog.cpp:20

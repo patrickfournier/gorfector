@@ -25,7 +25,7 @@ namespace Gorfector
             gtk_label_set_text(GTK_LABEL(entryHintLabel), _(s_EmptyNameHint));
             gtk_widget_set_sensitive(createButton, false);
         }
-        else if (!presetPanel->IsUniquePresetName(presetName))
+        else if (presetPanel->GetState()->GetPreset(presetName) != nullptr)
         {
             gtk_label_set_text(GTK_LABEL(entryHintLabel), _(s_NameConflictHint));
             gtk_widget_set_sensitive(createButton, false);

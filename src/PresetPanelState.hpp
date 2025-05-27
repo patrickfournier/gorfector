@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DeviceOptionsState.hpp"
-#include "OutputOptionsState.hpp"
 #include "ZooLib/StateComponent.hpp"
 
 namespace Gorfector
@@ -152,7 +151,7 @@ namespace Gorfector
                         m_StateComponent->m_Presets.end());
             }
 
-            void RenamePreset(std::string presetId, const std::string &newName)
+            void RenamePreset(const std::string &presetId, const std::string &newName)
             {
                 auto it = std::ranges::find_if(m_StateComponent->m_Presets, [&presetId](const nlohmann::json &preset) {
                     return preset[k_PresetNameKey] == presetId;
@@ -160,6 +159,41 @@ namespace Gorfector
                 if (it != m_StateComponent->m_Presets.end())
                 {
                     (*it)[k_PresetNameKey] = newName;
+                }
+            }
+
+            void UpdatePreset(const std::string &presetId, const nlohmann::json &newValues)
+            {
+                auto it = std::ranges::find_if(m_StateComponent->m_Presets, [&presetId](const nlohmann::json &preset) {
+                    return preset[k_PresetNameKey] == presetId;
+                });
+                if (it != m_StateComponent->m_Presets.end())
+                {
+                    auto &preset = *it;
+                    if (newValues.contains(k_ScanAreaKey))
+                    {
+                        preset[k_ScanAreaKey] = newValues[k_ScanAreaKey];
+                    }
+                    else
+                    {
+                        preset.erase(k_ScanAreaKey);
+                    }
+                    if (newValues.contains(k_ScannerSettingsKey))
+                    {
+                        preset[k_ScannerSettingsKey] = newValues[k_ScannerSettingsKey];
+                    }
+                    else
+                    {
+                        preset.erase(k_ScannerSettingsKey);
+                    }
+                    if (newValues.contains(k_OutputSettingsKey))
+                    {
+                        preset[k_OutputSettingsKey] = newValues[k_OutputSettingsKey];
+                    }
+                    else
+                    {
+                        preset.erase(k_OutputSettingsKey);
+                    }
                 }
             }
         };

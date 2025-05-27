@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 16:06-0400\n"
-"PO-Revision-Date: 2025-05-24 11:52-0400\n"
+"POT-Creation-Date: 2025-05-27 10:56-0400\n"
+"PO-Revision-Date: 2025-05-27 10:52-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -365,7 +365,6 @@ msgid "Create"
 msgstr "Créer"
 
 #: ../po/../src/PresetPanel.cpp:32
-#, fuzzy
 msgid "Presets"
 msgstr "Préréglages"
 
@@ -396,8 +395,8 @@ msgid "Inspect this preset"
 msgstr "Inspecter ce préréglage"
 
 #: ../po/../src/PresetPanel.cpp:164
-msgid "Rename this preset"
-msgstr "Renommer ce préréglage"
+msgid "Update this preset"
+msgstr "Modifier ce préréglage"
 
 #: ../po/../src/PresetPanel.cpp:177
 msgid "Delete this preset"
@@ -417,17 +416,21 @@ msgstr "Le nom du préréglage ne peut pas être vide."
 msgid "A preset with this name already exists."
 msgstr "Il y a déjà un préréglage avec ce nom."
 
-#: ../po/../src/PresetRenameDialog.cpp:83
-msgid "Rename Preset"
-msgstr "Renommer le préréglage"
+#: ../po/../src/PresetUpdateDialog.cpp:95
+msgid "Update Preset"
+msgstr "Modifier le préréglage"
 
-#: ../po/../src/PresetRenameDialog.cpp:98
+#: ../po/../src/PresetUpdateDialog.cpp:110
 msgid "Enter a new name for the preset:"
 msgstr "Nom du préréglage:"
 
-#: ../po/../src/PresetRenameDialog.cpp:122
-msgid "Rename"
-msgstr "Renommer"
+#: ../po/../src/PresetUpdateDialog.cpp:120
+msgid "Update preset values"
+msgstr "Mettre à jour le préréglage"
+
+#: ../po/../src/PresetUpdateDialog.cpp:142
+msgid "Update"
+msgstr "Modifier"
 
 #: ../po/../src/PresetViewDialog.cpp:20
 msgid "Inspect Preset"
@@ -1237,6 +1240,15 @@ msgstr "Bas"
 #: scanners/scanner_strings.h:173
 msgid "High"
 msgstr "Haut"
+
+#~ msgid "Rename"
+#~ msgstr "Renommer"
+
+#~ msgid "Rename this preset"
+#~ msgstr "Renommer ce préréglage"
+
+#~ msgid "Rename Preset"
+#~ msgstr "Renommer le préréglage"
 
 #~ msgid "Add to List"
 #~ msgstr "Ajouter à la liste"

@@ -161,7 +161,7 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
 
     auto renameButton = gtk_button_new();
     gtk_button_set_icon_name(GTK_BUTTON(renameButton), "document-edit-symbolic");
-    gtk_widget_set_tooltip_text(renameButton, _("Rename this preset"));
+    gtk_widget_set_tooltip_text(renameButton, _("Update this preset"));
     gtk_widget_set_halign(renameButton, GTK_ALIGN_END);
     gtk_widget_set_css_classes(GTK_WIDGET(renameButton), buttonClasses);
     gtk_widget_set_margin_top(renameButton, 3);
@@ -170,7 +170,7 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
     gtk_widget_set_margin_end(renameButton, 3);
     gtk_widget_set_size_request(renameButton, 32, 32);
     gtk_box_append(GTK_BOX(itemBox), renameButton);
-    g_signal_connect(renameButton, "clicked", G_CALLBACK(Gorfector::ShowRenamePresetDialog), this);
+    g_signal_connect(renameButton, "clicked", G_CALLBACK(Gorfector::ShowUpdatePresetDialog), this);
 
     auto deleteButton = gtk_button_new();
     gtk_button_set_icon_name(GTK_BUTTON(deleteButton), "list-remove-symbolic");
