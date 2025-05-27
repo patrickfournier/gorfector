@@ -33,7 +33,8 @@ Gorfector::App::App(int argc, char **argv, bool testMode)
     : Application(testMode)
 {
     SANE_Int saneVersion;
-    if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
+    SANE_Status status = sane_init(&saneVersion, nullptr);
+    if (SANE_STATUS_GOOD != status)
     {
         sane_exit();
         throw std::runtime_error("Failed to initialize SANE");

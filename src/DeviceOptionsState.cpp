@@ -4,7 +4,6 @@
 
 #include "DeviceOptionsState.hpp"
 #include "SaneDevice.hpp"
-#include "SaneException.hpp"
 
 static int EnsureBufferSize(std::unique_ptr<char8_t[]> &buffer, int currentSize, int requestedSize)
 {
@@ -31,7 +30,10 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
     }
 
     int optionCount;
-    device->GetOptionValue(0, &optionCount);
+    if (!device->GetOptionValue(0, &optionCount))
+    {
+        return;
+    }
 
     int valueBufferSize = sizeof(SANE_Word) * 512;
     std::unique_ptr<char8_t[]> value(new char8_t[valueBufferSize]);
@@ -49,11 +51,13 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
             valueBufferSize = EnsureBufferSize(value, valueBufferSize, optionDescriptor->size);
             if (valueBufferSize < optionDescriptor->size)
             {
-                throw SaneException(
-                        std::string(optionDescriptor->name) + ": Failed to allocate buffer for option value.");
+                continue;
             }
 
-            device->GetOptionValue(optionIndex, value.get());
+            if (!device->GetOptionValue(optionIndex, value.get()))
+            {
+                continue;
+            }
         }
 
         switch (optionDescriptor->type)
@@ -61,15 +65,9 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
             case SANE_TYPE_BOOL:
             {
                 auto *settingValue = dynamic_cast<DeviceOptionValue<bool> *>(m_OptionValues[optionIndex]);
-                if (settingValue != nullptr)
+                if (settingValue == nullptr)
                 {
                     settingValue->SetDeviceValue(0, (*reinterpret_cast<SANE_Bool *>(value.get())));
-                }
-                else
-                {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") +
-                            m_OptionValues[optionIndex]->GetTitle());
                 }
                 break;
             }
@@ -89,12 +87,6 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
                         intValue->SetDeviceValue(i, reinterpret_cast<SANE_Int *>(value.get())[i]);
                     }
                 }
-                else
-                {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") +
-                            m_OptionValues[optionIndex]->GetTitle());
-                }
                 break;
             }
 
@@ -104,12 +96,6 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
                 if (strValue != nullptr)
                 {
                     strValue->SetDeviceValue(0, std::string(reinterpret_cast<SANE_String>(value.get())));
-                }
-                else
-                {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") +
-                            m_OptionValues[optionIndex]->GetTitle());
                 }
                 break;
             }
@@ -131,7 +117,10 @@ void Gorfector::DeviceOptionsState::BuildOptions()
     }
 
     int optionCount;
-    device->GetOptionValue(0, &optionCount);
+    if (!device->GetOptionValue(0, &optionCount))
+    {
+        return;
+    }
 
     int valueBufferSize = sizeof(SANE_Word) * 512;
     std::unique_ptr<char8_t[]> value(new char8_t[valueBufferSize]);
@@ -149,11 +138,13 @@ void Gorfector::DeviceOptionsState::BuildOptions()
             valueBufferSize = EnsureBufferSize(value, valueBufferSize, optionDescriptor->size);
             if (valueBufferSize < optionDescriptor->size)
             {
-                throw SaneException(
-                        std::string(optionDescriptor->name) + ": Failed to allocate buffer for option value.");
+                continue;
             }
 
-            device->GetOptionValue(optionIndex, value.get());
+            if (!device->GetOptionValue(optionIndex, value.get()))
+            {
+                continue;
+            }
         }
 
         switch (optionDescriptor->type)
@@ -208,9 +199,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     auto *option = dynamic_cast<DeviceOptionValue<bool> *>(m_StateComponent->m_OptionValues[optionIndex]);
     if (option == nullptr)
     {
-        throw std::runtime_error(
-                std::string("Failed to set option (type mismatch): ") +
-                m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+        return;
     }
 
     if (option->GetValue(valueIndex) == requestedValue)
@@ -223,21 +212,21 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     // Convert value to SANE type.
     SANE_Bool saneValue = requestedValue ? SANE_TRUE : SANE_FALSE;
     // Set the value on the device.
-    m_StateComponent->GetDevice()->SetOptionValue(optionIndex, &saneValue, &optionInfo);
+    if (!m_StateComponent->GetDevice()->SetOptionValue(optionIndex, &saneValue, &optionInfo))
+    {
+        return;
+    }
 
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
     {
         ReloadOptions();
         option = dynamic_cast<DeviceOptionValue<bool> *>(m_StateComponent->m_OptionValues[optionIndex]);
-        if (option == nullptr)
+        if (option != nullptr)
         {
-            throw std::runtime_error(
-                    std::string("Failed to set option (type mismatch): ") +
-                    m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+            // Save the value as the requested value (which may differ from the actual value).
+            option->SetRequestedValue(valueIndex, requestedValue);
         }
-        // Save the value as the requested value (which may differ from the actual value).
-        option->SetRequestedValue(valueIndex, requestedValue);
     }
     else
     {
@@ -255,9 +244,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     auto *option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
     if (option == nullptr)
     {
-        throw std::runtime_error(
-                std::string("Failed to set option (type mismatch): ") +
-                m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+        return;
     }
 
     SANE_Word requestedValueAsInt;
@@ -279,9 +266,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     auto *option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
     if (option == nullptr)
     {
-        throw std::runtime_error(
-                std::string("Failed to set option (type mismatch): ") +
-                m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+        return;
     }
 
     if (option->GetValue(valueIndex) == requestedValue)
@@ -301,7 +286,11 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     std::unique_ptr<SANE_Word[]> saneValue(new SANE_Word[valueCount]);
     if (valueCount > 1)
     {
-        device->GetOptionValue(optionIndex, saneValue.get());
+        if (!device->GetOptionValue(optionIndex, saneValue.get()))
+        {
+            return;
+        }
+
         saneValue[valueIndex] = requestedValue;
     }
     else
@@ -310,7 +299,10 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     }
 
     // Set the value on the device.
-    device->SetOptionValue(optionIndex, saneValue.get(), &optionInfo);
+    if (!device->SetOptionValue(optionIndex, saneValue.get(), &optionInfo))
+    {
+        return;
+    }
 
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
@@ -319,9 +311,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         option = dynamic_cast<DeviceOptionValue<int> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
-            throw std::runtime_error(
-                    std::string("Failed to set option (type mismatch): ") +
-                    m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+            return;
         }
         // Save the value as the requested value (which may differ from the actual value).
         option->SetRequestedValue(valueIndex, requestedValue);
@@ -342,9 +332,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(m_StateComponent->m_OptionValues[optionIndex]);
     if (option == nullptr)
     {
-        throw std::runtime_error(
-                std::string("Failed to set option (type mismatch): ") +
-                m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+        return;
     }
 
     if (option->GetValue(valueIndex) == requestedValue)
@@ -363,7 +351,10 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     std::unique_ptr<char[]> saneValue(new char[option->GetValueSize() + 1]);
     strcpy(saneValue.get(), requestedValue.c_str());
     // Set the value on the device.
-    device->SetOptionValue(optionIndex, saneValue.get(), &optionInfo);
+    if (!device->SetOptionValue(optionIndex, saneValue.get(), &optionInfo))
+    {
+        return;
+    }
 
     // Check if the change of value on the device requires reloading all options.
     if ((optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0)
@@ -372,9 +363,7 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
         option = dynamic_cast<DeviceOptionValue<std::string> *>(m_StateComponent->m_OptionValues[optionIndex]);
         if (option == nullptr)
         {
-            throw std::runtime_error(
-                    std::string("Failed to set option (type mismatch): ") +
-                    m_StateComponent->m_OptionValues[optionIndex]->GetTitle());
+            return;
         }
         // Save the value as the requested value (which may differ from the actual value).
         option->SetRequestedValue(valueIndex, requestedValue);
@@ -389,21 +378,26 @@ void Gorfector::DeviceOptionsState::Updater::SetOptionValue(
     }
 }
 
-void Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
+bool Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices)
 {
     auto saneDevice = m_StateComponent->GetDevice();
     if (saneDevice == nullptr)
     {
-        return;
+        return false;
     }
-
-    bool needReload = false;
 
     for (unsigned long changedIndex: changedIndices)
     {
+        bool needReload = false;
+
         int optionInfo;
         auto optionValue = m_StateComponent->m_OptionValues[changedIndex];
         if (optionValue == nullptr)
+        {
+            continue;
+        }
+
+        if (optionValue->ShouldHide() || optionValue->IsDisplayOnly() || !optionValue->IsSoftwareSettable())
         {
             continue;
         }
@@ -413,16 +407,15 @@ void Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const 
             case SANE_TYPE_BOOL:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<bool> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                    SANE_Bool saneValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
+                    if (saneDevice->SetOptionValue(changedIndex, &saneValue, &optionInfo))
+                    {
+                        needReload = (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
+                        option->SetDeviceValue(0, saneValue == SANE_TRUE);
+                    }
                 }
-
-                SANE_Bool saneValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
-                saneDevice->SetOptionValue(changedIndex, &saneValue, &optionInfo);
-                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
-                option->SetDeviceValue(0, saneValue == SANE_TRUE);
                 break;
             }
 
@@ -430,25 +423,24 @@ void Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const 
             case SANE_TYPE_FIXED:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<int> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
-                }
+                    auto valueCount = option->GetValueCount();
+                    std::unique_ptr<SANE_Word[]> saneValue(new SANE_Word[valueCount]);
+                    for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
+                    {
+                        saneValue[valueIndex] = option->GetRequestedValue(valueIndex);
+                    }
 
-                auto valueCount = option->GetValueCount();
-                std::unique_ptr<SANE_Word[]> saneValue(new SANE_Word[valueCount]);
-                for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                {
-                    saneValue[valueIndex] = option->GetRequestedValue(valueIndex);
-                }
+                    if (saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo))
+                    {
+                        needReload = (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
 
-                saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
-                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
-
-                for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                {
-                    option->SetDeviceValue(valueIndex, saneValue[valueIndex]);
+                        for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
+                        {
+                            option->SetDeviceValue(valueIndex, saneValue[valueIndex]);
+                        }
+                    }
                 }
                 break;
             }
@@ -456,29 +448,31 @@ void Gorfector::DeviceOptionsState::Updater::ApplyRequestedValuesToDevice(const 
             case SANE_TYPE_STRING:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to set option (type mismatch): ") + optionValue->GetTitle());
+                    std::unique_ptr<char[]> saneValue(new char[option->GetValueSize() + 1]);
+                    strcpy(saneValue.get(), option->GetRequestedValue(0).c_str());
+                    if (saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo))
+                    {
+                        needReload = (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
+                        option->SetDeviceValue(0, std::string(saneValue.get()));
+                    }
                 }
-
-                std::unique_ptr<char[]> saneValue(new char[option->GetValueSize() + 1]);
-                strcpy(saneValue.get(), option->GetRequestedValue(0).c_str());
-                saneDevice->SetOptionValue(changedIndex, saneValue.get(), &optionInfo);
-                needReload = needReload || (optionInfo & SANE_INFO_RELOAD_OPTIONS) != 0;
-                option->SetDeviceValue(0, std::string(saneValue.get()));
                 break;
             }
 
             default:
                 break;
         }
+
+        if (needReload)
+        {
+            ReloadOptions();
+            return false;
+        }
     }
 
-    if (needReload)
-    {
-        ReloadOptions();
-    }
+    return true;
 }
 
 void Gorfector::DeviceOptionsState::Updater::FindRequestMismatches(
@@ -492,22 +486,24 @@ void Gorfector::DeviceOptionsState::Updater::FindRequestMismatches(
             continue;
         }
 
+        if (optionValue->ShouldHide() || optionValue->IsDisplayOnly() || !optionValue->IsSoftwareSettable())
+        {
+            continue;
+        }
+
         switch (optionValue->GetValueType())
         {
             case SANE_TYPE_BOOL:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<bool> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
-                }
-
-                SANE_Bool expectedValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
-                SANE_Bool currentValue = option->GetValue(0) ? SANE_TRUE : SANE_FALSE;
-                if (currentValue != expectedValue)
-                {
-                    mismatches.push_back(changedIndex);
+                    SANE_Bool expectedValue = option->GetRequestedValue(0) ? SANE_TRUE : SANE_FALSE;
+                    SANE_Bool currentValue = option->GetValue(0) ? SANE_TRUE : SANE_FALSE;
+                    if (currentValue != expectedValue)
+                    {
+                        mismatches.push_back(changedIndex);
+                    }
                 }
                 break;
             }
@@ -516,22 +512,19 @@ void Gorfector::DeviceOptionsState::Updater::FindRequestMismatches(
             case SANE_TYPE_FIXED:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<int> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
-                }
-
-                auto valueCount = option->GetValueCount();
-                for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
-                {
-                    SANE_Word expectedValue = option->GetRequestedValue(valueIndex);
-                    SANE_Word currentValue = option->GetValue(valueIndex);
-
-                    if (currentValue != expectedValue)
+                    auto valueCount = option->GetValueCount();
+                    for (auto valueIndex = 0U; valueIndex < valueCount; valueIndex++)
                     {
-                        mismatches.push_back(changedIndex);
-                        break;
+                        SANE_Word expectedValue = option->GetRequestedValue(valueIndex);
+                        SANE_Word currentValue = option->GetValue(valueIndex);
+
+                        if (currentValue != expectedValue)
+                        {
+                            mismatches.push_back(changedIndex);
+                            break;
+                        }
                     }
                 }
                 break;
@@ -540,17 +533,14 @@ void Gorfector::DeviceOptionsState::Updater::FindRequestMismatches(
             case SANE_TYPE_STRING:
             {
                 auto *option = dynamic_cast<DeviceOptionValue<std::string> *>(optionValue);
-                if (option == nullptr)
+                if (option != nullptr)
                 {
-                    throw std::runtime_error(
-                            std::string("Failed to load option (type mismatch): ") + optionValue->GetTitle());
-                }
-
-                std::string expectedValue = option->GetRequestedValue(0);
-                std::string currentValue = option->GetValue(0);
-                if (currentValue != expectedValue)
-                {
-                    mismatches.push_back(changedIndex);
+                    std::string expectedValue = option->GetRequestedValue(0);
+                    std::string currentValue = option->GetValue(0);
+                    if (currentValue != expectedValue)
+                    {
+                        mismatches.push_back(changedIndex);
+                    }
                 }
                 break;
             }
@@ -585,32 +575,27 @@ void Gorfector::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &j
         }
     }
 
-    ApplyRequestedValuesToDevice(indicesToApply);
-
     // When applying the requested values to the device, the device may decide to change the value
     // of some other options (for example, setting the source to transparent may change the resolution).
     // In this case, we need to check if the requested values are still valid and reapply them if necessary.
     // This is done until all requested values are set or until we reach a maximum number of iterations.
-    std::vector indiceSetA(indicesToApply);
-    std::vector<size_t> indiceSetB(indicesToApply.size());
-
-    auto currentIndiceSet = &indiceSetA;
-    auto nextIndiceSet = &indiceSetB;
-    int maxRepeatCount = 10;
-    while (!currentIndiceSet->empty() && maxRepeatCount > 0)
+    std::vector<size_t> mismatchIndices;
+    bool applyCompleted = false;
+    int maxRepeatCount = 20;
+    while (!applyCompleted && maxRepeatCount > 0)
     {
         maxRepeatCount--;
 
-        nextIndiceSet->clear();
-        FindRequestMismatches(*currentIndiceSet, *nextIndiceSet);
-        ApplyRequestedValuesToDevice(*nextIndiceSet);
-
-        std::swap(currentIndiceSet, nextIndiceSet);
+        mismatchIndices.clear();
+        FindRequestMismatches(indicesToApply, mismatchIndices);
+        applyCompleted = ApplyRequestedValuesToDevice(mismatchIndices);
     }
 
-    if (!currentIndiceSet->empty())
+    mismatchIndices.clear();
+    FindRequestMismatches(indicesToApply, mismatchIndices);
+    if (!mismatchIndices.empty())
     {
-        g_warning("Failed to set all requested values on the device.");
+        g_warning("Failed to set all requested values on the device after %d iterations.", 20 - maxRepeatCount);
     }
 }
 

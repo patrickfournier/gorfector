@@ -141,22 +141,12 @@ void Gorfector::DeviceSelector::Update(const std::vector<uint64_t> &lastSeenVers
         }
 
         deviceNamesCStr[dropDownItemIndex] = nullptr;
-        try
+        if (m_DeviceSelectorList != nullptr)
         {
-            if (m_DeviceSelectorList != nullptr)
-            {
-                auto *deviceGList = gtk_string_list_new(deviceNamesCStr.get());
-                adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceGList));
-                adw_combo_row_set_selected(ADW_COMBO_ROW(m_DeviceSelectorList), selectedItemIndex);
-                gtk_widget_set_sensitive(m_DeviceSelectorList, true);
-            }
-        }
-        catch (const SaneException &)
-        {
-            const auto parentWindow = gtk_widget_get_root(m_DeviceSelectorRoot);
-            ZooLib::ShowUserError(
-                    ADW_APPLICATION_WINDOW(parentWindow),
-                    std::vformat(_("Cannot open scanner {}."), std::make_format_args(deviceNamesCStr[0])));
+            auto *deviceGList = gtk_string_list_new(deviceNamesCStr.get());
+            adw_combo_row_set_model(ADW_COMBO_ROW(m_DeviceSelectorList), G_LIST_MODEL(deviceGList));
+            adw_combo_row_set_selected(ADW_COMBO_ROW(m_DeviceSelectorList), selectedItemIndex);
+            gtk_widget_set_sensitive(m_DeviceSelectorList, true);
         }
     }
     else

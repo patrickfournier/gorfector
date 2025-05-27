@@ -55,7 +55,7 @@ namespace Gorfector
             if (SANE_STATUS_GOOD != sane_init(&saneVersion, nullptr))
             {
                 sane_exit();
-                throw std::runtime_error("Failed to initialize SANE");
+                return;
             }
             ++m_SANEInitId;
 

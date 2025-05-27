@@ -3,8 +3,6 @@
 #include <cstring>
 #include <sane/sane.h>
 
-#include "SaneException.hpp"
-
 namespace Gorfector
 {
     class SaneDevice
@@ -92,7 +90,7 @@ namespace Gorfector
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to get option descriptor (device not open).");
+                return nullptr;
             }
 
             const SANE_Option_Descriptor *optionDescriptor =
@@ -100,67 +98,59 @@ namespace Gorfector
             return optionDescriptor;
         }
 
-        void GetOptionValue(uint32_t optionIndex, void *value) const
+        bool GetOptionValue(uint32_t optionIndex, void *value) const
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to get option (device not open).");
+                return false;
             }
 
             if (sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_GET_VALUE, value, nullptr) !=
                 SANE_STATUS_GOOD)
             {
-                throw SaneException("Failed to get option.");
+                return false;
             }
+
+            return true;
         }
 
-        void SetOptionValue(uint32_t optionIndex, void *value, int *optionInfo) const
+        bool SetOptionValue(uint32_t optionIndex, void *value, int *optionInfo) const
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to set option (device not open).");
+                return false;
             }
 
             if (sane_control_option(
                         m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_VALUE, value, optionInfo) !=
                 SANE_STATUS_GOOD)
             {
-                throw SaneException("Failed to set option.");
+                return false;
             }
+
+            return true;
         }
 
-        void SetOptionToDefault(uint32_t optionIndex) const
+        bool StartScan() const
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to set option to default (device not open).");
-            }
-
-            if (sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_AUTO, nullptr, nullptr) !=
-                SANE_STATUS_GOOD)
-            {
-                throw SaneException("Failed to set option to default.");
-            }
-        }
-
-        void StartScan() const
-        {
-            if (m_Handle == nullptr)
-            {
-                throw std::runtime_error("Failed to start scan (device not open).");
+                return false;
             }
 
             if (sane_start(m_Handle) != SANE_STATUS_GOOD)
             {
-                throw SaneException("Failed to start scan.");
+                return false;
             }
+
+            return true;
         }
 
         bool Read(SANE_Byte *buffer, SANE_Int maxLength, SANE_Int *length) const
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to read (device not open).");
+                return false;
             }
 
             switch (sane_read(m_Handle, buffer, maxLength, length))
@@ -172,10 +162,8 @@ namespace Gorfector
                 case SANE_STATUS_CANCELLED:
                 case SANE_STATUS_EOF:
                 case SANE_STATUS_NO_DOCS:
-                    return false;
-
                 default:
-                    throw SaneException("Failed to read.");
+                    return false;
             }
         }
 
@@ -183,7 +171,7 @@ namespace Gorfector
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to cancel scan (device not open).");
+                return;
             }
 
             sane_cancel(m_Handle);
@@ -191,19 +179,22 @@ namespace Gorfector
 
         /**
          * Gets the parameters of the device. Must be called after StartScan().
-         * @param parameters A pointer to the parameters structure to be filled with the device parameters.
+         * \param parameters A pointer to the parameter structure to be filled with the device parameters.
+         * \return True if the parameters were successfully retrieved, false otherwise.
          */
-        void GetParameters(SANE_Parameters *parameters) const
+        bool GetParameters(SANE_Parameters *parameters) const
         {
             if (m_Handle == nullptr)
             {
-                throw std::runtime_error("Failed to get parameters (device not open).");
+                return false;
             }
 
             if (sane_get_parameters(m_Handle, parameters) != SANE_STATUS_GOOD)
             {
-                throw SaneException("Failed to get parameters.");
+                return false;
             }
+
+            return true;
         }
 
         [[nodiscard]] static bool IsDisplayOnly(const SANE_Option_Descriptor &optionDescriptor)

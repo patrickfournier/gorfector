@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 10:56-0400\n"
+"POT-Creation-Date: 2025-05-27 18:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,7 +89,7 @@ msgid "Patrick Fournier"
 msgstr ""
 
 #: ../po/../data/com.patrickfournier.gorfector.desktop.in.in:7
-#: ../po/../src/App.cpp:344
+#: ../po/../src/App.cpp:345
 msgid "An application to scan images."
 msgstr ""
 
@@ -102,114 +102,114 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: ../po/../src/App.cpp:161 scanners/scanner_strings.h:40
+#: ../po/../src/App.cpp:162 scanners/scanner_strings.h:40
 #: scanners/scanner_strings.h:41
 msgid "Preview"
 msgstr ""
 
-#: ../po/../src/App.cpp:166
+#: ../po/../src/App.cpp:167
 msgid "Scan"
 msgstr ""
 
-#: ../po/../src/App.cpp:171 ../po/../src/OutputOptionsState.hpp:51
+#: ../po/../src/App.cpp:172 ../po/../src/OutputOptionsState.hpp:51
 msgid "Cancel Scan"
 msgstr ""
 
-#: ../po/../src/App.cpp:243
+#: ../po/../src/App.cpp:244
 msgid "Select Device..."
 msgstr ""
 
-#: ../po/../src/App.cpp:246
+#: ../po/../src/App.cpp:247
 msgid "Use Scan List"
 msgstr ""
 
-#: ../po/../src/App.cpp:251
+#: ../po/../src/App.cpp:252
 msgid "Create Desktop Entry..."
 msgstr ""
 
-#: ../po/../src/App.cpp:255
+#: ../po/../src/App.cpp:256
 msgid "Settings..."
 msgstr ""
 
-#: ../po/../src/App.cpp:256
+#: ../po/../src/App.cpp:257
 msgid "Help..."
 msgstr ""
 
-#: ../po/../src/App.cpp:257
+#: ../po/../src/App.cpp:258
 msgid "About..."
 msgstr ""
 
-#: ../po/../src/App.cpp:279
+#: ../po/../src/App.cpp:280
 msgid "Select Device"
 msgstr ""
 
-#: ../po/../src/App.cpp:303
+#: ../po/../src/App.cpp:304
 msgid "Settings"
 msgstr ""
 
-#: ../po/../src/App.cpp:354
+#: ../po/../src/App.cpp:355
 msgid "Create Desktop Entry"
 msgstr ""
 
-#: ../po/../src/App.cpp:354
+#: ../po/../src/App.cpp:355
 msgid ""
 "Do you want to create a desktop entry for Gorfector? This will allow you to "
 "launch Gorfector from your application menu."
 msgstr ""
 
-#: ../po/../src/App.cpp:356
+#: ../po/../src/App.cpp:357
 msgid "Yes"
 msgstr ""
 
-#: ../po/../src/App.cpp:356
+#: ../po/../src/App.cpp:357
 msgid "No"
 msgstr ""
 
-#: ../po/../src/App.cpp:541
+#: ../po/../src/App.cpp:542
 msgid "Select a directory where to save the image files."
 msgstr ""
 
-#: ../po/../src/App.cpp:548
+#: ../po/../src/App.cpp:549
 msgid "Enter a file name to save the image files."
 msgstr ""
 
-#: ../po/../src/App.cpp:576
+#: ../po/../src/App.cpp:577
 msgid "Directory does not exists: {}."
 msgstr ""
 
-#: ../po/../src/App.cpp:591
+#: ../po/../src/App.cpp:592
 msgid "File '{}' already exists."
 msgstr ""
 
-#: ../po/../src/App.cpp:604
+#: ../po/../src/App.cpp:605
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr ""
 
-#: ../po/../src/App.cpp:621
+#: ../po/../src/App.cpp:622
 msgid "File already exists"
 msgstr ""
 
-#: ../po/../src/App.cpp:623
+#: ../po/../src/App.cpp:624
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr ""
 
-#: ../po/../src/App.cpp:626 ../po/../src/PresetPanel.cpp:89
+#: ../po/../src/App.cpp:627 ../po/../src/PresetPanel.cpp:89
 #: ../po/../src/ScanListPanel.cpp:209 ../po/../src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr ""
 
-#: ../po/../src/App.cpp:626 ../po/../src/OutputOptionsState.hpp:51
+#: ../po/../src/App.cpp:627 ../po/../src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr ""
 
-#: ../po/../src/App.cpp:675
+#: ../po/../src/App.cpp:676
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
 msgstr ""
 
-#: ../po/../src/DeviceSelector.cpp:31 ../po/../src/DeviceSelector.cpp:169
+#: ../po/../src/DeviceSelector.cpp:31 ../po/../src/DeviceSelector.cpp:159
 msgid "No Scanner Found"
 msgstr ""
 
@@ -230,11 +230,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: ../po/../src/DeviceSelector.cpp:159
-msgid "Cannot open scanner {}."
-msgstr ""
-
-#: ../po/../src/DeviceSelector.cpp:165
+#: ../po/../src/DeviceSelector.cpp:155
 msgid "No scanner found."
 msgstr ""
 
@@ -559,6 +555,11 @@ msgstr ""
 
 #: ../po/../src/ScanOptionsPanel.cpp:610
 msgid "Select Destination"
+msgstr ""
+
+#: ../po/../src/ScanProcess.hpp:108 ../po/../src/ScanProcess.hpp:115
+#: ../po/../src/ScanProcess.hpp:122
+msgid "Failed to start scan"
 msgstr ""
 
 #: ../po/../src/SingleScanProcess.hpp:38

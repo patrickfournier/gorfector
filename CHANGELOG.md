@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ability to update the presets.
 
+### Fixed
+
+- Fixed a crash when applying a preset that tried to set a hidden parameter.
+
 
 ## [0.1.0] - 2025-05-24
 

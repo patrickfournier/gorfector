@@ -80,11 +80,15 @@ namespace Gorfector
             if (m_PreviewState != nullptr)
             {
                 // Get actual resolution.
+                double previewResolution = 400.0;
                 auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetResolutionIndex());
                 SANE_Int resolution;
-                m_Device->GetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution);
-                auto previewResolution =
-                        resolutionDescription->type == SANE_TYPE_FIXED ? SANE_UNFIX(resolution) : resolution;
+                if (resolutionDescription != nullptr &&
+                    m_Device->GetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution))
+                {
+                    previewResolution =
+                            resolutionDescription->type == SANE_TYPE_FIXED ? SANE_UNFIX(resolution) : resolution;
+                }
 
                 auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
                 previewPanelUpdater.PrepareForScan(

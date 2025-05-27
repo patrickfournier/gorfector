@@ -112,7 +112,6 @@ input_files = [
     '../src/PreviewState.hpp',
     '../src/Rect.hpp',
     '../src/SaneDevice.hpp',
-    '../src/SaneException.hpp',
     '../src/ScanListPanel.cpp',
     '../src/ScanListPanel.hpp',
     '../src/ScanListState.hpp',

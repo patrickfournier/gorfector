@@ -280,7 +280,7 @@ namespace Gorfector
          */
         class Updater : public StateComponent::Updater<DeviceOptionsState>
         {
-            void ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices);
+            bool ApplyRequestedValuesToDevice(const std::vector<size_t> &changedIndices);
             void FindRequestMismatches(const std::vector<size_t> &indicesToCheck, std::vector<size_t> &mismatches);
             void ApplyPreset(const nlohmann::json &json);
 

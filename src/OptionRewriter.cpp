@@ -15,7 +15,11 @@ void Gorfector::OptionRewriter::Dump(SaneDevice *device)
     deviceInfo["devices"].push_back(deviceJson);
 
     SANE_Int optionCount;
-    device->GetOptionValue(0, &optionCount);
+    if (!device->GetOptionValue(0, &optionCount))
+    {
+        return;
+    }
+
     for (auto i = 1; i < optionCount; i++)
     {
         auto option = device->GetOptionDescriptor(i);

@@ -102,22 +102,24 @@ namespace Gorfector
 
         virtual bool Start()
         {
-            try
-            {
-                m_Device->StartScan();
-            }
-            catch (const std::runtime_error &e)
+            if (!m_Device->StartScan())
             {
                 Stop(true);
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), e.what());
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
                 return false;
             }
 
-            m_Device->GetParameters(&m_ScanParameters);
+            if (!m_Device->GetParameters(&m_ScanParameters))
+            {
+                Stop(true);
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
+                return false;
+            }
 
             if (!AfterStartScanChecks())
             {
                 Stop(true);
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
                 return false;
             }
 
