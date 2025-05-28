@@ -265,7 +265,7 @@ GtkWidget *Gorfector::ScanListPanel::CreateScanListItem(const char *itemName)
     if (itemName == nullptr)
         return nullptr;
 
-    const char *buttonClasses[] = {"flat", nullptr};
+    static const char *buttonClasses[] = {"flat", nullptr};
 
     auto itemBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     auto labelItem = gtk_label_new(nullptr);

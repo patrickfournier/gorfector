@@ -70,6 +70,18 @@ Gorfector::App::App(int argc, char **argv, bool testMode)
 
 Gorfector::App::~App()
 {
+    if (m_RightPaned != nullptr)
+    {
+        g_object_unref(m_RightPaned);
+        m_RightPaned = nullptr;
+    }
+    if (m_PreviewPanel != nullptr)
+    {
+        g_object_unref(m_PreviewPanel->GetRootWidget());
+        m_PreviewPanel = nullptr;
+        // m_PreviewPanel destructor will be called by GTK when the root widget is destroyed.
+    }
+
     m_Dispatcher.UnregisterHandler<SetScanAreaCommand>();
 
     m_ObserverManager.RemoveObserver(m_DeviceSelectorObserver);
@@ -101,6 +113,11 @@ void Gorfector::App::OnActivate(GtkApplication *app)
 
 void Gorfector::App::OnPanelResized(GtkWidget *widget)
 {
+    if (widget == nullptr)
+    {
+        return;
+    }
+
     auto windowWidth = gtk_widget_get_width(m_MainWindow);
     auto position = gtk_paned_get_position(GTK_PANED(widget));
     if (widget == m_LeftPaned)
@@ -195,10 +212,31 @@ GtkWidget *Gorfector::App::BuildUI()
     gtk_widget_set_margin_top(previewBox, 0);
     gtk_widget_set_margin_start(previewBox, 10);
     gtk_widget_set_margin_end(previewBox, 10);
+    g_object_ref(previewBox);
+
+    m_RightPaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_paned_set_wide_handle(GTK_PANED(m_RightPaned), true);
+    gtk_paned_set_position(GTK_PANED(m_RightPaned), static_cast<int>(windowWidth * m_AppState->GetRightPanelWidth()));
+    gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), m_RightPaned);
+    ZooLib::ConnectGtkSignalWithParamSpecs(this, &App::OnPanelResized, m_RightPaned, "notify::position");
+    g_object_ref(m_RightPaned);
+
+    clamp = adw_clamp_new();
+    adw_clamp_set_unit(ADW_CLAMP(clamp), ADW_LENGTH_UNIT_SP);
+    adw_clamp_set_tightening_threshold(ADW_CLAMP(clamp), 300);
+    adw_clamp_set_maximum_size(ADW_CLAMP(clamp), 500);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
+    gtk_paned_set_end_child(GTK_PANED(m_RightPaned), clamp);
+
+    auto scanListPanel = ScanListPanel::Create(&m_Dispatcher, this);
+    auto scanListBox = scanListPanel->GetRootWidget();
+    adw_clamp_set_child(ADW_CLAMP(clamp), scanListBox);
+    // scanListPanel will be deleted when its root widget is destroyed.
 
     if (m_AppState->GetUseScanList())
     {
-        BuildScanListUI();
+        gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), m_RightPaned);
+        gtk_paned_set_start_child(GTK_PANED(m_RightPaned), previewBox);
     }
     else
     {
@@ -206,36 +244,6 @@ GtkWidget *Gorfector::App::BuildUI()
     }
 
     return m_LeftPaned;
-}
-
-void Gorfector::App::BuildScanListUI()
-{
-    m_RightPaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_paned_set_wide_handle(GTK_PANED(m_RightPaned), true);
-    auto windowWidth = gtk_widget_get_width(m_MainWindow);
-    windowWidth = windowWidth == 0 ? std::get<0>(GetMainWindowSize()) : windowWidth;
-    gtk_paned_set_position(GTK_PANED(m_RightPaned), static_cast<int>(windowWidth * m_AppState->GetRightPanelWidth()));
-    gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), m_RightPaned);
-    ZooLib::ConnectGtkSignalWithParamSpecs(this, &App::OnPanelResized, m_RightPaned, "notify::position");
-
-    gtk_paned_set_start_child(GTK_PANED(m_RightPaned), m_PreviewPanel->GetRootWidget());
-
-    auto clamp = adw_clamp_new();
-    adw_clamp_set_unit(ADW_CLAMP(clamp), ADW_LENGTH_UNIT_SP);
-    adw_clamp_set_tightening_threshold(ADW_CLAMP(clamp), 300);
-    adw_clamp_set_maximum_size(ADW_CLAMP(clamp), 500);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(clamp), GTK_ORIENTATION_HORIZONTAL);
-    gtk_paned_set_end_child(GTK_PANED(m_RightPaned), clamp);
-
-    m_ScanListPanel = ScanListPanel::Create(&m_Dispatcher, this);
-    auto scanListBox = m_ScanListPanel->GetRootWidget();
-    adw_clamp_set_child(ADW_CLAMP(clamp), scanListBox);
-}
-
-void Gorfector::App::RemoveScanListUI()
-{
-    m_RightPaned = nullptr;
-    m_ScanListPanel = nullptr;
 }
 
 void Gorfector::App::PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder)
@@ -442,26 +450,25 @@ void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
             auto previewBox = m_PreviewPanel->GetRootWidget();
             auto previewBoxParent = gtk_widget_get_parent(previewBox);
 
-            if (m_AppState->GetUseScanList() && previewBoxParent == m_LeftPaned)
+            if (m_AppState->GetUseScanList() && previewBoxParent != m_RightPaned)
             {
-                g_object_ref(previewBox);
+                // Order is important here. GTK is picky about the order of unparenting and reparenting.
                 gtk_widget_unparent(previewBox);
-                BuildScanListUI();
-                g_object_unref(previewBox);
+                gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), m_RightPaned);
+                gtk_paned_set_start_child(GTK_PANED(m_RightPaned), previewBox);
 
                 auto windowWidth = gtk_widget_get_width(m_MainWindow);
                 windowWidth = windowWidth == 0 ? std::get<0>(GetMainWindowSize()) : windowWidth;
                 gtk_paned_set_position(
                         GTK_PANED(m_RightPaned), static_cast<int>(windowWidth * m_AppState->GetRightPanelWidth()));
             }
-            else if (!m_AppState->GetUseScanList() && previewBoxParent == m_RightPaned)
+            else if (!m_AppState->GetUseScanList() && previewBoxParent != m_LeftPaned)
             {
-                g_object_ref(previewBox);
+                // Order is important here. GTK is picky about the order of unparenting and reparenting.
                 gtk_widget_unparent(previewBox);
+                gtk_paned_set_start_child(GTK_PANED(m_RightPaned), nullptr);
+                gtk_widget_unparent(m_RightPaned);
                 gtk_paned_set_end_child(GTK_PANED(m_LeftPaned), previewBox);
-                g_object_unref(previewBox);
-
-                RemoveScanListUI();
             }
         }
     }

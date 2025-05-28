@@ -46,7 +46,6 @@ namespace Gorfector
         ScanOptionsPanel *m_ScanOptionsPanel{};
         PreviewPanel *m_PreviewPanel{};
         PresetPanel *m_PresetPanel{};
-        ScanListPanel *m_ScanListPanel{};
 
         GtkWidget *m_LeftPaned{};
         GtkWidget *m_RightPaned{};
@@ -86,8 +85,6 @@ namespace Gorfector
         void OnActivate(GtkApplication *app) override;
         void OnPanelResized(GtkWidget *widget);
         GtkWidget *BuildUI() override;
-        void BuildScanListUI();
-        void RemoveScanListUI();
         void PopulateMenuBar(ZooLib::AppMenuBarBuilder *menuBarBuilder) override;
 
         [[nodiscard]] SaneDevice *GetDevice() const

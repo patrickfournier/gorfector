@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:00-0400\n"
+"POT-Creation-Date: 2025-05-28 12:19-0400\n"
 "PO-Revision-Date: 2025-05-27 18:03-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -102,7 +102,7 @@ msgid "Patrick Fournier"
 msgstr "Patrick Fournier"
 
 #: ../po/../data/com.patrickfournier.gorfector.desktop.in.in:7
-#: ../po/../src/App.cpp:345
+#: ../po/../src/App.cpp:353
 msgid "An application to scan images."
 msgstr "Une application pour numériser des images."
 
@@ -115,56 +115,56 @@ msgstr "numériser;numérisation;scanner"
 msgid "Error"
 msgstr "Erreur"
 
-#: ../po/../src/App.cpp:162 scanners/scanner_strings.h:40
+#: ../po/../src/App.cpp:179 scanners/scanner_strings.h:40
 #: scanners/scanner_strings.h:41
 msgid "Preview"
 msgstr "Aperçu"
 
-#: ../po/../src/App.cpp:167
+#: ../po/../src/App.cpp:184
 msgid "Scan"
 msgstr "Numériser"
 
-#: ../po/../src/App.cpp:172 ../po/../src/OutputOptionsState.hpp:51
+#: ../po/../src/App.cpp:189 ../po/../src/OutputOptionsState.hpp:51
 msgid "Cancel Scan"
 msgstr "Annuler la numérisation"
 
-#: ../po/../src/App.cpp:244
+#: ../po/../src/App.cpp:252
 msgid "Select Device..."
 msgstr "Sélectionner le périphérique..."
 
-#: ../po/../src/App.cpp:247
+#: ../po/../src/App.cpp:255
 msgid "Use Scan List"
 msgstr "Liste de numérisation"
 
-#: ../po/../src/App.cpp:252
+#: ../po/../src/App.cpp:260
 msgid "Create Desktop Entry..."
 msgstr "Intégrer au bureau..."
 
-#: ../po/../src/App.cpp:256
+#: ../po/../src/App.cpp:264
 msgid "Settings..."
 msgstr "Paramètres..."
 
-#: ../po/../src/App.cpp:257
+#: ../po/../src/App.cpp:265
 msgid "Help..."
 msgstr "Aide..."
 
-#: ../po/../src/App.cpp:258
+#: ../po/../src/App.cpp:266
 msgid "About..."
 msgstr "À propos..."
 
-#: ../po/../src/App.cpp:280
+#: ../po/../src/App.cpp:288
 msgid "Select Device"
 msgstr "Sélectionner le périphérique"
 
-#: ../po/../src/App.cpp:304
+#: ../po/../src/App.cpp:312
 msgid "Settings"
 msgstr "Paramètres"
 
-#: ../po/../src/App.cpp:355
+#: ../po/../src/App.cpp:363
 msgid "Create Desktop Entry"
 msgstr "Intégrer au bureau"
 
-#: ../po/../src/App.cpp:355
+#: ../po/../src/App.cpp:363
 msgid ""
 "Do you want to create a desktop entry for Gorfector? This will allow you to "
 "launch Gorfector from your application menu."
@@ -172,53 +172,53 @@ msgstr ""
 "Voulez-vous intégrer Gorfector au bureau ? Cela créera un lanceur dans le "
 "menu des applications."
 
-#: ../po/../src/App.cpp:357
+#: ../po/../src/App.cpp:365
 msgid "Yes"
 msgstr "Oui"
 
-#: ../po/../src/App.cpp:357
+#: ../po/../src/App.cpp:365
 msgid "No"
 msgstr "Non"
 
-#: ../po/../src/App.cpp:542
+#: ../po/../src/App.cpp:549
 msgid "Select a directory where to save the image files."
 msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
-#: ../po/../src/App.cpp:549
+#: ../po/../src/App.cpp:556
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
-#: ../po/../src/App.cpp:577
+#: ../po/../src/App.cpp:584
 msgid "Directory does not exists: {}."
 msgstr "Le répertoire '{}' n'existe pas."
 
-#: ../po/../src/App.cpp:592
+#: ../po/../src/App.cpp:599
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
-#: ../po/../src/App.cpp:605
+#: ../po/../src/App.cpp:612
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr "Impossible de trouver un nom unique en incrémentant '{}'."
 
-#: ../po/../src/App.cpp:622
+#: ../po/../src/App.cpp:629
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: ../po/../src/App.cpp:624
+#: ../po/../src/App.cpp:631
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
-#: ../po/../src/App.cpp:627 ../po/../src/PresetPanel.cpp:89
+#: ../po/../src/App.cpp:634 ../po/../src/PresetPanel.cpp:89
 #: ../po/../src/ScanListPanel.cpp:209 ../po/../src/ScanListPanel.cpp:331
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../po/../src/App.cpp:627 ../po/../src/OutputOptionsState.hpp:51
+#: ../po/../src/App.cpp:634 ../po/../src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr "Écraser"
 
-#: ../po/../src/App.cpp:676
+#: ../po/../src/App.cpp:683
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"

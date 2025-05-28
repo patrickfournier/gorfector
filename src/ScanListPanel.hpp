@@ -90,7 +90,14 @@ namespace Gorfector
 
             m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
+
+            delete m_CurrentDeviceObserver;
+            delete m_ViewUpdateObserver;
             delete m_PanelState;
+
+            m_CurrentDeviceObserver = nullptr;
+            m_ViewUpdateObserver = nullptr;
+            m_PanelState = nullptr;
         }
 
         [[nodiscard]] ScanListState *GetState() const
