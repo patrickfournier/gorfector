@@ -1147,9 +1147,15 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
     {
         for (auto changedIndex: changeset->GetChangedIndices())
         {
+            auto widget = m_Widgets[changedIndex.CompositeIndex];
+
+            if (widget == nullptr)
+            {
+                continue;
+            }
+
             auto option = m_DeviceOptions->GetOption(changedIndex.OptionValueIndices[0]);
             auto settingValueType = option->GetValueType();
-            auto widget = m_Widgets[changedIndex.CompositeIndex];
 
             switch (settingValueType)
             {
@@ -1209,20 +1215,27 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
 
                     if (ADW_IS_COMBO_ROW(widget))
                     {
-                        auto items = adw_combo_row_get_model(ADW_COMBO_ROW(widget));
-                        uint32_t valuePosition = 0;
-                        for (uint32_t i = 0; i < g_list_model_get_n_items(items); i++)
+                        auto stringList = option->GetStringList();
+                        auto valuePosition = 0;
+                        while (stringList[valuePosition] != nullptr)
                         {
-                            auto *item = G_OBJECT(g_list_model_get_item(items, i));
-                            auto itemName = gtk_string_object_get_string(GTK_STRING_OBJECT(item));
-                            if (strcmp(itemName, value.c_str()) == 0)
+                            auto optionValue = stringList[valuePosition];
+
+                            if (strcmp(optionValue, value.c_str()) == 0)
                             {
-                                valuePosition = i;
                                 break;
                             }
+                            valuePosition++;
                         }
 
-                        adw_combo_row_set_selected(ADW_COMBO_ROW(widget), valuePosition);
+                        if (stringList[valuePosition] == nullptr)
+                        {
+                            g_print("Value %s not found in combo row %s\n", value.c_str(), G_OBJECT_TYPE_NAME(widget));
+                        }
+                        else
+                        {
+                            adw_combo_row_set_selected(ADW_COMBO_ROW(widget), valuePosition);
+                        }
                     }
                     else if (ADW_IS_ENTRY_ROW(widget))
                     {

@@ -595,7 +595,7 @@ void Gorfector::DeviceOptionsState::Updater::ApplyPreset(const nlohmann::json &j
     FindRequestMismatches(indicesToApply, mismatchIndices);
     if (!mismatchIndices.empty())
     {
-        g_warning("Failed to set all requested values on the device after %d iterations.", 20 - maxRepeatCount);
+        g_print("Failed to set all requested values on the device after %d iterations.", 20 - maxRepeatCount);
     }
 }
 

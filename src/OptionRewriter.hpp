@@ -140,7 +140,7 @@ namespace Gorfector
         }
 
         /**
-         * \brief Retrieves a rewritten string list for an option.
+         * \brief Retrieves a rewritten, translated string list for an option.
          * \param optionIndex The index of the option.
          * \param defaultList The default string list to use if no custom list is found.
          * \param rewrittenStringList The output parameter to store the rewritten string list.

@@ -24,7 +24,10 @@ namespace Gorfector
 
     union WidgetIndex
     {
-        const uint32_t OptionValueIndices[2];
+        const uint32_t OptionValueIndices[2]; /*
+                                               * First index is the option index,
+                                               * second index is the value index within the option.
+                                               */
         const uint64_t CompositeIndex;
     };
 

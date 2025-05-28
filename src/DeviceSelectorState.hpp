@@ -33,8 +33,6 @@ namespace Gorfector
          *
          * This method clears the current device list, reinitializes the SANE library, and fetches the latest
          * list of devices. It also ensures that the previously selected device is reselected if it is still available.
-         *
-         * \throws std::runtime_error If the SANE library fails to initialize.
          */
         void GetDevicesFromSANE()
         {
