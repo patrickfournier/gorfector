@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 12:19-0400\n"
+"POT-Creation-Date: 2025-05-28 12:49-0400\n"
 "PO-Revision-Date: 2025-05-27 18:03-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -348,7 +348,7 @@ msgid "Scanners Settings"
 msgstr "Paramètres du périphérique"
 
 #: ../po/../src/PresetCreateDialog.cpp:140
-#: ../po/../src/ScanOptionsPanel.cpp:462 scanners/scanner_strings.h:44
+#: ../po/../src/ScanOptionsPanel.cpp:473 scanners/scanner_strings.h:44
 msgid "Scan Area"
 msgstr "Zone de numérisation"
 
@@ -436,7 +436,7 @@ msgstr "Inspecter le préréglage"
 msgid "Zoom:"
 msgstr "Zoom:"
 
-#: ../po/../src/PreviewPanel.cpp:869
+#: ../po/../src/PreviewPanel.cpp:873
 msgid "Progress: "
 msgstr "Progrès: "
 
@@ -526,55 +526,55 @@ msgstr "%%"
 msgid "μs"
 msgstr "μs"
 
-#: ../po/../src/ScanOptionsPanel.cpp:416
+#: ../po/../src/ScanOptionsPanel.cpp:427
 msgid "Basic"
 msgstr "Basique"
 
-#: ../po/../src/ScanOptionsPanel.cpp:420 scanners/scanner_strings.h:17
+#: ../po/../src/ScanOptionsPanel.cpp:431 scanners/scanner_strings.h:17
 msgid "Advanced"
 msgstr "Avancé"
 
-#: ../po/../src/ScanOptionsPanel.cpp:425
+#: ../po/../src/ScanOptionsPanel.cpp:436
 msgid "Output"
 msgstr "Sortie"
 
-#: ../po/../src/ScanOptionsPanel.cpp:446
+#: ../po/../src/ScanOptionsPanel.cpp:457
 msgid "Common Options"
 msgstr "Options communes"
 
-#: ../po/../src/ScanOptionsPanel.cpp:510 ../po/../src/ScanOptionsPanel.cpp:515
+#: ../po/../src/ScanOptionsPanel.cpp:521 ../po/../src/ScanOptionsPanel.cpp:526
 msgid "Destination"
 msgstr "Destination"
 
-#: ../po/../src/ScanOptionsPanel.cpp:530
+#: ../po/../src/ScanOptionsPanel.cpp:541
 msgid "Location"
 msgstr "Répertoire"
 
-#: ../po/../src/ScanOptionsPanel.cpp:531
+#: ../po/../src/ScanOptionsPanel.cpp:542
 msgid "The directory where the scanned files will be saved."
 msgstr "Le répertoire dans lequel les images seront enregistrées."
 
-#: ../po/../src/ScanOptionsPanel.cpp:546
+#: ../po/../src/ScanOptionsPanel.cpp:557
 msgid "Browse for a location."
 msgstr "Choisir un répertoire."
 
-#: ../po/../src/ScanOptionsPanel.cpp:552
+#: ../po/../src/ScanOptionsPanel.cpp:563
 msgid "Create Missing Directories"
 msgstr "Créer les répertoires manquants"
 
-#: ../po/../src/ScanOptionsPanel.cpp:553
+#: ../po/../src/ScanOptionsPanel.cpp:564
 msgid "Create directories if they do not exist."
 msgstr "Créer les répertoires qui n'existent pas."
 
-#: ../po/../src/ScanOptionsPanel.cpp:562
+#: ../po/../src/ScanOptionsPanel.cpp:573
 msgid "File Name"
 msgstr "Nom du fichier"
 
-#: ../po/../src/ScanOptionsPanel.cpp:575
+#: ../po/../src/ScanOptionsPanel.cpp:586
 msgid "If File Exists"
 msgstr "Si le fichier existe"
 
-#: ../po/../src/ScanOptionsPanel.cpp:610
+#: ../po/../src/ScanOptionsPanel.cpp:621
 msgid "Select Destination"
 msgstr "Choisir la destination"
 

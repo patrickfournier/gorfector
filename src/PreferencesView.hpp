@@ -265,9 +265,12 @@ namespace Gorfector
             m_Dispatcher.UnregisterHandler<SetTiffJpegQuality>();
             m_Dispatcher.UnregisterHandler<SetPngCompressionLevel>();
             m_Dispatcher.UnregisterHandler<SetJpegQuality>();
+            m_Dispatcher.UnregisterHandler<SetDumpSaneOptions>();
 
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
             delete m_ViewUpdateObserver;
+
+            m_ViewUpdateObserver = nullptr;
         }
 
         /**

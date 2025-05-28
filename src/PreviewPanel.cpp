@@ -89,8 +89,12 @@ Gorfector::PreviewPanel::~PreviewPanel()
     m_Dispatcher.UnregisterHandler<SetZoomCommand>();
 
     m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
+
     delete m_ViewUpdateObserver;
     delete m_PreviewState;
+
+    m_ViewUpdateObserver = nullptr;
+    m_PreviewState = nullptr;
 }
 
 void Gorfector::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)

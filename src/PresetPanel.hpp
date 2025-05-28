@@ -126,7 +126,13 @@ namespace Gorfector
             m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
             m_App->GetObserverManager()->RemoveObserver(m_CurrentDeviceObserver);
 
+            delete m_ViewUpdateObserver;
+            delete m_CurrentDeviceObserver;
             delete m_PresetPanelState;
+
+            m_ViewUpdateObserver = nullptr;
+            m_CurrentDeviceObserver = nullptr;
+            m_PresetPanelState = nullptr;
         }
 
         [[nodiscard]] PresetPanelState *GetState() const

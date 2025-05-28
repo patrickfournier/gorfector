@@ -377,10 +377,21 @@ Gorfector::ScanOptionsPanel::~ScanOptionsPanel()
     m_Dispatcher.UnregisterHandler<ChangeOptionCommand<int>>();
     m_Dispatcher.UnregisterHandler<ChangeOptionCommand<std::string>>();
 
+    m_Dispatcher.UnregisterHandler<SetOutputDestinationCommand>();
+    m_Dispatcher.UnregisterHandler<SetOutputDirectoryCommand>();
+    m_Dispatcher.UnregisterHandler<SetCreateMissingDirectoriesCommand>();
+    m_Dispatcher.UnregisterHandler<SetOutputFileNameCommand>();
+    m_Dispatcher.UnregisterHandler<SetFileExistsActionCommand>();
+
     m_App->GetObserverManager()->RemoveObserver(m_OptionUpdateObserver);
     delete m_OptionUpdateObserver;
 
     delete m_DeviceOptions;
+    delete m_OutputOptions;
+
+    m_OptionUpdateObserver = nullptr;
+    m_DeviceOptions = nullptr;
+    m_OutputOptions = nullptr;
 }
 
 void Gorfector::ScanOptionsPanel::BuildUI()
