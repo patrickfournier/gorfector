@@ -1,5 +1,6 @@
 #pragma once
 
+#include <gtk/gtk.h>
 #include <vector>
 
 #include "StateComponent.hpp"
@@ -94,7 +95,16 @@ namespace ZooLib
                 auto &version = m_ObservedComponentVersions[i];
                 if (observedComponent->GetVersion() != version)
                 {
+#if DEBUG_OBSERVERS
+                    g_debug("Observed component %s changed from version %lu to %lu.", typeid(*observedComponent).name(),
+                            version, observedComponent->GetVersion());
+#endif
+
                     UpdateImplementation();
+
+#if DEBUG_OBSERVERS
+                    g_debug("Updated observer %s.", typeid(*this).name());
+#endif
                     break;
                 }
             }

@@ -139,6 +139,10 @@ namespace ZooLib
                 m_NeedsSorting = false;
             }
 
+#if DEBUG_OBSERVER_MANAGER
+            g_debug("ObserverManager::NotifyObservers() notifying %zu observers", m_SortedObservers.size());
+#endif
+
             for (auto observer: m_SortedObservers)
             {
                 if (std::ranges::find(m_DeletedObservers, observer) != m_DeletedObservers.end())
@@ -146,8 +150,22 @@ namespace ZooLib
                     continue;
                 }
 
+#if DEBUG_OBSERVER_MANAGER
+                g_debug("ObserverManager::NotifyObservers() calling observer %s (%p)", typeid(*observer).name(),
+                        observer);
+#endif
+
                 observer->Update();
+
+#if DEBUG_OBSERVER_MANAGER
+                g_debug("ObserverManager::NotifyObservers() done calling observer %s (%p)", typeid(*observer).name(),
+                        observer);
+#endif
             }
+
+#if DEBUG_OBSERVER_MANAGER
+            g_debug("ObserverManager::NotifyObservers() done notifying observers\n");
+#endif
         }
     };
 }
