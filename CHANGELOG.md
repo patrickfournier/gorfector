@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed a crash when applying a preset that tried to set a hidden parameter.
+- Cancel Scans button from the scan list section now can cancel the preview scan.
 
 
 ## [0.1.0] - 2025-05-24

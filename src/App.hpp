@@ -157,6 +157,21 @@ namespace Gorfector
         }
 
         /**
+         * \brief Starts the preview scan of the current device.
+         */
+        void StartPreview();
+
+        /**
+         * \brief Starts the scanning process for the current device.
+         */
+        void StartScan();
+
+        /**
+         * \brief Cancels the current scan operation (preview or scan).
+         */
+        void CancelScan();
+
+        /**
          * \brief Updates the application UI from the state components.
          * \param lastSeenVersions A vector of last seen version identifiers for the state components.
          */

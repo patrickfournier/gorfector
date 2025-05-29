@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 12:49-0400\n"
+"POT-Creation-Date: 2025-05-29 13:39-0400\n"
 "PO-Revision-Date: 2025-05-27 18:03-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -180,45 +180,45 @@ msgstr "Oui"
 msgid "No"
 msgstr "Non"
 
-#: ../po/../src/App.cpp:549
+#: ../po/../src/App.cpp:562
 msgid "Select a directory where to save the image files."
 msgstr "Choisissez un répertoire dans lequel les images seront enregistrées."
 
-#: ../po/../src/App.cpp:556
+#: ../po/../src/App.cpp:569
 msgid "Enter a file name to save the image files."
 msgstr "Entrez le nom du fichier pour enregistrer l'image."
 
-#: ../po/../src/App.cpp:584
+#: ../po/../src/App.cpp:597
 msgid "Directory does not exists: {}."
 msgstr "Le répertoire '{}' n'existe pas."
 
-#: ../po/../src/App.cpp:599
+#: ../po/../src/App.cpp:612
 msgid "File '{}' already exists."
 msgstr "Le fichier '{}' existe déjà."
 
-#: ../po/../src/App.cpp:612
+#: ../po/../src/App.cpp:625
 msgid "Incrementing file name '{}' failed to produce a unique name."
 msgstr "Impossible de trouver un nom unique en incrémentant '{}'."
 
-#: ../po/../src/App.cpp:629
+#: ../po/../src/App.cpp:642
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: ../po/../src/App.cpp:631
+#: ../po/../src/App.cpp:644
 #, c-format
 msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
-#: ../po/../src/App.cpp:634 ../po/../src/PresetPanel.cpp:89
-#: ../po/../src/ScanListPanel.cpp:209 ../po/../src/ScanListPanel.cpp:331
+#: ../po/../src/App.cpp:647 ../po/../src/PresetPanel.cpp:89
+#: ../po/../src/ScanListPanel.cpp:209 ../po/../src/ScanListPanel.cpp:335
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../po/../src/App.cpp:634 ../po/../src/OutputOptionsState.hpp:51
+#: ../po/../src/App.cpp:647 ../po/../src/OutputOptionsState.hpp:51
 msgid "Overwrite"
 msgstr "Écraser"
 
-#: ../po/../src/App.cpp:683
+#: ../po/../src/App.cpp:696
 msgid ""
 "The file name must ends with an extension that specify the image format, "
 "like {}"
@@ -377,8 +377,8 @@ msgstr "Supprimer ce préréglage"
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr "Voulez-vous vraiment supprimer le préréglage \"%s\"?"
 
-#: ../po/../src/PresetPanel.cpp:89 ../po/../src/ScanListPanel.cpp:298
-#: ../po/../src/ScanListPanel.cpp:331
+#: ../po/../src/PresetPanel.cpp:89 ../po/../src/ScanListPanel.cpp:302
+#: ../po/../src/ScanListPanel.cpp:335
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -390,11 +390,11 @@ msgstr "Appliquer ce préréglage"
 msgid "Inspect this preset"
 msgstr "Inspecter ce préréglage"
 
-#: ../po/../src/PresetPanel.cpp:164
+#: ../po/../src/PresetPanel.cpp:165
 msgid "Update this preset"
 msgstr "Modifier ce préréglage"
 
-#: ../po/../src/PresetPanel.cpp:177
+#: ../po/../src/PresetPanel.cpp:178
 msgid "Delete this preset"
 msgstr "Supprimer ce préréglage"
 
@@ -456,11 +456,11 @@ msgstr "Monter"
 msgid "Move Item Down"
 msgstr "Descendre"
 
-#: ../po/../src/ScanListPanel.cpp:87 ../po/../src/ScanListPanel.cpp:424
+#: ../po/../src/ScanListPanel.cpp:87 ../po/../src/ScanListPanel.cpp:443
 msgid "Add Scan Area"
 msgstr "Ajouter une zone"
 
-#: ../po/../src/ScanListPanel.cpp:88 ../po/../src/ScanListPanel.cpp:420
+#: ../po/../src/ScanListPanel.cpp:88 ../po/../src/ScanListPanel.cpp:439
 msgid "Add All Params"
 msgstr "Ajouter tous les paramètres"
 
@@ -488,15 +488,15 @@ msgstr "Voulez-vous vraiment vider la liste de numérisation ?"
 msgid "Clear"
 msgstr "Vider"
 
-#: ../po/../src/ScanListPanel.cpp:285
+#: ../po/../src/ScanListPanel.cpp:289
 msgid "Load"
 msgstr "Charger les réglages"
 
-#: ../po/../src/ScanListPanel.cpp:328
+#: ../po/../src/ScanListPanel.cpp:332
 msgid "Delete Scan"
 msgstr "Supprimer l'item"
 
-#: ../po/../src/ScanListPanel.cpp:330
+#: ../po/../src/ScanListPanel.cpp:334
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr "Voulez-vous vraiment supprimer l'item #%03d ?"

@@ -249,6 +249,10 @@ void Gorfector::ScanListPanel::OnCancelClicked(GtkWidget *widget)
     {
         m_ScanProcess->Cancel();
     }
+    else
+    {
+        m_App->CancelScan();
+    }
 }
 
 namespace Gorfector

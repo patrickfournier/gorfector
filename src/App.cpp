@@ -518,6 +518,11 @@ Gorfector::OutputOptionsState *Gorfector::App::GetOutputOptions()
 
 void Gorfector::App::OnPreviewClicked(GtkWidget *)
 {
+    StartPreview();
+}
+
+void Gorfector::App::StartPreview()
+{
     auto *finishCallback = new std::function<void()>([this]() { this->m_ScanProcess = nullptr; });
 
     m_ScanProcess = new PreviewScanProcess(
@@ -533,6 +538,11 @@ void Gorfector::App::OnPreviewClicked(GtkWidget *)
 }
 
 void Gorfector::App::OnCancelClicked(GtkWidget *)
+{
+    CancelScan();
+}
+
+void Gorfector::App::CancelScan()
 {
     if (m_ScanProcess != nullptr)
     {
@@ -691,6 +701,11 @@ Gorfector::FileWriter *Gorfector::App::SelectFileWriter(const std::string &path)
 }
 
 void Gorfector::App::OnScanClicked(GtkWidget *)
+{
+    StartScan();
+}
+
+void Gorfector::App::StartScan()
 {
     if (m_ScanOptionsPanel == nullptr)
     {
