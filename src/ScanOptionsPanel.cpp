@@ -335,7 +335,7 @@ Gorfector::ScanOptionsPanel::ScanOptionsPanel(
     m_OutputOptions = new OutputOptionsState(m_App->GetState());
     m_App->GetState()->LoadFromPreferencesFile(m_OutputOptions);
 
-    m_OptionUpdateObserver = new ViewUpdateObserver(this, m_DeviceOptions, m_OutputOptions);
+    m_OptionUpdateObserver = new ViewUpdateObserver(this, m_DeviceOptions, m_OutputOptions, m_App->GetAppState());
     m_App->GetObserverManager()->AddObserver(m_OptionUpdateObserver);
 
     m_RootWidget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -1120,7 +1120,7 @@ void Gorfector::ScanOptionsPanel::SelectPage(Page page)
 void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVersions)
 {
     auto firstChangesetVersion = m_DeviceOptions->FirstChangesetVersion();
-    auto changeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersions[0]);
+    auto deviceOptionsChangeset = m_DeviceOptions->GetAggregatedChangeset(lastSeenVersions[0]);
 
     if (lastSeenVersions[1] < m_OutputOptions->GetVersion())
     {
@@ -1150,13 +1150,13 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
 
     if ((firstChangesetVersion != std::numeric_limits<uint64_t>::max() &&
          firstChangesetVersion > lastSeenVersions[0]) ||
-        changeset->ShouldRebuildOptions())
+        deviceOptionsChangeset->ShouldRebuildOptions())
     {
         BuildUI();
     }
     else
     {
-        for (auto changedIndex: changeset->GetChangedIndices())
+        for (auto changedIndex: deviceOptionsChangeset->GetChangedIndices())
         {
             auto widget = m_Widgets[changedIndex.CompositeIndex];
 
@@ -1257,6 +1257,41 @@ void Gorfector::ScanOptionsPanel::Update(const std::vector<uint64_t> &lastSeenVe
 
                 default:
                     break;
+            }
+        }
+    }
+
+    auto appChangeset = m_App->GetAppState()->GetAggregatedChangeset(lastSeenVersions[2]);
+    if (appChangeset != nullptr)
+    {
+        if (appChangeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_ScanActivity))
+        {
+            bool isScanning = m_App->GetAppState()->IsScanning() || m_App->GetAppState()->IsPreviewing();
+
+            gtk_widget_set_sensitive(m_DestinationCombo, !isScanning);
+            if (m_LocationEntryRow != nullptr)
+            {
+                gtk_widget_set_sensitive(m_LocationEntryRow, !isScanning);
+            }
+            if (m_CreateDirSwitch != nullptr)
+            {
+                gtk_widget_set_sensitive(m_CreateDirSwitch, !isScanning);
+            }
+            if (m_FileNameEntry != nullptr)
+            {
+                gtk_widget_set_sensitive(m_FileNameEntry, !isScanning);
+            }
+            if (m_IfFileExistsCombo != nullptr)
+            {
+                gtk_widget_set_sensitive(m_IfFileExistsCombo, !isScanning);
+            }
+
+            for (auto &widget: m_Widgets | std::views::values)
+            {
+                if (widget != nullptr)
+                {
+                    gtk_widget_set_sensitive(widget, !isScanning);
+                }
             }
         }
     }

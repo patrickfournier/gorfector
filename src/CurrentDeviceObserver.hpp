@@ -50,6 +50,12 @@ namespace Gorfector
                 auto updater = typename TModifiedState::Updater(m_ModifiedState);
                 updater.SetCurrentDeviceName(vendorName, modelName);
             }
+            if (changeset != nullptr && changeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_ScanActivity))
+            {
+                auto scanActivity = m_AppState->IsPreviewing() || m_AppState->IsScanning();
+                auto updater = typename TModifiedState::Updater(m_ModifiedState);
+                updater.SetScanActivity(scanActivity);
+            }
         }
 
     public:

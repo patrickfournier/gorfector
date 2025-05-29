@@ -43,7 +43,7 @@ namespace Gorfector
         GtkWidget *m_PageBasic{};
         GtkWidget *m_PageAdvanced{};
 
-        ViewUpdateObserver<ScanOptionsPanel, DeviceOptionsState, OutputOptionsState> *m_OptionUpdateObserver;
+        ViewUpdateObserver<ScanOptionsPanel, DeviceOptionsState, OutputOptionsState, AppState> *m_OptionUpdateObserver;
 
         std::unordered_map<uint64_t, GtkWidget *> m_Widgets;
 

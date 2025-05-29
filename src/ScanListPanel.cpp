@@ -397,20 +397,35 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
         gtk_list_box_bind_model(
                 GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
 
-        if (scanCount == 0)
-        {
-            gtk_widget_set_sensitive(m_ScanListButton, false);
-            gtk_widget_set_sensitive(m_ClearScanListButton, false);
-            gtk_widget_set_sensitive(m_CancelListButton, false);
-        }
-        else
-        {
-            gtk_widget_set_sensitive(m_ScanListButton, true);
-            gtk_widget_set_sensitive(m_ClearScanListButton, true);
-            gtk_widget_set_sensitive(m_CancelListButton, true);
-        }
-
         m_BlockOnItemSelected = false;
+    }
+
+    if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ScanActivity))
+    {
+        auto canApply = !m_PanelState->IsScanning();
+        int i = 0;
+        auto row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), i);
+        while (row != nullptr)
+        {
+            auto applyButton = ZooLib::FindWidgetByName(GTK_WIDGET(row), "apply-button");
+            if (applyButton != nullptr)
+            {
+                gtk_widget_set_sensitive(applyButton, canApply);
+            }
+
+            row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), ++i);
+        }
+    }
+
+    if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ListContent) ||
+        changeset->IsChanged(ScanListStateChangeset::TypeFlag::ScanActivity))
+    {
+        auto hasScans = m_PanelState->GetScanListSize() > 0;
+        auto isScanning = m_PanelState->IsScanning();
+
+        gtk_widget_set_sensitive(m_ScanListButton, hasScans && !isScanning);
+        gtk_widget_set_sensitive(m_ClearScanListButton, hasScans);
+        gtk_widget_set_sensitive(m_CancelListButton, isScanning);
     }
 
     if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ButtonAction))

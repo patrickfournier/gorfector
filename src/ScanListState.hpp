@@ -24,7 +24,8 @@ namespace Gorfector
             None = 0,
             ListContent = 1,
             SelectedItem = 2,
-            ButtonAction = 4
+            ButtonAction = 4,
+            ScanActivity = 8,
         };
 
     private:
@@ -92,6 +93,7 @@ namespace Gorfector
 
         std::string m_CurrentDevice{};
         std::vector<nlohmann::json> m_CurrentScanList{};
+        bool m_ScanActivity{};
 
         int m_SelectedIndex{-1};
 
@@ -193,6 +195,11 @@ namespace Gorfector
         [[nodiscard]] int GetSelectedIndex() const
         {
             return m_SelectedIndex;
+        }
+
+        [[nodiscard]] bool IsScanning() const
+        {
+            return m_ScanActivity;
         }
 
         class Updater final : public StateComponent::Updater<ScanListState>
@@ -390,6 +397,14 @@ namespace Gorfector
                     auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
                     changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
                 }
+            }
+
+            void SetScanActivity(bool scanning)
+            {
+                m_StateComponent->m_ScanActivity = scanning;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                changeset->Set(ScanListStateChangeset::TypeFlag::ScanActivity);
             }
 
             void SetAddToScanListAddsAllParams(bool addsAllParams) const

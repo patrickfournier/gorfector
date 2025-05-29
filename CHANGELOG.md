@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ability to update the presets.
 
+### Changed
+
+- UI that changes the scan parameters is now disabled when a scan is in progress.
+
 ### Fixed
 
 - Fixed a crash when applying a preset that tried to set a hidden parameter.

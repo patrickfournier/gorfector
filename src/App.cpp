@@ -475,21 +475,24 @@ void Gorfector::App::Update(const std::vector<uint64_t> &lastSeenVersions)
 
     if (changeset->IsChanged(AppStateChangeset::ChangeTypeFlag::e_ScanActivity))
     {
-        // TODO: also update the option panel
+        auto action = g_action_map_lookup_action(G_ACTION_MAP(m_GtkApp), "select_device");
         if (m_AppState->IsScanning() || m_AppState->IsPreviewing())
         {
+            g_simple_action_set_enabled(G_SIMPLE_ACTION(action), false);
             gtk_widget_set_sensitive(m_PreviewButton, false);
             gtk_widget_set_sensitive(m_ScanButton, false);
             gtk_widget_set_sensitive(m_CancelButton, true);
         }
         else if (!GetSelectorDeviceName().empty())
         {
+            g_simple_action_set_enabled(G_SIMPLE_ACTION(action), true);
             gtk_widget_set_sensitive(m_PreviewButton, true);
             gtk_widget_set_sensitive(m_ScanButton, true);
             gtk_widget_set_sensitive(m_CancelButton, false);
         }
         else
         {
+            g_simple_action_set_enabled(G_SIMPLE_ACTION(action), true);
             gtk_widget_set_sensitive(m_PreviewButton, false);
             gtk_widget_set_sensitive(m_ScanButton, false);
             gtk_widget_set_sensitive(m_CancelButton, false);

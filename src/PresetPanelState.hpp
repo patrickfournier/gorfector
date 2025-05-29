@@ -19,6 +19,7 @@ namespace Gorfector
 
         std::string m_CurrentDeviceModel{};
         std::string m_CurrentDeviceVendor{};
+        bool m_ScanActivity{};
 
         friend void to_json(nlohmann::json &j, const PresetPanelState &state);
         friend void from_json(const nlohmann::json &j, PresetPanelState &state);
@@ -49,9 +50,14 @@ namespace Gorfector
             return "PresetPanelState";
         }
 
-        [[nodiscard]] bool CanCreateOrApplyPreset() const
+        [[nodiscard]] bool CanCreatePreset() const
         {
             return !m_CurrentDeviceModel.empty() && !m_CurrentDeviceVendor.empty();
+        }
+
+        [[nodiscard]] bool CanApplyPreset() const
+        {
+            return !m_CurrentDeviceModel.empty() && !m_CurrentDeviceVendor.empty() && !m_ScanActivity;
         }
 
         [[nodiscard]] bool IsExpanded() const
@@ -117,6 +123,11 @@ namespace Gorfector
             {
                 m_StateComponent->m_CurrentDeviceVendor = vendorName;
                 m_StateComponent->m_CurrentDeviceModel = modelName;
+            }
+
+            void SetScanActivity(bool scanning)
+            {
+                m_StateComponent->m_ScanActivity = scanning;
             }
 
             void LoadFromJson(const nlohmann::json &json) override

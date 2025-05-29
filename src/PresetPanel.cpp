@@ -161,6 +161,7 @@ GtkWidget *Gorfector::PresetPanel::CreatePresetListItem(const char *itemName)
 
     auto renameButton = gtk_button_new();
     gtk_button_set_icon_name(GTK_BUTTON(renameButton), "document-edit-symbolic");
+    gtk_widget_set_name(renameButton, "modify-button");
     gtk_widget_set_tooltip_text(renameButton, _("Update this preset"));
     gtk_widget_set_halign(renameButton, GTK_ALIGN_END);
     gtk_widget_set_css_classes(GTK_WIDGET(renameButton), buttonClasses);
@@ -198,8 +199,8 @@ void Gorfector::PresetPanel::Update(const std::vector<uint64_t> &lastSeenVersion
     m_Dispatcher.UnregisterHandler<ApplyPresetCommand>();
     m_Dispatcher.RegisterHandler(ApplyPresetCommand::Execute, m_App->GetDeviceOptions(), m_App->GetOutputOptions());
 
-    bool canCreateOrApplyPreset = m_PresetPanelState->CanCreateOrApplyPreset();
-    gtk_widget_set_sensitive(m_CreatePresetButton, canCreateOrApplyPreset);
+    bool canCreatePreset = m_PresetPanelState->CanCreatePreset();
+    gtk_widget_set_sensitive(m_CreatePresetButton, canCreatePreset);
 
     m_DisplayedPresetNames.clear();
     for (const auto &preset: m_PresetPanelState->GetPresetsForScanner(
@@ -208,7 +209,6 @@ void Gorfector::PresetPanel::Update(const std::vector<uint64_t> &lastSeenVersion
         m_DisplayedPresetNames.push_back(preset[PresetPanelState::k_PresetNameKey].get<std::string>());
     }
 
-    // FIXME leaks
     const char **names = new const char *[m_DisplayedPresetNames.size() + 1];
     for (size_t i = 0; i < m_DisplayedPresetNames.size(); ++i)
     {
@@ -220,6 +220,9 @@ void Gorfector::PresetPanel::Update(const std::vector<uint64_t> &lastSeenVersion
     gtk_list_box_bind_model(
             GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(presetNamesList), Gorfector::CreatePresetListItem, this, nullptr);
 
+    delete[] names;
+
+    bool canApplyPreset = m_PresetPanelState->CanApplyPreset();
     int i = 0;
     auto row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), i);
     while (row != nullptr)
@@ -227,7 +230,13 @@ void Gorfector::PresetPanel::Update(const std::vector<uint64_t> &lastSeenVersion
         auto applyButton = ZooLib::FindWidgetByName(GTK_WIDGET(row), "apply-button");
         if (applyButton != nullptr)
         {
-            gtk_widget_set_sensitive(applyButton, canCreateOrApplyPreset);
+            gtk_widget_set_sensitive(applyButton, canApplyPreset);
+        }
+
+        auto modifyButton = ZooLib::FindWidgetByName(GTK_WIDGET(row), "modify-button");
+        if (modifyButton != nullptr)
+        {
+            gtk_widget_set_sensitive(modifyButton, canCreatePreset);
         }
 
         row = gtk_list_box_get_row_at_index(GTK_LIST_BOX(m_ListBox), ++i);
