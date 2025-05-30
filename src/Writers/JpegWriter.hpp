@@ -140,17 +140,16 @@ namespace Gorfector
          * \param parameters SANE parameters for the file.
          * \return The number of bytes appended.
          */
-        uint32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
+        size_t AppendBytes(SANE_Byte *bytes, uint32_t numberOfLines, const SANE_Parameters &parameters) override
         {
-            if (m_CompressStruct == nullptr)
+            if (numberOfLines == 0 || m_CompressStruct == nullptr)
                 return 0;
 
             if (m_CompressStruct->image_height <= m_CompressStruct->next_scanline)
                 return 0;
 
-            auto numLinesToWrite = std::min(
-                    static_cast<unsigned int>(numberOfLines),
-                    m_CompressStruct->image_height - m_CompressStruct->next_scanline);
+            auto numLinesToWrite =
+                    std::min(numberOfLines, m_CompressStruct->image_height - m_CompressStruct->next_scanline);
 
             auto rowPointer = new JSAMPROW[numLinesToWrite];
 
@@ -224,10 +223,8 @@ namespace Gorfector
         void CloseFile() override
         {
             jpeg_finish_compress(m_CompressStruct);
-            fclose(m_File);
-            jpeg_destroy_compress(m_CompressStruct);
-            delete m_CompressStruct;
-            delete m_ErrorHandler;
+
+            CancelFile();
         }
 
         /**
@@ -235,10 +232,21 @@ namespace Gorfector
          */
         void CancelFile() override
         {
-            fclose(m_File);
-            jpeg_destroy_compress(m_CompressStruct);
-            delete m_CompressStruct;
+            if (m_File != nullptr)
+            {
+                fclose(m_File);
+                m_File = nullptr;
+            }
+
+            if (m_CompressStruct != nullptr)
+            {
+                jpeg_destroy_compress(m_CompressStruct);
+                delete m_CompressStruct;
+                m_CompressStruct = nullptr;
+            }
+
             delete m_ErrorHandler;
+            m_ErrorHandler = nullptr;
         }
     };
 }

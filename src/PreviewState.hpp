@@ -386,13 +386,13 @@ namespace Gorfector
                 changeset->Set(PreviewStateChangeset::TypeFlag::Image, -1);
             }
 
-            void GetReadBuffer(SANE_Byte *&buffer, int &maxLength)
+            void GetReadBuffer(SANE_Byte *&buffer, size_t &maxLength)
             {
                 buffer = m_StateComponent->m_Image + m_StateComponent->m_Offset;
-                maxLength = static_cast<int>(m_StateComponent->m_ImageSize - m_StateComponent->m_Offset);
+                maxLength = m_StateComponent->m_ImageSize - m_StateComponent->m_Offset;
             }
 
-            void CommitReadBuffer(int readLength)
+            void CommitReadBuffer(size_t readLength)
             {
                 m_StateComponent->m_Offset += readLength;
 

@@ -188,9 +188,9 @@ namespace Gorfector
          * @param parameters The `SANE_Parameters` structure containing image parameters.
          * @return The total number of bytes written to the TIFF file.
          */
-        uint32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
+        size_t AppendBytes(SANE_Byte *bytes, uint32_t numberOfLines, const SANE_Parameters &parameters) override
         {
-            for (auto i = 0; i < numberOfLines; i++)
+            for (auto i = 0u; i < numberOfLines; i++)
             {
                 TIFFWriteScanline(m_File, bytes + i * parameters.bytes_per_line, m_LineCounter++, 0);
             }
@@ -206,8 +206,7 @@ namespace Gorfector
          */
         void CloseFile() override
         {
-            TIFFClose(m_File);
-            m_File = nullptr;
+            CancelFile();
         }
 
         /**
@@ -218,8 +217,12 @@ namespace Gorfector
          */
         void CancelFile() override
         {
-            TIFFClose(m_File);
-            m_File = nullptr;
+            if (m_File != nullptr)
+            {
+                TIFFClose(m_File);
+                m_File = nullptr;
+            }
+            m_LineCounter = 0;
         }
     };
 }

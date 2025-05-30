@@ -55,7 +55,7 @@ namespace Gorfector
         /**
          * \brief Size of the line pointer array.
          */
-        int m_LinePointerSize{};
+        size_t m_LinePointerSize{};
 
     public:
         /**
@@ -115,6 +115,52 @@ namespace Gorfector
                 std::filesystem::path &path, const DeviceOptionsState *deviceOptions,
                 const SANE_Parameters &parameters) override
         {
+            if (parameters.lines > 0 &&
+                static_cast<size_t>(parameters.lines) > PNG_SIZE_MAX / parameters.bytes_per_line)
+            {
+                return Error::ImageTooLarge;
+            }
+
+            m_File = fopen(path.c_str(), "wb");
+            if (m_File == nullptr)
+            {
+                return Error::CannotOpenFile;
+            }
+
+            m_Png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+            if (!m_Png)
+            {
+                fclose(m_File);
+                m_File = nullptr;
+                return Error::UnknownError;
+            }
+
+            if (setjmp(png_jmpbuf(m_Png)))
+            {
+                return Error::UnknownError;
+            }
+
+            m_PngInfo = png_create_info_struct(m_Png);
+            if (!m_PngInfo)
+            {
+                fclose(m_File);
+                m_File = nullptr;
+
+                png_destroy_write_struct(&m_Png, nullptr);
+                m_Png = nullptr;
+
+                return Error::UnknownError;
+            }
+
+            png_init_io(m_Png, m_File);
+
+            png_set_IHDR(
+                    m_Png, m_PngInfo, parameters.pixels_per_line, parameters.lines, parameters.depth,
+                    parameters.format == SANE_FRAME_RGB ? PNG_COLOR_TYPE_RGB : PNG_COLOR_TYPE_GRAY, PNG_INTERLACE_NONE,
+                    PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+            png_set_compression_level(m_Png, m_StateComponent->GetCompressionLevel());
+
             if (parameters.depth == 1)
             {
                 png_set_invert_mono(m_Png);
@@ -153,6 +199,9 @@ namespace Gorfector
 
             png_set_flush(m_Png, 128);
 
+            m_LinePointers = nullptr;
+            m_LinePointerSize = 0;
+
             return Error::None;
         }
 
@@ -163,8 +212,13 @@ namespace Gorfector
          * \param parameters Parameters for the image data.
          * \return The number of bytes successfully written.
          */
-        uint32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) override
+        size_t AppendBytes(SANE_Byte *bytes, uint32_t numberOfLines, const SANE_Parameters &parameters) override
         {
+            if (numberOfLines == 0 || m_Png == nullptr)
+            {
+                return 0;
+            }
+
             if (m_LinePointers == nullptr || m_LinePointerSize < numberOfLines)
             {
                 delete[] m_LinePointers;
@@ -172,18 +226,18 @@ namespace Gorfector
                 m_LinePointerSize = numberOfLines;
             }
 
-            int i = 0;
+            auto i = 0ul;
 
             if (setjmp(png_jmpbuf(m_Png))) // NOLINT(*-err52-cpp)
             {
                 return i * parameters.bytes_per_line;
             }
 
-            for (i = 0; i < numberOfLines; ++i)
+            for (; i < numberOfLines; ++i)
             {
                 m_LinePointers[i] = bytes + i * parameters.bytes_per_line;
             }
-            png_write_rows(m_Png, m_LinePointers, m_LinePointerSize);
+            png_write_rows(m_Png, m_LinePointers, numberOfLines);
 
             return numberOfLines * parameters.bytes_per_line;
         }
@@ -195,12 +249,17 @@ namespace Gorfector
         {
             if (setjmp(png_jmpbuf(m_Png))) // NOLINT(*-err52-cpp)
             {
-                fclose(m_File);
+                if (m_File != nullptr)
+                {
+                    fclose(m_File);
+                    m_File = nullptr;
+                }
 
                 if (m_LinePointers != nullptr)
                 {
                     delete[] m_LinePointers;
                     m_LinePointers = nullptr;
+                    m_LinePointerSize = 0;
                 }
 
                 m_File = nullptr;
@@ -209,19 +268,12 @@ namespace Gorfector
                 return;
             }
 
-            png_write_end(m_Png, nullptr);
-            png_destroy_write_struct(&m_Png, &m_PngInfo);
-            fclose(m_File);
-
-            if (m_LinePointers != nullptr)
+            if (m_Png != nullptr && m_PngInfo != nullptr)
             {
-                delete[] m_LinePointers;
-                m_LinePointers = nullptr;
+                png_write_end(m_Png, m_PngInfo);
             }
 
-            m_File = nullptr;
-            m_Png = nullptr;
-            m_PngInfo = nullptr;
+            CancelFile();
         }
 
         /**
@@ -229,18 +281,25 @@ namespace Gorfector
          */
         void CancelFile() override
         {
-            png_destroy_write_struct(&m_Png, &m_PngInfo);
-            fclose(m_File);
+            if (m_Png != nullptr && m_PngInfo != nullptr)
+            {
+                png_destroy_write_struct(&m_Png, &m_PngInfo);
+                m_Png = nullptr;
+                m_PngInfo = nullptr;
+            }
+
+            if (m_File != nullptr)
+            {
+                fclose(m_File);
+                m_File = nullptr;
+            }
 
             if (m_LinePointers != nullptr)
             {
                 delete[] m_LinePointers;
                 m_LinePointers = nullptr;
+                m_LinePointerSize = 0;
             }
-
-            m_File = nullptr;
-            m_Png = nullptr;
-            m_PngInfo = nullptr;
         }
     };
 }

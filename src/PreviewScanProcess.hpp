@@ -41,13 +41,13 @@ namespace Gorfector
             return true;
         }
 
-        void GetBuffer(SANE_Byte *&outBuffer, int &outMaxReadLength) override
+        void GetBuffer(SANE_Byte *&outBuffer, size_t &outMaxReadLength) override
         {
             auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
             previewPanelUpdater.GetReadBuffer(outBuffer, outMaxReadLength);
         }
 
-        void CommitBuffer(int32_t readLength) override
+        void CommitBuffer(size_t readLength) override
         {
             auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
             previewPanelUpdater.CommitReadBuffer(readLength);

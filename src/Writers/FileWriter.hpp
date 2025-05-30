@@ -187,7 +187,7 @@ namespace Gorfector
          * \param parameters SANE parameters for the file.
          * \return The number of bytes appended.
          */
-        virtual uint32_t AppendBytes(SANE_Byte *bytes, int numberOfLines, const SANE_Parameters &parameters) = 0;
+        virtual size_t AppendBytes(SANE_Byte *bytes, uint32_t numberOfLines, const SANE_Parameters &parameters) = 0;
 
         /**
          * \brief Closes the file after writing.

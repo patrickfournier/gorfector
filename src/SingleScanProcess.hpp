@@ -12,8 +12,8 @@ namespace Gorfector
         std::filesystem::path m_ImageFilePath;
 
         SANE_Byte *m_Buffer{};
-        int32_t m_BufferSize{};
-        int32_t m_WriteOffset{};
+        size_t m_BufferSize{};
+        size_t m_WriteOffset{};
 
         virtual bool LoadSettings()
         {
@@ -56,23 +56,23 @@ namespace Gorfector
             return true;
         }
 
-        void GetBuffer(SANE_Byte *&outBuffer, int &outMaxReadLength) override
+        void GetBuffer(SANE_Byte *&outBuffer, size_t &outMaxReadLength) override
         {
             outBuffer = m_Buffer != nullptr ? m_Buffer + m_WriteOffset : nullptr;
             outMaxReadLength = m_BufferSize - m_WriteOffset;
         }
 
-        void CommitBuffer(int32_t readLength) override
+        void CommitBuffer(size_t readLength) override
         {
             ScanProcess::CommitBuffer(readLength);
 
             auto availableBytes = m_WriteOffset + readLength;
             auto availableLines = availableBytes / m_ScanParameters.bytes_per_line;
             auto savedBytes = m_FileWriter->AppendBytes(m_Buffer, availableLines, m_ScanParameters);
-            if (static_cast<int32_t>(savedBytes) < availableBytes)
+            if (savedBytes < availableBytes)
             {
                 memmove(m_Buffer, m_Buffer + savedBytes, availableBytes - savedBytes);
-                m_WriteOffset = availableBytes - static_cast<int32_t>(savedBytes);
+                m_WriteOffset = availableBytes - savedBytes;
             }
             else
             {
@@ -165,7 +165,7 @@ namespace Gorfector
                 return false;
             }
 
-            auto linesIn1MB = 1024 * 1024 / m_ScanParameters.bytes_per_line;
+            auto linesIn1MB = 1024UL * 1024 / m_ScanParameters.bytes_per_line;
             m_BufferSize = m_ScanParameters.bytes_per_line * linesIn1MB;
             m_Buffer = static_cast<SANE_Byte *>(calloc(m_BufferSize, sizeof(SANE_Byte)));
             m_WriteOffset = 0;
