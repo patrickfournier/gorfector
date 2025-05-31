@@ -31,7 +31,7 @@ void Gorfector::PreviewScanProcess::SetPreviewOptions() const
             SANE_Int smallestDiff = std::abs(resolution - resolutionDescription->constraint.word_list[1]);
             for (auto i = 2; i <= count; i++)
             {
-                auto diff = std::abs(resolution - resolutionDescription->constraint.word_list[1]);
+                auto diff = std::abs(resolution - resolutionDescription->constraint.word_list[i]);
                 if (diff < smallestDiff)
                 {
                     nearestResolutionIndex = i;

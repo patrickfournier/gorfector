@@ -65,7 +65,7 @@ void Gorfector::DeviceOptionsState::ReloadOptions() const
             case SANE_TYPE_BOOL:
             {
                 auto *settingValue = dynamic_cast<DeviceOptionValue<bool> *>(m_OptionValues[optionIndex]);
-                if (settingValue == nullptr)
+                if (settingValue != nullptr)
                 {
                     settingValue->SetDeviceValue(0, (*reinterpret_cast<SANE_Bool *>(value.get())));
                 }
