@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-30 11:59-0400\n"
-"PO-Revision-Date: 2025-05-27 18:03-0400\n"
+"POT-Creation-Date: 2025-05-30 23:37-0400\n"
+"PO-Revision-Date: 2025-05-30 23:39-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -279,35 +279,31 @@ msgstr "Algorithme de compression"
 msgid "Deflate Compression Level"
 msgstr "Niveau de compression Deflate"
 
-#: ../po/../src/PreferencesView.cpp:21 ../po/../src/PreferencesView.cpp:40
-msgid ""
-"0 = no compression, 9 = maximum compression. Higher compression levels may "
-"slow down the scanning process."
-msgstr ""
-"0 = pas de compression, 9 = compression maximale. Des niveaux de compression "
-"plus élevés peuvent ralentir le processus de numérisation."
+#: ../po/../src/PreferencesView.cpp:20 ../po/../src/PreferencesView.cpp:38
+msgid "0 = no compression, 9 = maximum compression."
+msgstr "0 = pas de compression, 9 = compression maximale."
 
-#: ../po/../src/PreferencesView.cpp:28
+#: ../po/../src/PreferencesView.cpp:26
 msgid "JPEG Quality"
 msgstr "Qualité JPEG"
 
-#: ../po/../src/PreferencesView.cpp:29 ../po/../src/PreferencesView.cpp:52
+#: ../po/../src/PreferencesView.cpp:27 ../po/../src/PreferencesView.cpp:49
 msgid "0 = lowest quality, 100 = maximum quality."
 msgstr "0 = qualité la plus basse, 100 = qualité maximale."
 
-#: ../po/../src/PreferencesView.cpp:34
+#: ../po/../src/PreferencesView.cpp:32
 msgid "PNG Settings"
 msgstr "Paramètres PNG"
 
-#: ../po/../src/PreferencesView.cpp:38
+#: ../po/../src/PreferencesView.cpp:36
 msgid "Compression Level"
 msgstr "Niveau de compression"
 
-#: ../po/../src/PreferencesView.cpp:47
+#: ../po/../src/PreferencesView.cpp:44
 msgid "JPEG Settings"
 msgstr "Paramètres JPEG"
 
-#: ../po/../src/PreferencesView.cpp:51
+#: ../po/../src/PreferencesView.cpp:48
 msgid "Quality"
 msgstr "Qualité"
 
@@ -441,8 +437,8 @@ msgid "Progress: "
 msgstr "Progrès: "
 
 #: ../po/../src/PreviewScanProcess.hpp:37 ../po/../src/SingleScanProcess.hpp:32
-msgid "Unsupported format"
-msgstr "Format non pris en charge"
+msgid "Unsupported format."
+msgstr "Format non pris en charge."
 
 #: ../po/../src/ScanListPanel.cpp:24
 msgid "Scan List"
@@ -578,18 +574,22 @@ msgstr "Si le fichier existe"
 msgid "Select Destination"
 msgstr "Choisir la destination"
 
-#: ../po/../src/ScanProcess.hpp:196 ../po/../src/ScanProcess.hpp:203
-#: ../po/../src/ScanProcess.hpp:210
-msgid "Failed to start scan"
-msgstr "Impossible de lancer la numérisation"
+#: ../po/../src/ScanProcess.hpp:298
+msgid "Failed to start scan."
+msgstr "Impossible de lancer la numérisation."
+
+#: ../po/../src/ScanProcess.hpp:306
+msgid "Failed to start scan: cannot get parameters."
+msgstr ""
+"Impossible de lancer la numérisation: impossible d'obtenir les paramètres."
 
 #: ../po/../src/SingleScanProcess.hpp:38
-msgid "Unsupported depth"
-msgstr "Profondeur non prise en charge"
+msgid "Unsupported depth."
+msgstr "Profondeur non prise en charge."
 
 #: ../po/../src/SingleScanProcess.hpp:44
-msgid "Unsupported file format"
-msgstr "Format de fichier non pris en charge"
+msgid "Unsupported file format."
+msgstr "Format de fichier non pris en charge."
 
 #: ../po/../src/SingleScanProcess.hpp:51
 msgid "Failed to create file: "
@@ -1241,6 +1241,13 @@ msgstr "Bas"
 #: scanners/scanner_strings.h:173
 msgid "High"
 msgstr "Haut"
+
+#~ msgid ""
+#~ "0 = no compression, 9 = maximum compression. Higher compression levels "
+#~ "may slow down the scanning process."
+#~ msgstr ""
+#~ "0 = pas de compression, 9 = compression maximale. Des niveaux de "
+#~ "compression plus élevés peuvent ralentir le processus de numérisation."
 
 #~ msgid "Cannot open scanner {}."
 #~ msgstr "Impossible d'ouvrir le scanner {}."

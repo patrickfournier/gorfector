@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gtk/gtk.h>
+#include <list>
 #include <thread>
 
 #include "AppState.hpp"
@@ -17,40 +18,107 @@ namespace Gorfector
         class ScanThread
         {
             const SaneDevice *m_Device;
-            SANE_Byte *m_Buffer;
-            size_t m_BufferSize;
-            size_t m_WrittenLength{};
-            size_t m_ReadLength{};
+            size_t m_ImageSize;
+            const size_t m_ChunkSize{};
 
-            bool m_Abort{};
+            std::list<SANE_Byte *> m_FreeChunks{};
+            std::list<SANE_Byte *> m_UsedChunks{};
+
+            std::list<SANE_Byte *>::iterator m_CurrentWriteChunk{};
+            size_t m_WritePos{}; // 0 - m_ChunkSize
+
+            std::list<SANE_Byte *>::iterator m_CurrentReadChunk{};
+            size_t m_ReadPos{}; // 0 - m_ChunkSize
+
+            size_t m_TotalBytesWritten{}; // 0 - m_ImageSize
+            size_t m_TotalBytesRead{}; // 0 - m_ImageSize
+
+            bool m_AbortRequested{};
             bool m_Finished{};
 
+            std::mutex m_Mutex{};
+
         public:
-            ScanThread(const SaneDevice *device, size_t bufferSize)
+            ScanThread(const SaneDevice *device, size_t imageSize)
                 : m_Device(device)
-                , m_Buffer(new SANE_Byte[bufferSize])
-                , m_BufferSize(bufferSize)
+                , m_ImageSize(imageSize)
+                , m_ChunkSize(std::min(imageSize, static_cast<size_t>(2 * 1024 * 1024)))
             {
+                auto chunk = new SANE_Byte[m_ChunkSize];
+                m_UsedChunks.push_back(chunk);
+
+                m_CurrentWriteChunk = m_UsedChunks.begin();
+                m_WritePos = 0;
+
+                m_CurrentReadChunk = m_UsedChunks.begin();
+                m_ReadPos = 0;
             }
 
             ~ScanThread()
             {
-                delete[] m_Buffer;
+                for (auto buffer: m_FreeChunks)
+                {
+                    delete[] buffer;
+                }
+                m_FreeChunks.clear();
+
+                for (auto buffer: m_UsedChunks)
+                {
+                    delete[] buffer;
+                }
+                m_UsedChunks.clear();
             }
 
-            bool Copy(SANE_Byte *buffer, size_t maxLength, size_t &readLength)
+            /// \returns true if there is still data to read
+            bool Copy(SANE_Byte *destBuffer, size_t maxLength, size_t &readLength)
             {
-                if (buffer != nullptr && maxLength > 0)
+                if (destBuffer == nullptr || maxLength <= 0)
                 {
-                    readLength = std::max(0uz, std::min(maxLength, m_WrittenLength - m_ReadLength));
-                    if (readLength > 0)
-                    {
-                        std::memcpy(buffer, m_Buffer + m_ReadLength, readLength);
-                        m_ReadLength += readLength;
-                    }
+                    readLength = 0;
+                    return !m_Finished || m_TotalBytesRead < m_TotalBytesWritten;
                 }
 
-                return !m_Finished || m_ReadLength < m_WrittenLength;
+                std::lock_guard lock(m_Mutex);
+
+                if (m_CurrentReadChunk == m_UsedChunks.end())
+                {
+                    m_CurrentReadChunk = m_UsedChunks.begin(); // if empty, == end()
+                    m_ReadPos = 0;
+                }
+
+                if (m_CurrentReadChunk == m_UsedChunks.end())
+                {
+                    // No data to read for now
+                    readLength = 0;
+                    return !m_Finished || m_TotalBytesRead < m_TotalBytesWritten;
+                }
+
+                auto dataAvailable = 0uz;
+                if (m_CurrentWriteChunk == m_CurrentReadChunk)
+                {
+                    dataAvailable = m_WritePos - m_ReadPos;
+                }
+                else
+                {
+                    dataAvailable = m_ChunkSize - m_ReadPos;
+                }
+
+                readLength = std::min(maxLength, dataAvailable);
+                if (readLength > 0)
+                {
+                    std::memcpy(destBuffer, *m_CurrentReadChunk + m_ReadPos, readLength);
+                    m_ReadPos += readLength;
+                    m_TotalBytesRead += readLength;
+                }
+
+                if (m_ReadPos == m_ChunkSize)
+                {
+                    m_FreeChunks.push_back(*m_CurrentReadChunk);
+                    m_CurrentReadChunk = m_UsedChunks.erase(m_CurrentReadChunk);
+                    m_ReadPos = 0;
+                }
+
+                return !m_Finished || m_TotalBytesRead < m_TotalBytesWritten;
             }
 
             [[nodiscard]] bool Finished() const
@@ -60,24 +128,53 @@ namespace Gorfector
 
             void RequestAbort()
             {
-                m_Abort = true;
+                m_AbortRequested = true;
             }
 
             void operator()()
             {
-                if (m_Buffer == nullptr || m_BufferSize <= 0)
+                if (m_CurrentWriteChunk == m_UsedChunks.end() || m_ImageSize <= 0)
                 {
                     return;
                 }
 
                 auto done = false;
-                while (!done && !m_Abort)
+                while (!done && !m_AbortRequested)
                 {
                     SANE_Int readLength = 0;
                     SANE_Int maxLength = static_cast<SANE_Int>(std::min(
-                            m_BufferSize - m_WrittenLength, static_cast<size_t>(std::numeric_limits<SANE_Int>::max())));
-                    done = !m_Device->Read(m_Buffer + m_WrittenLength, maxLength, &readLength);
-                    m_WrittenLength += readLength;
+                            m_ChunkSize - m_WritePos, static_cast<size_t>(std::numeric_limits<SANE_Int>::max())));
+                    done = !m_Device->Read(*m_CurrentWriteChunk + m_WritePos, maxLength, &readLength);
+
+                    {
+                        std::lock_guard lock(m_Mutex);
+
+                        m_WritePos += readLength;
+                        m_TotalBytesWritten += readLength;
+
+                        if (m_WritePos == m_ChunkSize)
+                        {
+                            m_WritePos = 0;
+                            m_CurrentWriteChunk = std::next(m_CurrentWriteChunk);
+
+                            if (m_CurrentWriteChunk == m_UsedChunks.end())
+                            {
+                                if (m_FreeChunks.empty())
+                                {
+                                    auto newChunk = new SANE_Byte[m_ChunkSize];
+                                    m_UsedChunks.push_back(newChunk);
+                                    m_CurrentWriteChunk = std::prev(m_UsedChunks.end());
+                                }
+                                else
+                                {
+                                    m_CurrentWriteChunk = m_FreeChunks.begin();
+                                    m_UsedChunks.push_back(*m_CurrentWriteChunk);
+                                    m_FreeChunks.erase(m_CurrentWriteChunk);
+                                    m_CurrentWriteChunk = std::prev(m_UsedChunks.end());
+                                }
+                            }
+                        }
+                    }
                 }
 
                 m_Finished = true;
@@ -109,17 +206,22 @@ namespace Gorfector
 
         virtual bool Update()
         {
+            if (m_ScanThread == nullptr)
+            {
+                auto bufferSize = static_cast<size_t>(m_ScanParameters.bytes_per_line) * m_ScanParameters.lines;
+                m_ScanThread = new ScanThread(m_Device, bufferSize);
+                auto t(std::thread(std::ref(*m_ScanThread)));
+                t.detach();
+
+                return true;
+            }
+
             size_t readLength = 0;
             SANE_Byte *readBuffer = nullptr;
             size_t maxReadLength = 0;
             GetBuffer(readBuffer, maxReadLength);
 
             if (readBuffer == nullptr || maxReadLength <= 0)
-            {
-                return false;
-            }
-
-            if (m_ScanThread == nullptr)
             {
                 return false;
             }
@@ -163,7 +265,7 @@ namespace Gorfector
                 m_ScanThread = nullptr;
             }
 
-            if (canceled && m_Device != nullptr)
+            if (m_Device != nullptr)
             {
                 m_Device->CancelScan();
             }
@@ -193,29 +295,26 @@ namespace Gorfector
             if (!m_Device->StartScan())
             {
                 Stop(true);
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan."));
                 return false;
             }
 
             if (!m_Device->GetParameters(&m_ScanParameters))
             {
                 Stop(true);
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
+                ZooLib::ShowUserError(
+                        ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan: cannot get parameters."));
                 return false;
             }
 
             if (!AfterStartScanChecks())
             {
                 Stop(true);
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Failed to start scan"));
+                // `AfterStartScanChecks()` already shows an error dialog
                 return false;
             }
 
             auto bufferSize = static_cast<size_t>(m_ScanParameters.bytes_per_line) * m_ScanParameters.lines;
-            m_ScanThread = new ScanThread(m_Device, bufferSize);
-            auto t(std::thread(std::ref(*m_ScanThread)));
-            t.detach();
-
             InstallGtkCallback();
 
             if (m_PreviewState != nullptr)

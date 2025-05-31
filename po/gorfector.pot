@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-30 11:59-0400\n"
+"POT-Creation-Date: 2025-05-30 23:37-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -262,33 +262,31 @@ msgstr ""
 msgid "Deflate Compression Level"
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:21 ../po/../src/PreferencesView.cpp:40
-msgid ""
-"0 = no compression, 9 = maximum compression. Higher compression levels may "
-"slow down the scanning process."
+#: ../po/../src/PreferencesView.cpp:20 ../po/../src/PreferencesView.cpp:38
+msgid "0 = no compression, 9 = maximum compression."
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:28
+#: ../po/../src/PreferencesView.cpp:26
 msgid "JPEG Quality"
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:29 ../po/../src/PreferencesView.cpp:52
+#: ../po/../src/PreferencesView.cpp:27 ../po/../src/PreferencesView.cpp:49
 msgid "0 = lowest quality, 100 = maximum quality."
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:34
+#: ../po/../src/PreferencesView.cpp:32
 msgid "PNG Settings"
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:38
+#: ../po/../src/PreferencesView.cpp:36
 msgid "Compression Level"
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:47
+#: ../po/../src/PreferencesView.cpp:44
 msgid "JPEG Settings"
 msgstr ""
 
-#: ../po/../src/PreferencesView.cpp:51
+#: ../po/../src/PreferencesView.cpp:48
 msgid "Quality"
 msgstr ""
 
@@ -420,7 +418,7 @@ msgid "Progress: "
 msgstr ""
 
 #: ../po/../src/PreviewScanProcess.hpp:37 ../po/../src/SingleScanProcess.hpp:32
-msgid "Unsupported format"
+msgid "Unsupported format."
 msgstr ""
 
 #: ../po/../src/ScanListPanel.cpp:24
@@ -557,17 +555,20 @@ msgstr ""
 msgid "Select Destination"
 msgstr ""
 
-#: ../po/../src/ScanProcess.hpp:196 ../po/../src/ScanProcess.hpp:203
-#: ../po/../src/ScanProcess.hpp:210
-msgid "Failed to start scan"
+#: ../po/../src/ScanProcess.hpp:298
+msgid "Failed to start scan."
+msgstr ""
+
+#: ../po/../src/ScanProcess.hpp:306
+msgid "Failed to start scan: cannot get parameters."
 msgstr ""
 
 #: ../po/../src/SingleScanProcess.hpp:38
-msgid "Unsupported depth"
+msgid "Unsupported depth."
 msgstr ""
 
 #: ../po/../src/SingleScanProcess.hpp:44
-msgid "Unsupported file format"
+msgid "Unsupported file format."
 msgstr ""
 
 #: ../po/../src/SingleScanProcess.hpp:51

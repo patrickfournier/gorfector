@@ -29,26 +29,26 @@ namespace Gorfector
         {
             if (m_ScanParameters.format != SANE_FRAME_GRAY && m_ScanParameters.format != SANE_FRAME_RGB)
             {
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format"));
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported format."));
                 return false;
             }
 
             if (m_ScanParameters.depth != 1 && m_ScanParameters.depth != 8 && m_ScanParameters.depth != 16)
             {
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported depth"));
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported depth."));
                 return false;
             }
 
             if (m_FileWriter == nullptr)
             {
-                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported file format"));
+                ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), _("Unsupported file format."));
                 return false;
             }
 
             if (auto error = m_FileWriter->CreateFile(m_ImageFilePath, m_ScanOptions, m_ScanParameters);
                 error != FileWriter::Error::None)
             {
-                auto errorString = std::string(_("Failed to create file: ")) + m_FileWriter->GetError(error);
+                auto errorString = std::string(_("Failed to create file: ")) + m_FileWriter->GetError(error) + ".";
                 ZooLib::ShowUserError(ADW_APPLICATION_WINDOW(m_MainWindow), errorString);
                 return false;
             }

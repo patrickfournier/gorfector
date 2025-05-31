@@ -17,9 +17,7 @@ void Gorfector::PreferencesView::BuildFileSettingsBox(GtkWidget *parent)
     m_TiffDeflateCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_TiffDeflateCompressionLevel), _("Deflate Compression Level"));
     adw_action_row_set_subtitle(
-            ADW_ACTION_ROW(m_TiffDeflateCompressionLevel),
-            _("0 = no compression, 9 = maximum compression. Higher compression levels may slow down the "
-              "scanning process."));
+            ADW_ACTION_ROW(m_TiffDeflateCompressionLevel), _("0 = no compression, 9 = maximum compression."));
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_TiffDeflateCompressionLevel);
     ZooLib::ConnectGtkSignalWithParamSpecs(
             this, &PreferencesView::OnValueChanged, m_TiffDeflateCompressionLevel, "notify::value");
@@ -37,8 +35,7 @@ void Gorfector::PreferencesView::BuildFileSettingsBox(GtkWidget *parent)
     m_PngCompressionLevel = adw_spin_row_new_with_range(0, 9, 1);
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_PngCompressionLevel), _("Compression Level"));
     adw_action_row_set_subtitle(
-            ADW_ACTION_ROW(m_PngCompressionLevel), _("0 = no compression, 9 = maximum compression. Higher "
-                                                     "compression levels may slow down the scanning process."));
+            ADW_ACTION_ROW(m_PngCompressionLevel), _("0 = no compression, 9 = maximum compression."));
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(prefGroup), m_PngCompressionLevel);
     ZooLib::ConnectGtkSignalWithParamSpecs(
             this, &PreferencesView::OnValueChanged, m_PngCompressionLevel, "notify::value");

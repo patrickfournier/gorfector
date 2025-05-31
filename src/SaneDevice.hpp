@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <glib.h>
 #include <sane/sane.h>
 
 namespace Gorfector
@@ -47,9 +48,12 @@ namespace Gorfector
 
         bool Open()
         {
+            g_debug("Opening device %s", m_Device->name);
+
             SANE_Status status = sane_open(m_Device->name, &m_Handle);
             if (status != SANE_STATUS_GOOD)
             {
+                g_debug("Failed to open device %s: %s", m_Device->name, sane_strstatus(status));
                 m_Handle = nullptr;
                 return false;
             }
@@ -60,6 +64,8 @@ namespace Gorfector
         {
             if (m_Handle != nullptr)
             {
+                g_debug("Closing device %s", m_Device->name);
+
                 sane_cancel(m_Handle);
                 sane_close(m_Handle);
             }
@@ -93,6 +99,8 @@ namespace Gorfector
                 return nullptr;
             }
 
+            g_debug("Getting option descriptor for option %d", optionIndex);
+
             const SANE_Option_Descriptor *optionDescriptor =
                     sane_get_option_descriptor(m_Handle, static_cast<int>(optionIndex));
             return optionDescriptor;
@@ -105,9 +113,13 @@ namespace Gorfector
                 return false;
             }
 
-            if (sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_GET_VALUE, value, nullptr) !=
-                SANE_STATUS_GOOD)
+            g_debug("Getting option %d value", optionIndex);
+
+            auto status =
+                    sane_control_option(m_Handle, static_cast<int>(optionIndex), SANE_ACTION_GET_VALUE, value, nullptr);
+            if (status != SANE_STATUS_GOOD)
             {
+                g_debug("Failed to get option value for option %d: %s", optionIndex, sane_strstatus(status));
                 return false;
             }
 
@@ -121,10 +133,16 @@ namespace Gorfector
                 return false;
             }
 
-            if (sane_control_option(
-                        m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_VALUE, value, optionInfo) !=
-                SANE_STATUS_GOOD)
+            int *intValue = static_cast<int *>(value);
+            char *charValue = static_cast<char *>(value);
+            g_debug("Setting option %d (%d) (%c%c%c%c)", optionIndex, *intValue, charValue[0], charValue[1],
+                    charValue[2], charValue[3]);
+
+            auto status = sane_control_option(
+                    m_Handle, static_cast<int>(optionIndex), SANE_ACTION_SET_VALUE, value, optionInfo);
+            if (status != SANE_STATUS_GOOD)
             {
+                g_debug("Failed to set option value for option %d: %s", optionIndex, sane_strstatus(status));
                 return false;
             }
 
@@ -138,8 +156,12 @@ namespace Gorfector
                 return false;
             }
 
-            if (sane_start(m_Handle) != SANE_STATUS_GOOD)
+            g_debug("Starting scan for device %s", m_Device->name);
+
+            auto status = sane_start(m_Handle);
+            if (status != SANE_STATUS_GOOD)
             {
+                g_debug("Failed to start scan: %s", sane_strstatus(status));
                 return false;
             }
 
@@ -153,16 +175,15 @@ namespace Gorfector
                 return false;
             }
 
-            switch (sane_read(m_Handle, buffer, maxLength, length))
+            auto status = sane_read(m_Handle, buffer, maxLength, length);
+            switch (status)
             {
                 case SANE_STATUS_GOOD:
                 case SANE_STATUS_DEVICE_BUSY:
                     return true;
 
-                case SANE_STATUS_CANCELLED:
-                case SANE_STATUS_EOF:
-                case SANE_STATUS_NO_DOCS:
                 default:
+                    g_debug("Failed to read from device %s: %s", m_Device->name, sane_strstatus(status));
                     return false;
             }
         }
@@ -174,6 +195,7 @@ namespace Gorfector
                 return;
             }
 
+            g_debug("Cancelling scan for device %s", m_Device->name);
             sane_cancel(m_Handle);
         }
 
@@ -189,8 +211,12 @@ namespace Gorfector
                 return false;
             }
 
-            if (sane_get_parameters(m_Handle, parameters) != SANE_STATUS_GOOD)
+            g_debug("Getting parameters for device %s", m_Device->name);
+
+            auto status = sane_get_parameters(m_Handle, parameters);
+            if (status != SANE_STATUS_GOOD)
             {
+                g_debug("Failed to get parameters for device %s: %s", m_Device->name, sane_strstatus(status));
                 return false;
             }
 
