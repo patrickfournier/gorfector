@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-30 23:37-0400\n"
+"POT-Creation-Date: 2025-05-31 23:15-0400\n"
 "PO-Revision-Date: 2025-05-30 23:39-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
@@ -432,11 +432,11 @@ msgstr "Inspecter le préréglage"
 msgid "Zoom:"
 msgstr "Zoom:"
 
-#: ../po/../src/PreviewPanel.cpp:873
+#: ../po/../src/PreviewPanel.cpp:888
 msgid "Progress: "
 msgstr "Progrès: "
 
-#: ../po/../src/PreviewScanProcess.hpp:37 ../po/../src/SingleScanProcess.hpp:32
+#: ../po/../src/PreviewScanProcess.hpp:39 ../po/../src/SingleScanProcess.hpp:32
 msgid "Unsupported format."
 msgstr "Format non pris en charge."
 
