@@ -17,7 +17,8 @@ void Gorfector::PreviewScanProcess::SetPreviewOptions() const
     }
     if (resolutionDescription != nullptr)
     {
-        SANE_Int resolution = resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(300) : 300;
+        SANE_Int resolution =
+                resolutionDescription->type == SANE_TYPE_FIXED ? SANE_FIX(k_DefaultResolution) : k_DefaultResolution;
         if (resolutionDescription->constraint_type == SANE_CONSTRAINT_RANGE)
         {
             resolution = std::clamp(

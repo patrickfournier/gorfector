@@ -54,7 +54,7 @@ namespace Gorfector
         const unsigned char *m_UnderlyingBuffer{};
         // Auxiliary buffer for the converted image, if scanned data is not in 8bit RGBA format.
         unsigned char *m_ConvertedImage{};
-        int m_ConvertedImageSize{};
+        size_t m_ConvertedImageSize{};
         int m_LastLineConverted{-1};
 
         bool m_IsDragging{};

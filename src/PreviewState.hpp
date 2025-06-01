@@ -67,14 +67,7 @@ namespace Gorfector
             ChangesetBase::Aggregate(changeset);
 
             m_ChangeType |= changeset.m_ChangeType;
-            if (changeset.m_LastLine == -1)
-            {
-                m_LastLine = -1;
-            }
-            else
-            {
-                m_LastLine = std::max(m_LastLine, changeset.m_LastLine);
-            }
+            m_LastLine = std::max(m_LastLine, changeset.m_LastLine);
         }
     };
 
@@ -378,6 +371,13 @@ namespace Gorfector
                     m_StateComponent->m_ImageSize = requestedSize;
                     m_StateComponent->m_Image =
                             static_cast<SANE_Byte *>(calloc(m_StateComponent->m_ImageSize, sizeof(SANE_Byte)));
+                }
+                else
+                {
+                    for (auto b = 0ul; b < m_StateComponent->m_ImageSize; ++b)
+                    {
+                        m_StateComponent->m_Image[b] = 0;
+                    }
                 }
 
                 m_StateComponent->m_Offset = 0;

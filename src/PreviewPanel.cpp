@@ -690,9 +690,10 @@ void Gorfector::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersio
     {
         if (const auto image = m_PreviewState->GetScannedImage(); image != nullptr)
         {
-            auto width = m_PreviewState->GetScannedPixelsPerLine();
-            auto bytesPerLine = m_PreviewState->GetScannedBytesPerLine();
-            auto height = m_PreviewState->GetScannedImageHeight();
+            const auto width = m_PreviewState->GetScannedPixelsPerLine();
+            const auto bytesPerLine = m_PreviewState->GetScannedBytesPerLine();
+            const auto height = m_PreviewState->GetScannedImageHeight();
+            const auto scannedImageSize = static_cast<size_t>(width) * height * 3;
 
             if (m_PreviewState->GetScannedImageBitDepth() == 8 &&
                 m_PreviewState->GetScannedImagePixelFormat() == SANE_FRAME_RGB)
@@ -727,13 +728,23 @@ void Gorfector::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersio
                     m_LastLineConverted = -1;
                     return;
                 }
-                if (lastLineToConvert < m_LastLineConverted || m_LastLineConverted >= height)
+                if (m_LastLineConverted == -1 || lastLineToConvert < m_LastLineConverted ||
+                    m_LastLineConverted >= height)
                 {
                     // Assume this is a new image.
                     m_LastLineConverted = -1;
+
+                    // Reset the converted image buffer if the size does match (otherwise it will be reallocated below).
+                    if (m_ConvertedImage != nullptr && m_ConvertedImageSize == scannedImageSize)
+                    {
+                        for (auto b = 0ul; b < m_ConvertedImageSize; ++b)
+                        {
+                            m_ConvertedImage[b] = 0;
+                        }
+                    }
                 }
 
-                if (m_ConvertedImage == nullptr || m_ConvertedImageSize != width * height * 3)
+                if (m_ConvertedImage == nullptr || m_ConvertedImageSize != scannedImageSize)
                 {
                     if (m_ScannedImage != nullptr)
                     {
@@ -742,8 +753,12 @@ void Gorfector::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersio
                     }
 
                     delete[] m_ConvertedImage;
-                    m_ConvertedImageSize = width * height * 3;
+                    m_ConvertedImageSize = scannedImageSize;
                     m_ConvertedImage = new unsigned char[m_ConvertedImageSize];
+                    for (auto b = 0ul; b < m_ConvertedImageSize; ++b)
+                    {
+                        m_ConvertedImage[b] = 0;
+                    }
                     m_UnderlyingBuffer = m_ConvertedImage;
 
                     m_ScannedImage = gdk_pixbuf_new_from_data(

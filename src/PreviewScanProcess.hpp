@@ -6,6 +6,8 @@ namespace Gorfector
 {
     class PreviewScanProcess final : public ScanProcess
     {
+        static constexpr int k_DefaultResolution = 300;
+
         void SetPreviewOptions() const;
         void RestoreOptionsAfterPreview() const;
 
@@ -70,6 +72,17 @@ namespace Gorfector
 
             SetPreviewOptions();
 
+            // Get actual resolution.
+            double previewResolution = k_DefaultResolution;
+            auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetResolutionIndex());
+            SANE_Int resolution;
+            if (resolutionDescription != nullptr &&
+                m_Device->GetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution))
+            {
+                previewResolution =
+                        resolutionDescription->type == SANE_TYPE_FIXED ? SANE_UNFIX(resolution) : resolution;
+            }
+
             if (!ScanProcess::Start())
             {
                 // Stop() has already been called
@@ -79,17 +92,6 @@ namespace Gorfector
 
             if (m_PreviewState != nullptr)
             {
-                // Get actual resolution.
-                double previewResolution = 400.0;
-                auto resolutionDescription = m_Device->GetOptionDescriptor(m_ScanOptions->GetResolutionIndex());
-                SANE_Int resolution;
-                if (resolutionDescription != nullptr &&
-                    m_Device->GetOptionValue(m_ScanOptions->GetResolutionIndex(), &resolution))
-                {
-                    previewResolution =
-                            resolutionDescription->type == SANE_TYPE_FIXED ? SANE_UNFIX(resolution) : resolution;
-                }
-
                 auto previewPanelUpdater = PreviewState::Updater(m_PreviewState);
                 previewPanelUpdater.PrepareForScan(
                         m_ScanParameters.pixels_per_line, m_ScanParameters.bytes_per_line, m_ScanParameters.lines,
