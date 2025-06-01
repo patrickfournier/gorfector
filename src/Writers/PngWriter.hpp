@@ -167,7 +167,9 @@ namespace Gorfector
             }
 
             std::string appId = GetApplicationName();
-            std::string creator = std::string(deviceOptions->GetDeviceVendor()) + " " + deviceOptions->GetDeviceModel();
+            std::string creator = deviceOptions != nullptr ? std::string(deviceOptions->GetDeviceVendor()) + " " +
+                                                                     deviceOptions->GetDeviceModel()
+                                                           : "";
 
             constexpr int numTexts = 2;
             png_text textData[numTexts];

@@ -40,6 +40,7 @@ meson install --destdir ../"${app_dir}"
 
 cd ../"${app_dir}" || exit
 rm -f usr/bin/gorfector-tests
+rm -rf usr/share/com.patrickfournier.gorfector/Tests
 mv usr/share/metainfo/com.patrickfournier.gorfector.metainfo.xml usr/share/metainfo/com.patrickfournier.gorfector.appdata.xml
 
 cd ..

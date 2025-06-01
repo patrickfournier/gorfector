@@ -131,7 +131,7 @@ namespace ZooLib
         template<typename TStateComponent>
         void SaveToFile(TStateComponent *stateComponent)
         {
-            if (stateComponent == nullptr)
+            if (stateComponent == nullptr || m_PreferencesFilePath.empty())
             {
                 return;
             }

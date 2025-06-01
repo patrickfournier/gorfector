@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to update the presets.
+- Tests for the image writers.
 
 ### Changed
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cancel Scans button from the scan list section now can cancel the preview scan.
 - PNG writer is now working.
 - Various crashes with the SANE test backend have been fixed.
+- Fixed a bug when writing 1-bit image to JPEG file.
 
 
 ## [0.1.0] - 2025-05-24

@@ -2,10 +2,30 @@
 
 #include <gtk/gtk.h>
 
+#include "CompareFiles.hpp"
+
+std::string g_DataDir{};
+bool g_CleanArtifacts{true};
+
 static int OnCommandLine(GtkApplication *app, GApplicationCommandLine *cmdline)
 {
     int argc;
     char **argv = g_application_command_line_get_arguments(cmdline, &argc);
+
+    for (auto i = 0; i < argc; ++i)
+    {
+        if (strncmp(argv[i], "--data_dir=", 11) == 0)
+        {
+            g_DataDir = argv[i];
+            g_DataDir = g_DataDir.substr(11); // Remove the "--data_dir=" prefix
+        }
+
+        if (strncmp(argv[i], "--leave_artifacts", 11) == 0)
+        {
+            g_CleanArtifacts = false;
+        }
+    }
+
     testing::InitGoogleTest(&argc, argv);
     g_strfreev(argv);
 

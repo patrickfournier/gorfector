@@ -127,7 +127,7 @@ namespace Gorfector
             m_CompressStruct->input_components = parameters.format == SANE_FRAME_RGB ? 3 : 1;
             m_CompressStruct->in_color_space = parameters.format == SANE_FRAME_RGB ? JCS_RGB : JCS_GRAYSCALE;
             jpeg_set_defaults(m_CompressStruct);
-            jpeg_set_quality(m_CompressStruct, m_StateComponent->GetQuality(), TRUE);
+            jpeg_set_quality(m_CompressStruct, m_StateComponent->GetQuality(), FALSE);
             jpeg_start_compress(m_CompressStruct, TRUE);
 
             return Error::None;
@@ -152,11 +152,12 @@ namespace Gorfector
                     std::min(numberOfLines, m_CompressStruct->image_height - m_CompressStruct->next_scanline);
 
             auto rowPointer = new JSAMPROW[numLinesToWrite];
+            SANE_Byte *auxBuffer = nullptr;
 
             if (parameters.depth == 1)
             {
                 // Convert 1-bit grayscale to 8-bit grayscale
-                auto *auxBuffer = new SANE_Byte[numLinesToWrite * parameters.pixels_per_line];
+                auxBuffer = new SANE_Byte[numLinesToWrite * parameters.pixels_per_line];
                 for (auto i = 0U; i < numLinesToWrite; ++i)
                 {
                     auto line = &bytes[i * parameters.bytes_per_line];
@@ -167,7 +168,6 @@ namespace Gorfector
                     }
                     rowPointer[i] = &auxBuffer[i * parameters.pixels_per_line];
                 }
-                delete[] auxBuffer;
             }
             else if (parameters.depth == 8)
             {
@@ -214,6 +214,8 @@ namespace Gorfector
             jpeg_write_scanlines(m_CompressStruct, rowPointer, numLinesToWrite);
 
             delete[] rowPointer;
+            delete[] auxBuffer;
+
             return numLinesToWrite * parameters.bytes_per_line;
         }
 

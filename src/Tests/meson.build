@@ -2,10 +2,18 @@ gtest_dep = dependency('gtest', required: true)
 xdo_dep = cx.find_library('xdo', required: true)
 
 gorfector_tests_sources = [
+    '../Writers/FileWriter.cpp',
+    '../Writers/JpegWriter.cpp',
+    '../Writers/PngWriter.cpp',
+    '../Writers/TiffWriter.cpp',
+
     '../ZooLib/Application.cpp',
     '../ZooLib/State.cpp',
 
+    '../DeviceOptionsState.cpp',
+
     'TestsSupport/Commands.cpp',
+    'TestsSupport/CompareFiles.cpp',
 
     'ZooLib/Application_tests.cpp',
     'ZooLib/AppMenuBarBuilder_tests.cpp',
@@ -18,8 +26,17 @@ gorfector_tests_sources = [
     'ZooLib/StringUtils_tests.cpp',
     'ZooLib/View_tests.cpp',
 
+    'JpegWriter_tests.cpp',
+    'PngWriter_tests.cpp',
+    'TiffWriter_tests.cpp',
+
     'main.cpp',
 ]
+
+test_data = install_subdir(
+    'Data',
+    install_dir: join_paths(get_option('datadir'), app_id, 'Tests'),
+)
 
 test_exe = executable(
     'gorfector-tests',
@@ -45,4 +62,5 @@ test_exe = executable(
     install : true
 )
 
-test('gorfector tests', test_exe, args: ['--gtest_color=yes'], verbose: true)
+test_data_dir = join_paths(meson.source_root(), 'src', 'Tests', 'Data')
+test('gorfector tests', test_exe, args: ['--gtest_color=yes', '--data_dir=' + test_data_dir], verbose: true)
