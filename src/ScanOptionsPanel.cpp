@@ -767,7 +767,7 @@ std::tuple<GtkWidget *, GtkWidget *> Gorfector::ScanOptionsPanel::AddScannerOpti
                 gtk_widget_set_tooltip_text(button, description);
             }
 
-            auto isDisplayOnly = m_Rewriter->IsDisplayOnly(optionIndex, optionValue->IsDisplayOnly());
+            auto isDisplayOnly = m_Rewriter->IsDisplayOnly(optionIndex, SaneDevice::IsDisplayOnly(*optionDescriptor));
             if (isDisplayOnly)
             {
                 gtk_widget_set_sensitive(button, false);
