@@ -642,10 +642,13 @@ void Gorfector::DeviceOptionsState::Updater::LoadFromJson(const nlohmann::json &
 
 bool Gorfector::DeviceOptionsState::IsPreview() const
 {
-    auto optionValue = m_OptionValues[m_PreviewIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "preview") == 0))
+    if (m_PreviewIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<bool> *>(optionValue)->GetValue(0) != 0;
+        auto optionValue = m_OptionValues[m_PreviewIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "preview") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<bool> *>(optionValue)->GetValue(0) != 0;
+        }
     }
 
     return false;
@@ -653,10 +656,13 @@ bool Gorfector::DeviceOptionsState::IsPreview() const
 
 std::string Gorfector::DeviceOptionsState::GetMode() const
 {
-    auto optionValue = m_OptionValues[m_ModeIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "mode") == 0))
+    if (m_ModeIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<std::string> *>(optionValue)->GetValue(0);
+        auto optionValue = m_OptionValues[m_ModeIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "mode") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<std::string> *>(optionValue)->GetValue(0);
+        }
     }
 
     return "";
@@ -664,10 +670,13 @@ std::string Gorfector::DeviceOptionsState::GetMode() const
 
 Gorfector::ScanAreaUnit Gorfector::DeviceOptionsState::GetScanAreaUnit() const
 {
-    auto optionValue = m_OptionValues[m_TLXIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "tl-x") == 0))
+    if (m_TLXIndex != std::numeric_limits<uint32_t>::max())
     {
-        return optionValue->GetUnit() == SANE_UNIT_DPI ? ScanAreaUnit::e_Pixels : ScanAreaUnit::e_Millimeters;
+        auto optionValue = m_OptionValues[m_TLXIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "tl-x") == 0))
+        {
+            return optionValue->GetUnit() == SANE_UNIT_DPI ? ScanAreaUnit::e_Pixels : ScanAreaUnit::e_Millimeters;
+        }
     }
 
     return ScanAreaUnit::e_Pixels;
@@ -727,6 +736,12 @@ Gorfector::Rect<double> Gorfector::DeviceOptionsState::GetMaxScanArea() const
     int top = 0, bottom = 0;
     SANE_Value_Type valueType = SANE_TYPE_INT;
 
+    if (m_TLXIndex == std::numeric_limits<uint32_t>::max() || m_TLYIndex == std::numeric_limits<uint32_t>::max() ||
+        m_BRXIndex == std::numeric_limits<uint32_t>::max() || m_BRYIndex == std::numeric_limits<uint32_t>::max())
+    {
+        return {};
+    }
+
     auto optionValue = m_OptionValues[m_TLXIndex];
     if (optionValue != nullptr && (strcmp(optionValue->GetName(), "tl-x") == 0))
     {
@@ -779,10 +794,13 @@ Gorfector::Rect<double> Gorfector::DeviceOptionsState::GetMaxScanArea() const
 
 int Gorfector::DeviceOptionsState::GetResolution() const
 {
-    auto optionValue = m_OptionValues[m_ResolutionIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "resolution") == 0))
+    if (m_ResolutionIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        auto optionValue = m_OptionValues[m_ResolutionIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "resolution") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        }
     }
 
     return 0;
@@ -790,10 +808,13 @@ int Gorfector::DeviceOptionsState::GetResolution() const
 
 int Gorfector::DeviceOptionsState::GetXResolution() const
 {
-    auto optionValue = m_OptionValues[m_XResolutionIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "x-resolution") == 0))
+    if (m_XResolutionIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        auto optionValue = m_OptionValues[m_XResolutionIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "x-resolution") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        }
     }
 
     return GetResolution();
@@ -801,10 +822,13 @@ int Gorfector::DeviceOptionsState::GetXResolution() const
 
 int Gorfector::DeviceOptionsState::GetYResolution() const
 {
-    auto optionValue = m_OptionValues[m_YResolutionIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "y-resolution") == 0))
+    if (m_YResolutionIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        auto optionValue = m_OptionValues[m_YResolutionIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "y-resolution") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        }
     }
 
     return GetResolution();
@@ -812,10 +836,13 @@ int Gorfector::DeviceOptionsState::GetYResolution() const
 
 int Gorfector::DeviceOptionsState::GetBitDepth() const
 {
-    auto optionValue = m_OptionValues[m_BitDepthIndex];
-    if (optionValue != nullptr && (strcmp(optionValue->GetName(), "depth") == 0))
+    if (m_BitDepthIndex != std::numeric_limits<uint32_t>::max())
     {
-        return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        auto optionValue = m_OptionValues[m_BitDepthIndex];
+        if (optionValue != nullptr && (strcmp(optionValue->GetName(), "depth") == 0))
+        {
+            return dynamic_cast<DeviceOptionValue<int> *>(optionValue)->GetValue(0);
+        }
     }
 
     return 8;
