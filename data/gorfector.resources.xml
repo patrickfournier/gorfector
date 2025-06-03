@@ -6,4 +6,7 @@
     <gresource prefix="/com/patrickfournier/gorfector/icons/scalable/actions/">
         <file alias="apply-symbolic.svg" preprocess="xml-stripblanks">icons/hicolor/scalable/actions/pip-out-symbolic.svg</file>
     </gresource>
+    <gresource prefix="/com/patrickfournier/gorfector/icons/scalable/actions/">
+        <file alias="move-tool-symbolic.svg" preprocess="xml-stripblanks">icons/hicolor/scalable/actions/move-tool-symbolic.svg</file>
+    </gresource>
 </gresources>

@@ -47,6 +47,11 @@ namespace Gorfector
         GdkPixbuf *m_ScannedImage{};
         // The whole preview image, including the checkerboard.
         GtkWidget *m_PreviewImage{};
+        GtkWidget *m_PanToggleButton;
+        GtkWidget *m_CropToggleButton;
+
+        gulong m_PanToggleButtonSignalId;
+        gulong m_CropToggleButtonSignalId;
 
         // The scanned data
         GdkPixbuf *m_PreviewPixBuf{};
@@ -77,6 +82,8 @@ namespace Gorfector
         void OnPreviewDraw(cairo_t *cr) const;
 
         void OnResized(GtkWidget *widget, void *data, void *);
+        void OnCropButtonToggled(GtkToggleButton *button, void *data);
+        void OnPanButtonToggled(GtkToggleButton *button, void *data);
         void OnZoomDropDownChanged(GtkDropDown *dropDown, void *data);
 
         void ComputeScanArea(double deltaX, double deltaY, Rect<double> &outScanArea) const;

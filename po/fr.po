@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gorfector master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-31 23:15-0400\n"
-"PO-Revision-Date: 2025-05-30 23:39-0400\n"
+"POT-Creation-Date: 2025-06-03 19:14-0400\n"
+"PO-Revision-Date: 2025-06-03 18:53-0400\n"
 "Last-Translator: Patrick Fournier <>\n"
 "Language-Team: French - Canada\n"
 "Language: fr_CA\n"
@@ -210,7 +210,7 @@ msgid "The file \"%s\" already exists. Really overwrite it?"
 msgstr "Le fichier \"%s\" existe déjà. Voulez-vous vraiment l'écraser?"
 
 #: ../po/../src/App.cpp:647 ../po/../src/PresetPanel.cpp:89
-#: ../po/../src/ScanListPanel.cpp:209 ../po/../src/ScanListPanel.cpp:335
+#: ../po/../src/ScanListPanel.cpp:204 ../po/../src/ScanListPanel.cpp:330
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -373,8 +373,8 @@ msgstr "Supprimer ce préréglage"
 msgid "Are you sure you want to delete the preset \"%s\"?"
 msgstr "Voulez-vous vraiment supprimer le préréglage \"%s\"?"
 
-#: ../po/../src/PresetPanel.cpp:89 ../po/../src/ScanListPanel.cpp:302
-#: ../po/../src/ScanListPanel.cpp:335
+#: ../po/../src/PresetPanel.cpp:89 ../po/../src/ScanListPanel.cpp:297
+#: ../po/../src/ScanListPanel.cpp:330
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -428,11 +428,20 @@ msgstr "Modifier"
 msgid "Inspect Preset"
 msgstr "Inspecter le préréglage"
 
-#: ../po/../src/PreviewPanel.cpp:43
+#: ../po/../src/PreviewPanel.cpp:54
+msgid "Pan. Use Shift to define the scan area."
+msgstr "Déplacer l'image. Enfoncer Shift pour définir la zone de numérisation."
+
+#: ../po/../src/PreviewPanel.cpp:62
+msgid "Select Scan Area. Use Shift to pan."
+msgstr ""
+"Sélectionner la zone de numérisation. Enfoncer Shift pour déplacer l'image."
+
+#: ../po/../src/PreviewPanel.cpp:68
 msgid "Zoom:"
 msgstr "Zoom:"
 
-#: ../po/../src/PreviewPanel.cpp:888
+#: ../po/../src/PreviewPanel.cpp:945
 msgid "Progress: "
 msgstr "Progrès: "
 
@@ -452,11 +461,11 @@ msgstr "Monter"
 msgid "Move Item Down"
 msgstr "Descendre"
 
-#: ../po/../src/ScanListPanel.cpp:87 ../po/../src/ScanListPanel.cpp:443
+#: ../po/../src/ScanListPanel.cpp:87 ../po/../src/ScanListPanel.cpp:438
 msgid "Add Scan Area"
 msgstr "Ajouter une zone"
 
-#: ../po/../src/ScanListPanel.cpp:88 ../po/../src/ScanListPanel.cpp:439
+#: ../po/../src/ScanListPanel.cpp:88 ../po/../src/ScanListPanel.cpp:434
 msgid "Add All Params"
 msgstr "Ajouter tous les paramètres"
 
@@ -472,27 +481,27 @@ msgstr "Tout numériser"
 msgid "Cancel Scans"
 msgstr "Annuler les numérisations"
 
-#: ../po/../src/ScanListPanel.cpp:207
+#: ../po/../src/ScanListPanel.cpp:202
 msgid "Clear Scan List"
 msgstr "Vider la liste de numérisation"
 
-#: ../po/../src/ScanListPanel.cpp:208
+#: ../po/../src/ScanListPanel.cpp:203
 msgid "Are you sure you want to clear the scan list?"
 msgstr "Voulez-vous vraiment vider la liste de numérisation ?"
 
-#: ../po/../src/ScanListPanel.cpp:209
+#: ../po/../src/ScanListPanel.cpp:204
 msgid "Clear"
 msgstr "Vider"
 
-#: ../po/../src/ScanListPanel.cpp:289
+#: ../po/../src/ScanListPanel.cpp:284
 msgid "Load"
 msgstr "Charger les réglages"
 
-#: ../po/../src/ScanListPanel.cpp:332
+#: ../po/../src/ScanListPanel.cpp:327
 msgid "Delete Scan"
 msgstr "Supprimer l'item"
 
-#: ../po/../src/ScanListPanel.cpp:334
+#: ../po/../src/ScanListPanel.cpp:329
 #, c-format
 msgid "Are you sure you want to delete the scan item #%03d ?"
 msgstr "Voulez-vous vraiment supprimer l'item #%03d ?"
@@ -1241,61 +1250,3 @@ msgstr "Bas"
 #: scanners/scanner_strings.h:173
 msgid "High"
 msgstr "Haut"
-
-#~ msgid ""
-#~ "0 = no compression, 9 = maximum compression. Higher compression levels "
-#~ "may slow down the scanning process."
-#~ msgstr ""
-#~ "0 = pas de compression, 9 = compression maximale. Des niveaux de "
-#~ "compression plus élevés peuvent ralentir le processus de numérisation."
-
-#~ msgid "Cannot open scanner {}."
-#~ msgstr "Impossible d'ouvrir le scanner {}."
-
-#~ msgid "Rename"
-#~ msgstr "Renommer"
-
-#~ msgid "Rename this preset"
-#~ msgstr "Renommer ce préréglage"
-
-#~ msgid "Rename Preset"
-#~ msgstr "Renommer le préréglage"
-
-#~ msgid "Add to List"
-#~ msgstr "Ajouter à la liste"
-
-#~ msgid "<Printer>"
-#~ msgstr "<Imprimante>"
-
-#~ msgid "<Email>"
-#~ msgstr "<Courriel>"
-
-#~ msgid "View this preset"
-#~ msgstr "Inspecter ce préréglage"
-
-#~ msgid "All Files"
-#~ msgstr "Tous les fichiers"
-
-#~ msgid "Ask"
-#~ msgstr "Demander"
-
-#~ msgid "Cannot determine image file format"
-#~ msgstr "Impossible de déterminer le format de fichier image"
-
-#~ msgid "File Format"
-#~ msgstr "Format d'image"
-
-#~ msgid "JPEG"
-#~ msgstr "JPEG"
-
-#~ msgid "PNG"
-#~ msgstr "PNG"
-
-#~ msgid "Save Scan"
-#~ msgstr "Enregistrer l'image"
-
-#~ msgid "TIFF"
-#~ msgstr "TIFF"
-
-#~ msgid "Use Extension"
-#~ msgstr "Selon l'extension"

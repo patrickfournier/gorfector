@@ -1,3 +1,7 @@
+languages = [
+    'fr',
+]
+
 gnome.yelp ('gorfector',
             sources: [
                 'cropping.page',
@@ -12,4 +16,5 @@ gnome.yelp ('gorfector',
             media: [
                 'figures/gorfector.png',
             ],
+            languages: languages,
             symlink_media: false)

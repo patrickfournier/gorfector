@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-05-27 00:12-0400\n"
+"POT-Creation-Date: 2025-06-03 11:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,16 +26,16 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: ../help/C/cropping.page:20
-msgid "Once you have done a preview scan, you can set the area for the final scan by holding the <key>Shift</key> key and drawing a rectangle with the mouse on the preview image. The rectangle you draw will be the area that is scanned. You can adjust the rectangle by clicking and dragging its corners or edges while holding the <key>Shift</key> key. You can also move the rectangle by clicking and dragging it while holding the <keyseq><key>Shift</key><key>Alt</key></keyseq> keys."
+msgid "Once you have done a preview scan, you need to define the area for the final scan. You can inspect the preview image and decide which part of the image you want to keep. Press the <gui>Pan</gui> button located below the preview image and then pan the image by dragging it with the mouse. Zoom in or out using the <keyseq><key>Ctrl</key><key>Mouse Wheel</key></keyseq>."
 msgstr ""
 
 #. (itstool) path: page/p
-#: ../help/C/cropping.page:27
-msgid "You can pan and zoom the preview image for better precision: pan by dragging the image with the mouse and zoom using <keyseq><key>Ctrl</key><key>Mouse Wheel</key></keyseq>."
+#: ../help/C/cropping.page:26
+msgid "Once you have inspected the preview image, you may want to crop it to a specific area before scanning. To do so, you can use the <gui>Scan Area</gui> tool by clicking the <gui>Scan Area</gui> button located below the preview image. If you prefer, you can also press the <key>Shift</key> while using the <gui>Pan</gui> tool to temporarily enable the <gui>Scan Area</gui> tool. Then, using the mouse, you can draw a rectangle on the preview image to define the area you want to scan. You can adjust the rectangle by clicking and dragging its corners or edges. You can also move the rectangle by clicking and dragging it while holding the <key>Alt</key> key."
 msgstr ""
 
 #. (itstool) path: page/p
-#: ../help/C/cropping.page:29
+#: ../help/C/cropping.page:36
 msgid "You can also set the scan area by entering the coordinates of the rectangle in the <gui>Scan Area</gui> section of the <gui>Basic</gui> parameter tab. Some scanners may offer additional cropping options, such as selecting a size from a predefined list of common media sizes."
 msgstr ""
 

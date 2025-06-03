@@ -1,7 +1,6 @@
 # TODO
 
 - Rotate preview
-- Have toolbar for pan/select modes
 - Histogram
 - Define aspect ratio
 

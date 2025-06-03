@@ -3,6 +3,7 @@
 #include "Commands/SetPanCommand.hpp"
 #include "Commands/SetScanAreaCommand.hpp"
 #include "Commands/SetZoomCommand.hpp"
+#include "SetMouseBehaviorCommand.hpp"
 #include "ZooLib/Gettext.hpp"
 #include "ZooLib/SignalSupport.hpp"
 
@@ -40,6 +41,30 @@ Gorfector::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatche
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_grid_attach(GTK_GRID(m_RootWidget), box, 0, 1, 1, 1);
+
+    auto buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_append(GTK_BOX(box), buttonBox);
+    gtk_widget_add_css_class(GTK_WIDGET(buttonBox), "linked");
+    gtk_widget_add_css_class(GTK_WIDGET(buttonBox), "horizontal");
+    gtk_widget_set_margin_end(buttonBox, 10);
+
+    m_PanToggleButton = gtk_toggle_button_new();
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_PanToggleButton), true);
+    gtk_button_set_icon_name(GTK_BUTTON(m_PanToggleButton), "move-tool-symbolic");
+    gtk_widget_set_tooltip_text(m_PanToggleButton, _("Pan. Use Shift to define the scan area."));
+    gtk_widget_set_size_request(m_PanToggleButton, 32, 32);
+    gtk_box_append(GTK_BOX(buttonBox), m_PanToggleButton);
+    m_PanToggleButtonSignalId = ConnectGtkSignal(this, &PreviewPanel::OnPanButtonToggled, m_PanToggleButton, "toggled");
+
+    m_CropToggleButton = gtk_toggle_button_new();
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_CropToggleButton), false);
+    gtk_button_set_icon_name(GTK_BUTTON(m_CropToggleButton), "crop-symbolic");
+    gtk_widget_set_tooltip_text(m_CropToggleButton, _("Select Scan Area. Use Shift to pan."));
+    gtk_widget_set_size_request(m_CropToggleButton, 32, 32);
+    gtk_box_append(GTK_BOX(buttonBox), m_CropToggleButton);
+    m_CropToggleButtonSignalId =
+            ConnectGtkSignal(this, &PreviewPanel::OnCropButtonToggled, m_CropToggleButton, "toggled");
+
     auto label = gtk_label_new(_("Zoom:"));
     gtk_box_append(GTK_BOX(box), label);
 
@@ -81,12 +106,14 @@ Gorfector::PreviewPanel::PreviewPanel(ZooLib::CommandDispatcher *parentDispatche
 
     m_Dispatcher.RegisterHandler(SetPanCommand::Execute, m_PreviewState);
     m_Dispatcher.RegisterHandler(SetZoomCommand::Execute, m_PreviewState);
+    m_Dispatcher.RegisterHandler(SetMouseBehaviorCommand::Execute, m_PreviewState);
 }
 
 Gorfector::PreviewPanel::~PreviewPanel()
 {
     m_Dispatcher.UnregisterHandler<SetPanCommand>();
     m_Dispatcher.UnregisterHandler<SetZoomCommand>();
+    m_Dispatcher.UnregisterHandler<SetMouseBehaviorCommand>();
 
     m_App->GetObserverManager()->RemoveObserver(m_ViewUpdateObserver);
 
@@ -123,6 +150,20 @@ void Gorfector::PreviewPanel::OnResized(GtkWidget *widget, void *data, void *)
 
     auto updater = PreviewState::Updater(m_PreviewState);
     updater.SetPreviewWindowSize(width, height);
+}
+
+void Gorfector::PreviewPanel::OnCropButtonToggled(GtkToggleButton *button, void *data)
+{
+    auto isActive = gtk_toggle_button_get_active(button);
+    auto mouseBehavior = isActive ? PreviewState::MouseBehavior::Crop : PreviewState::MouseBehavior::Pan;
+    m_Dispatcher.Dispatch(SetMouseBehaviorCommand(mouseBehavior));
+}
+
+void Gorfector::PreviewPanel::OnPanButtonToggled(GtkToggleButton *button, void *data)
+{
+    auto isActive = gtk_toggle_button_get_active(button);
+    auto mouseBehavior = isActive ? PreviewState::MouseBehavior::Pan : PreviewState::MouseBehavior::Crop;
+    m_Dispatcher.Dispatch(SetMouseBehaviorCommand(mouseBehavior));
 }
 
 void Gorfector::PreviewPanel::OnZoomDropDownChanged(GtkDropDown *dropDown, void *data)
@@ -420,10 +461,26 @@ void Gorfector::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
     gtk_gesture_drag_get_start_point(dragController, &m_DragStartX, &m_DragStartY);
     gtk_gesture_drag_get_offset(dragController, &x, &y);
 
-    auto modifiers = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(dragController)) & gdkModifiers;
-    auto isShiftAndMaybeAlt = ((modifiers ^ (GDK_SHIFT_MASK | GDK_ALT_MASK)) | GDK_ALT_MASK) == GDK_ALT_MASK;
+    bool isCropping = false;
+    bool isPanning = false;
 
-    if (isShiftAndMaybeAlt)
+    auto modifiers = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(dragController)) & gdkModifiers;
+    if (m_PreviewState->GetDefaultMouseBehavior() == PreviewState::MouseBehavior::Crop)
+    {
+        auto isShift = (modifiers & GDK_SHIFT_MASK) != 0;
+
+        isCropping = !isShift;
+        isPanning = isShift;
+    }
+    else if (m_PreviewState->GetDefaultMouseBehavior() == PreviewState::MouseBehavior::Pan)
+    {
+        auto isShiftAndMaybeAlt = ((modifiers ^ (GDK_SHIFT_MASK | GDK_ALT_MASK)) | GDK_ALT_MASK) == GDK_ALT_MASK;
+
+        isCropping = isShiftAndMaybeAlt;
+        isPanning = modifiers == 0;
+    }
+
+    if (isCropping)
     {
         if (auto deviceOptions = m_App->GetDeviceOptions();
             deviceOptions != nullptr && ScanAreaToPixels(deviceOptions->GetScanArea(), m_PixelScanArea))
@@ -480,7 +537,7 @@ void Gorfector::PreviewPanel::OnPreviewDragBegin(GtkGestureDrag *dragController)
         ComputeScanArea(x, y, scanArea);
         m_Dispatcher.Dispatch(SetScanAreaCommand(scanArea));
     }
-    else if (modifiers == 0)
+    else if (isPanning)
     {
         m_OriginalPan = m_PreviewState->GetPreviewPanOffset();
         m_DragMode = DragMode::Pan;
@@ -896,6 +953,30 @@ void Gorfector::PreviewPanel::Update(const std::vector<uint64_t> &lastSeenVersio
 
             gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_ProgressBar), current);
             gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_ProgressBar), text.c_str());
+        }
+    }
+
+    if (changeset->IsChanged(PreviewStateChangeset::TypeFlag::MouseBehavior))
+    {
+        auto mouseBehavior = m_PreviewState->GetDefaultMouseBehavior();
+        auto isPan = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_PanToggleButton));
+        auto isCrop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_CropToggleButton));
+        auto isCoherent = isPan ^ isCrop;
+        auto isUpToDate = (mouseBehavior == PreviewState::MouseBehavior::Pan && isPan) ||
+                          (mouseBehavior == PreviewState::MouseBehavior::Crop && isCrop);
+
+        if (!isCoherent || !isUpToDate)
+        {
+            g_signal_handler_block(m_PanToggleButton, m_PanToggleButtonSignalId);
+            g_signal_handler_block(m_CropToggleButton, m_CropToggleButtonSignalId);
+
+            gtk_toggle_button_set_active(
+                    GTK_TOGGLE_BUTTON(m_PanToggleButton), mouseBehavior == PreviewState::MouseBehavior::Pan);
+            gtk_toggle_button_set_active(
+                    GTK_TOGGLE_BUTTON(m_CropToggleButton), mouseBehavior == PreviewState::MouseBehavior::Crop);
+
+            g_signal_handler_unblock(m_PanToggleButton, m_PanToggleButtonSignalId);
+            g_signal_handler_unblock(m_CropToggleButton, m_CropToggleButtonSignalId);
         }
     }
 

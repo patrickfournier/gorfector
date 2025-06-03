@@ -53,7 +53,7 @@ void Gorfector::ScanListPanel::BuildUI()
     gtk_widget_set_vexpand(m_ListBox, FALSE);
     gtk_widget_set_valign(m_ListBox, GTK_ALIGN_START);
     gtk_widget_set_css_classes(m_ListBox, scanListClasses);
-    ConnectGtkSignal(this, &ScanListPanel::OnItemSelected, m_ListBox, "row-selected");
+    m_OnItemSelectedSignalId = ConnectGtkSignal(this, &ScanListPanel::OnItemSelected, m_ListBox, "row-selected");
     gtk_viewport_set_child(GTK_VIEWPORT(viewport), m_ListBox);
 
     auto upDownBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -122,11 +122,6 @@ void Gorfector::ScanListPanel::BuildUI()
 
 void Gorfector::ScanListPanel::OnItemSelected(GtkListBox *listBox, GtkListBoxRow *row)
 {
-    if (m_BlockOnItemSelected)
-    {
-        return;
-    }
-
     int rowId = -1;
     if (row != nullptr)
     {
@@ -365,7 +360,7 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
 
     if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ListContent))
     {
-        m_BlockOnItemSelected = true;
+        g_signal_handler_block(m_ListBox, m_OnItemSelectedSignalId);
 
         m_Dispatcher.UnregisterHandler<LoadScanItemCommand>();
         m_Dispatcher.RegisterHandler(
@@ -401,7 +396,7 @@ void Gorfector::ScanListPanel::Update(const std::vector<uint64_t> &lastSeenVersi
         gtk_list_box_bind_model(
                 GTK_LIST_BOX(m_ListBox), G_LIST_MODEL(scanListModel), &Gorfector::CreateScanListItem, this, nullptr);
 
-        m_BlockOnItemSelected = false;
+        g_signal_handler_unblock(m_ListBox, m_OnItemSelectedSignalId);
     }
 
     if (forceUpdate || changeset->IsChanged(ScanListStateChangeset::TypeFlag::ScanActivity))

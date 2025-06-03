@@ -32,9 +32,9 @@ namespace Gorfector
         GtkWidget *m_MoveItemUpButton{};
         GtkWidget *m_MoveItemDownButton{};
 
-        ScanProcess *m_ScanProcess{};
+        gulong m_OnItemSelectedSignalId;
 
-        bool m_BlockOnItemSelected{};
+        ScanProcess *m_ScanProcess{};
 
         ScanListPanel(ZooLib::CommandDispatcher *parentDispatcher, App *app)
             : m_App(app)

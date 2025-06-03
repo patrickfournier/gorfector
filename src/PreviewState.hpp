@@ -20,6 +20,7 @@ namespace Gorfector
             ScanArea = 4,
             Image = 8,
             Progress = 16,
+            MouseBehavior = 32,
         };
 
     private:
@@ -78,6 +79,12 @@ namespace Gorfector
                                                              "x2", "x4",   "x8",  "x16", nullptr};
         static constexpr double k_ZoomValues[] = {0., .0625, .125, .25, .5, 1.0, 2.0, 4.0, 8.0, 16.0};
 
+        enum class MouseBehavior
+        {
+            Pan = 0,
+            Crop = 1,
+        };
+
     private:
         int m_PreviewWindowWidth{};
         int m_PreviewWindowHeight{};
@@ -100,6 +107,8 @@ namespace Gorfector
         uint64_t m_ProgressMin{};
         uint64_t m_ProgressMax{};
         uint64_t m_ProgressCurrent{};
+
+        MouseBehavior m_DefaultMouseBehavior{};
 
         ZooLib::ChangesetManager<PreviewStateChangeset> m_ChangesetManager{};
 
@@ -262,6 +271,11 @@ namespace Gorfector
             }
 
             return k_ZoomValues[nearestIndex];
+        }
+
+        [[nodiscard]] MouseBehavior GetDefaultMouseBehavior() const
+        {
+            return m_DefaultMouseBehavior;
         }
 
         [[nodiscard]] ZooLib::ChangesetManagerBase *GetChangesetManager() override
@@ -453,6 +467,19 @@ namespace Gorfector
 
                 auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
+            }
+
+            void SetDefaultMouseBehavior(MouseBehavior behavior)
+            {
+                if (m_StateComponent->m_DefaultMouseBehavior == behavior)
+                {
+                    return;
+                }
+
+                m_StateComponent->m_DefaultMouseBehavior = behavior;
+
+                auto changeset = m_StateComponent->GetCurrentChangeset();
+                changeset->Set(PreviewStateChangeset::TypeFlag::MouseBehavior);
             }
         };
     };

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to update the presets.
+- Buttons to switch between pan mode and crop mode in the preview image.
 - Tests for the image writers.
 
 ### Changed
