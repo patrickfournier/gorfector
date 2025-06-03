@@ -81,6 +81,23 @@ namespace ZooLib
         }
 
         /**
+         * \brief Gets the last observed version of the observed state component.
+         * \param stateComponent A pointer to the state component for which to retrieve the observed version.
+         * \return The last observed version of the state component, or 0 if it is not being observed.
+         */
+        [[nodiscard]] uint64_t GetObservedVersion(const StateComponent *stateComponent) const
+        {
+            auto it = std::ranges::find(m_ObservedComponents, stateComponent);
+            if (it != m_ObservedComponents.end())
+            {
+                auto index = std::distance(m_ObservedComponents.begin(), it);
+                return m_ObservedComponentVersions[index];
+            }
+
+            return 0;
+        }
+
+        /**
          * \brief Checks for changes in the observed components and updates their versions.
          *
          * This method iterates through the observed components and compares their current versions

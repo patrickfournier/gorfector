@@ -48,7 +48,7 @@ namespace Gorfector
         }
     };
 
-    class AppState final : public ZooLib::StateComponent, public ZooLib::ChangesetManager<AppStateChangeset>
+    class AppState final : public ZooLib::StateComponent
     {
     public:
         static constexpr const char *k_UseScanListKey = "UseScanList";
@@ -66,9 +66,11 @@ namespace Gorfector
         bool m_IsScanning{};
         bool m_IsPreviewing{};
 
+        ZooLib::ChangesetManager<AppStateChangeset> m_ChangesetManager{};
+
         [[nodiscard]] AppStateChangeset *GetCurrentChangeset()
         {
-            return ChangesetManager::GetCurrentChangeset(GetVersion());
+            return m_ChangesetManager.GetCurrentChangeset(GetVersion());
         }
 
         friend void to_json(nlohmann::json &j, const AppState &state);
@@ -126,6 +128,16 @@ namespace Gorfector
             return m_IsPreviewing;
         }
 
+        [[nodiscard]] ZooLib::ChangesetManagerBase *GetChangesetManager() override
+        {
+            return &m_ChangesetManager;
+        }
+
+        [[nodiscard]] AppStateChangeset *GetAggregatedChangeset(uint64_t stateComponentVersion) const
+        {
+            return m_ChangesetManager.GetAggregatedChangeset(stateComponentVersion);
+        }
+
         class Updater final : public StateComponent::Updater<AppState>
         {
         public:
@@ -136,7 +148,7 @@ namespace Gorfector
 
             ~Updater() override
             {
-                m_StateComponent->PushCurrentChangeset();
+                m_StateComponent->m_ChangesetManager.PushCurrentChangeset();
             }
 
             void LoadFromJson(const nlohmann::json &json) override

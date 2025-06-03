@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChangesetManager.hpp"
 #include "State.hpp"
 
 namespace ZooLib
@@ -70,6 +71,11 @@ namespace ZooLib
         [[nodiscard]] virtual std::string GetSerializationKey() const
         {
             return {};
+        }
+
+        [[nodiscard]] virtual ChangesetManagerBase *GetChangesetManager()
+        {
+            return nullptr;
         }
 
         /**

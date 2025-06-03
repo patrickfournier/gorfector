@@ -71,7 +71,7 @@ namespace Gorfector
         }
     };
 
-    class PreviewState final : public ZooLib::StateComponent, public ZooLib::ChangesetManager<PreviewStateChangeset>
+    class PreviewState final : public ZooLib::StateComponent
     {
     public:
         static constexpr const char *k_ZoomValueStrings[] = {"-",  "1/16", "1/8", "1/4", "1/2",  "x1",
@@ -100,6 +100,13 @@ namespace Gorfector
         uint64_t m_ProgressMin{};
         uint64_t m_ProgressMax{};
         uint64_t m_ProgressCurrent{};
+
+        ZooLib::ChangesetManager<PreviewStateChangeset> m_ChangesetManager{};
+
+        [[nodiscard]] PreviewStateChangeset *GetCurrentChangeset()
+        {
+            return m_ChangesetManager.GetCurrentChangeset(GetVersion());
+        }
 
         void ApplyPanConstraints()
         {
@@ -257,6 +264,16 @@ namespace Gorfector
             return k_ZoomValues[nearestIndex];
         }
 
+        [[nodiscard]] ZooLib::ChangesetManagerBase *GetChangesetManager() override
+        {
+            return &m_ChangesetManager;
+        }
+
+        [[nodiscard]] PreviewStateChangeset *GetAggregatedChangeset(uint64_t stateComponentVersion) const
+        {
+            return m_ChangesetManager.GetAggregatedChangeset(stateComponentVersion);
+        }
+
         class Updater final : public StateComponent::Updater<PreviewState>
         {
         public:
@@ -267,7 +284,7 @@ namespace Gorfector
 
             ~Updater() override
             {
-                m_StateComponent->PushCurrentChangeset();
+                m_StateComponent->m_ChangesetManager.PushCurrentChangeset();
             }
 
             void LoadFromJson(const nlohmann::json &json) override
@@ -287,7 +304,7 @@ namespace Gorfector
 
                 m_StateComponent->ApplyPanConstraints();
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
             }
 
@@ -301,7 +318,7 @@ namespace Gorfector
                 m_StateComponent->m_PanOffset = panOffsetDelta;
                 m_StateComponent->ApplyPanConstraints();
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
             }
 
@@ -330,7 +347,7 @@ namespace Gorfector
 
                 m_StateComponent->m_ZoomFactor = zoomFactor;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 m_StateComponent->ApplyPanConstraints();
                 changeset->Set(PreviewStateChangeset::TypeFlag::PanOffset);
                 changeset->Set(PreviewStateChangeset::TypeFlag::ZoomFactor);
@@ -344,7 +361,7 @@ namespace Gorfector
                 }
 
                 m_StateComponent->m_ScanArea = scanArea;
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::ScanArea);
             }
 
@@ -382,7 +399,7 @@ namespace Gorfector
 
                 m_StateComponent->m_Offset = 0;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Image, -1);
             }
 
@@ -399,7 +416,7 @@ namespace Gorfector
                 int lastWrittenLine =
                         static_cast<int>(m_StateComponent->m_Offset / m_StateComponent->m_BytesPerLine) - 1;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Image, lastWrittenLine);
             }
 
@@ -415,7 +432,7 @@ namespace Gorfector
                 m_StateComponent->m_ProgressMax = max;
                 m_StateComponent->m_ProgressCurrent = min;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
@@ -423,7 +440,7 @@ namespace Gorfector
             {
                 m_StateComponent->m_ProgressCurrent += delta;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
 
@@ -434,7 +451,7 @@ namespace Gorfector
                 m_StateComponent->m_ProgressMax = 0UL;
                 m_StateComponent->m_ProgressCurrent = 0UL;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(PreviewStateChangeset::TypeFlag::Progress);
             }
         };

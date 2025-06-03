@@ -1,10 +1,32 @@
 #pragma once
 
+#include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <vector>
 
 namespace ZooLib
 {
     class ChangesetBase;
+
+    /**
+     * \class ChangesetManagerBase
+     * \brief Base class for managing changesets.
+     *
+     * This class provides an interface for purging changesets based on their version.
+     * It is intended to be inherited by specific changeset manager implementations.
+     */
+    class ChangesetManagerBase
+    {
+    public:
+        virtual ~ChangesetManagerBase() = default;
+
+        /**
+         * \brief Purges all changesets that are older than the specified version.
+         * \param untilVersion The first version to keep in the changeset stack.
+         */
+        virtual void PurgeChangesets(uint64_t untilVersion) = 0;
+    };
 
     /**
      * \class ChangesetManager
@@ -17,7 +39,7 @@ namespace ZooLib
      * with the changesets.
      */
     template<typename TChangeset>
-    class ChangesetManager
+    class ChangesetManager final : public ChangesetManagerBase
     {
         /**
          * \brief Pointer to the current changeset being managed.
@@ -29,11 +51,11 @@ namespace ZooLib
          */
         std::vector<TChangeset *> m_Changesets;
 
-    protected:
+    public:
         /**
          * \brief Destructor. Cleans up all dynamically allocated changesets.
          */
-        virtual ~ChangesetManager()
+        ~ChangesetManager() override
         {
             for (auto changeset: m_Changesets)
             {
@@ -75,7 +97,6 @@ namespace ZooLib
             }
         }
 
-    public:
         /**
          * \brief Aggregates all changesets since a given version into a new changeset.
          *
@@ -119,6 +140,56 @@ namespace ZooLib
             }
 
             return m_Changesets.front()->GetStateInitialVersion();
+        }
+
+        /**
+         * \brief Purges all changesets that are older than the specified version.
+         * \param untilVersion The first version to keep in the changeset stack.
+         */
+        void PurgeChangesets(uint64_t untilVersion) override
+        {
+            if (m_Changesets.empty())
+            {
+                return;
+            }
+
+            // Find the first changeset that is newer than, or at, the specified version.
+            auto keep =
+                    std::find_if(m_Changesets.begin(), m_Changesets.end(), [untilVersion](const TChangeset *changeset) {
+                        return changeset->GetStateInitialVersion() >= untilVersion;
+                    });
+
+            if (keep == m_Changesets.begin())
+            {
+                return;
+            }
+
+            if (keep != m_Changesets.end())
+            {
+                // If strictly greater than, `untilVersion` is part of the previous changeset, so we need to keep it.
+                if ((*keep)->GetStateInitialVersion() > untilVersion)
+                {
+                    keep = keep - 1;
+                }
+            }
+            else
+            {
+                // keep == m_Changesets.end(); the next changeset is m_CurrentChangeset
+
+                if (m_CurrentChangeset == nullptr || m_CurrentChangeset->GetStateInitialVersion() > untilVersion)
+                {
+                    keep = keep - 1;
+                }
+            }
+
+            if (keep == m_Changesets.begin())
+            {
+                return;
+            }
+
+            // Delete all changesets that are older than the changeset to keep.
+            std::for_each(m_Changesets.begin(), keep, [](TChangeset *changeset) { delete changeset; });
+            m_Changesets.erase(m_Changesets.begin(), keep);
         }
     };
 }

@@ -70,6 +70,7 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
             [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
                 auto *localApp = static_cast<Application *>(data);
                 localApp->m_ObserverManager.NotifyObservers();
+                localApp->PurgeChangesets();
                 return G_SOURCE_CONTINUE;
             },
             this, nullptr);

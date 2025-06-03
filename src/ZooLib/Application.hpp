@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <string>
 
+#include "ChangesetManager.hpp"
 #include "CommandDispatcher.hpp"
 #include "ObserverManager.hpp"
 #include "PathUtils.hpp"
@@ -195,6 +196,27 @@ namespace ZooLib
         {
             auto command = TCommand();
             m_Dispatcher.Dispatch<TCommand>(command);
+        }
+
+        /**
+         * \brief Purges all changesets that are older than the most recent observed version.
+         *
+         * This method iterates through all state components and purges their changesets
+         * based on the most recent observed version from the `ObserverManager`.
+         */
+        void PurgeChangesets()
+        {
+            for (auto m_StateComponent: m_State.GetStateComponents())
+            {
+                auto changesetManager = m_StateComponent->GetChangesetManager();
+                if (changesetManager == nullptr)
+                {
+                    continue;
+                }
+
+                auto mostRecentObservedVersion = m_ObserverManager.GetMostRecentObservedVersion(m_StateComponent);
+                changesetManager->PurgeChangesets(mostRecentObservedVersion);
+            }
         }
 
         /**

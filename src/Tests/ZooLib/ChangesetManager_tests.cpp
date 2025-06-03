@@ -5,28 +5,10 @@
 
 namespace ZooLib
 {
-    class TestChangesetManager : public ChangesetManager<TestsSupport::ChangesetA>
-    {
-    public:
-        TestChangesetManager() = default;
-        ~TestChangesetManager() override = default;
-
-        TestsSupport::ChangesetA *GetChangeset(uint64_t version)
-        {
-            auto cs = GetCurrentChangeset(version);
-            return cs;
-        }
-
-        void PushChangeset()
-        {
-            PushCurrentChangeset();
-        }
-    };
-
     TEST(ZooLib_ChangesetManagerTests, CorrectlyCreatesAnInitialChangeset)
     {
-        TestChangesetManager changesetManager;
-        auto changeset = changesetManager.GetChangeset(1);
+        ChangesetManager<TestsSupport::ChangesetA> changesetManager;
+        auto changeset = changesetManager.GetCurrentChangeset(1);
 
         EXPECT_NE(changeset, nullptr);
         EXPECT_EQ(changeset->GetStateInitialVersion(), 1);
@@ -34,10 +16,10 @@ namespace ZooLib
 
     TEST(ZooLib_ChangesetManagerTests, CorrectlyPushesChangeset)
     {
-        TestChangesetManager changesetManager;
-        changesetManager.GetChangeset(1); // side effect: create changeset
-        changesetManager.PushChangeset();
-        auto changeset = changesetManager.GetChangeset(2);
+        ChangesetManager<TestsSupport::ChangesetA> changesetManager;
+        auto changeset = changesetManager.GetCurrentChangeset(1); // side effect: create changeset
+        changesetManager.PushCurrentChangeset();
+        changeset = changesetManager.GetCurrentChangeset(2);
 
         EXPECT_NE(changeset, nullptr);
         EXPECT_EQ(changeset->GetStateInitialVersion(), 2);
@@ -46,12 +28,12 @@ namespace ZooLib
 
     TEST(ZooLib_ChangesetManagerTests, CorrectlyAggregatesChangesets)
     {
-        TestChangesetManager changesetManager;
-        auto changeset1 = changesetManager.GetChangeset(1);
-        changesetManager.PushChangeset();
+        ChangesetManager<TestsSupport::ChangesetA> changesetManager;
+        auto changeset1 = changesetManager.GetCurrentChangeset(1); // side effect: create changeset
+        changesetManager.PushCurrentChangeset();
 
-        auto changeset2 = changesetManager.GetChangeset(2);
-        changesetManager.PushChangeset();
+        auto changeset2 = changesetManager.GetCurrentChangeset(2); // side effect: create changeset
+        changesetManager.PushCurrentChangeset();
 
         auto aggregatedChangeset = changesetManager.GetAggregatedChangeset(1);
 

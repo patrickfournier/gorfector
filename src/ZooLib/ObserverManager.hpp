@@ -126,6 +126,25 @@ namespace ZooLib
         }
 
         /**
+         * \brief Retrieves the most recent observed version of a state component across all observers.
+         * \param stateComponent The state component for which to retrieve the most recent version.
+         * \return The most recent observed version of the state component.
+         */
+        uint64_t GetMostRecentObservedVersion(const StateComponent *stateComponent) const
+        {
+            uint64_t mostRecentVersion = 0;
+            for (const auto &observer: m_Observers)
+            {
+                if (std::ranges::find(observer->GetObservedComponents(), stateComponent) !=
+                    observer->GetObservedComponents().end())
+                {
+                    mostRecentVersion = std::max(mostRecentVersion, observer->GetObservedVersion(stateComponent));
+                }
+            }
+            return mostRecentVersion;
+        }
+
+        /**
          * \brief Notifies all observers in the correct order.
          *
          * If sorting is required, it sorts the observers first. Deleted observers are skipped.

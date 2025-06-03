@@ -55,6 +55,15 @@ namespace ZooLib
         }
 
         /**
+         * \brief Retrieves all state components managed by this state.
+         * \return A constant reference to the vector of state components.
+         */
+        const std::vector<StateComponent *> &GetStateComponents() const
+        {
+            return m_StateComponents;
+        }
+
+        /**
          * \brief Retrieves a state component by its type.
          * \tparam TStateComponent The type of the state component to retrieve.
          * \return A pointer to the state component if found, otherwise nullptr.

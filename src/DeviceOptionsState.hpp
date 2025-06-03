@@ -129,8 +129,7 @@ namespace Gorfector
      * It inherits from `ZooLib::StateComponent` and `ZooLib::ChangesetManager` to handle state changes
      * and manage changesets for tracking modifications.
      */
-    class DeviceOptionsState : public ZooLib::StateComponent,
-                               public ZooLib::ChangesetManager<DeviceOptionsStateChangeset>
+    class DeviceOptionsState : public ZooLib::StateComponent
     {
     public:
         static constexpr uint32_t k_InvalidIndex = std::numeric_limits<uint32_t>::max(); ///< Invalid index constant.
@@ -160,9 +159,11 @@ namespace Gorfector
         uint32_t m_YResolutionIndex;
         uint32_t m_BitDepthIndex;
 
+        ZooLib::ChangesetManager<DeviceOptionsStateChangeset> m_ChangesetManager{};
+
         [[nodiscard]] DeviceOptionsStateChangeset *GetCurrentChangeset()
         {
-            return ChangesetManager::GetCurrentChangeset(GetVersion());
+            return m_ChangesetManager.GetCurrentChangeset(GetVersion());
         }
 
         [[nodiscard]] SaneDevice *GetDevice() const
@@ -272,6 +273,21 @@ namespace Gorfector
             Clear();
         }
 
+        [[nodiscard]] uint64_t FirstChangesetVersion() const
+        {
+            return m_ChangesetManager.FirstChangesetVersion();
+        }
+
+        [[nodiscard]] ZooLib::ChangesetManagerBase *GetChangesetManager() override
+        {
+            return &m_ChangesetManager;
+        }
+
+        [[nodiscard]] DeviceOptionsStateChangeset *GetAggregatedChangeset(uint64_t stateComponentVersion) const
+        {
+            return m_ChangesetManager.GetAggregatedChangeset(stateComponentVersion);
+        }
+
         /**
          * \class Updater
          * \brief Provides functionality to update and manage the state of `DeviceOptionsState`.
@@ -303,7 +319,7 @@ namespace Gorfector
              */
             ~Updater() override
             {
-                m_StateComponent->PushCurrentChangeset();
+                m_StateComponent->m_ChangesetManager.PushCurrentChangeset();
             }
 
             /**

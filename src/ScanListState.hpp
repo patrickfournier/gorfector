@@ -74,7 +74,7 @@ namespace Gorfector
      * add, remove, and retrieve scan items, as well as manage the current device's scan list. The state is
      * serialized using `nlohmann::json` for persistence.
      */
-    class ScanListState final : public ZooLib::StateComponent, public ZooLib::ChangesetManager<ScanListStateChangeset>
+    class ScanListState final : public ZooLib::StateComponent
     {
     public:
         static constexpr const char *k_AddAllParamsKey = "AddAllParams";
@@ -97,8 +97,15 @@ namespace Gorfector
 
         int m_SelectedIndex{-1};
 
+        ZooLib::ChangesetManager<ScanListStateChangeset> m_ChangesetManager{};
+
         friend void to_json(nlohmann::json &j, const ScanListState &state);
         friend void from_json(const nlohmann::json &j, ScanListState &state);
+
+        [[nodiscard]] ScanListStateChangeset *GetCurrentChangeset()
+        {
+            return m_ChangesetManager.GetCurrentChangeset(GetVersion());
+        }
 
     public:
         explicit ScanListState(ZooLib::State *state)
@@ -202,6 +209,16 @@ namespace Gorfector
             return m_ScanActivity;
         }
 
+        [[nodiscard]] ZooLib::ChangesetManagerBase *GetChangesetManager() override
+        {
+            return &m_ChangesetManager;
+        }
+
+        [[nodiscard]] ScanListStateChangeset *GetAggregatedChangeset(uint64_t stateComponentVersion) const
+        {
+            return m_ChangesetManager.GetAggregatedChangeset(stateComponentVersion);
+        }
+
         class Updater final : public StateComponent::Updater<ScanListState>
         {
             void LoadScanListForCurrentDevice()
@@ -225,7 +242,7 @@ namespace Gorfector
 
             ~Updater() override
             {
-                m_StateComponent->PushCurrentChangeset();
+                m_StateComponent->m_ChangesetManager.PushCurrentChangeset();
             }
 
             void LoadFromJson(const nlohmann::json &json) override
@@ -233,7 +250,7 @@ namespace Gorfector
                 from_json(json, *m_StateComponent);
                 LoadScanListForCurrentDevice();
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
             }
 
@@ -247,7 +264,7 @@ namespace Gorfector
                 {
                     m_StateComponent->m_SelectedIndex = -1;
                 }
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::SelectedItem);
             }
 
@@ -279,7 +296,7 @@ namespace Gorfector
 
                 SetSelectedIndex(newIndex);
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
             }
 
@@ -305,7 +322,7 @@ namespace Gorfector
                 to_json(scanItem[k_ItemOutputSettingsKey], *outputOptions);
                 m_StateComponent->m_CurrentScanList.emplace_back(std::move(scanItem));
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
             }
 
@@ -341,7 +358,7 @@ namespace Gorfector
                 };
                 m_StateComponent->m_CurrentScanList.emplace_back(std::move(scanItem));
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
             }
 
@@ -352,7 +369,7 @@ namespace Gorfector
                     m_StateComponent->m_CurrentScanList.erase(
                             m_StateComponent->m_CurrentScanList.begin() + static_cast<long>(index));
 
-                    auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                    auto changeset = m_StateComponent->GetCurrentChangeset();
                     changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
 
                     if (static_cast<int>(index) <= m_StateComponent->m_SelectedIndex)
@@ -375,7 +392,7 @@ namespace Gorfector
                 m_StateComponent->m_CurrentScanList.clear();
                 m_StateComponent->m_SelectedIndex = -1;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
                 changeset->Set(ScanListStateChangeset::TypeFlag::SelectedItem);
             }
@@ -394,7 +411,7 @@ namespace Gorfector
                     m_StateComponent->m_CurrentDevice = newDeviceName;
                     LoadScanListForCurrentDevice();
 
-                    auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                    auto changeset = m_StateComponent->GetCurrentChangeset();
                     changeset->Set(ScanListStateChangeset::TypeFlag::ListContent);
                 }
             }
@@ -403,7 +420,7 @@ namespace Gorfector
             {
                 m_StateComponent->m_ScanActivity = scanning;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ScanActivity);
             }
 
@@ -411,7 +428,7 @@ namespace Gorfector
             {
                 m_StateComponent->m_AddToScanListButtonAddsAllParams = addsAllParams;
 
-                auto changeset = m_StateComponent->GetCurrentChangeset(m_StateComponent->GetVersion());
+                auto changeset = m_StateComponent->GetCurrentChangeset();
                 changeset->Set(ScanListStateChangeset::TypeFlag::ButtonAction);
             }
         };
