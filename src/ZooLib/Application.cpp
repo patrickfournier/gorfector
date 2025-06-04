@@ -24,7 +24,11 @@ void ZooLib::Application::Initialize()
 
 ZooLib::Application::~Application()
 {
-    gtk_widget_remove_tick_callback(m_MainWindow, m_RunObserversCallbackId);
+
+    if (m_ExecuteTestActionCallbackId != 0)
+    {
+        gtk_widget_remove_tick_callback(m_MainWindow, m_RunObserversCallbackId);
+    }
     if (m_ExecuteTestActionCallbackId != 0)
     {
         gtk_widget_remove_tick_callback(m_MainWindow, m_ExecuteTestActionCallbackId);
