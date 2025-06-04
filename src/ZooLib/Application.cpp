@@ -24,6 +24,12 @@ void ZooLib::Application::Initialize()
 
 ZooLib::Application::~Application()
 {
+    gtk_widget_remove_tick_callback(m_MainWindow, m_RunObserversCallbackId);
+    if (m_ExecuteTestActionCallbackId != 0)
+    {
+        gtk_widget_remove_tick_callback(m_MainWindow, m_ExecuteTestActionCallbackId);
+    }
+
     g_object_unref(m_GtkApp);
     m_GtkApp = nullptr;
     delete m_TestActionsStack;
@@ -65,7 +71,7 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
     adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(mainView), content);
 
     gtk_window_present(GTK_WINDOW(m_MainWindow));
-    gtk_widget_add_tick_callback(
+    m_RunObserversCallbackId = gtk_widget_add_tick_callback(
             m_MainWindow,
             [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
                 auto *localApp = static_cast<Application *>(data);
@@ -77,7 +83,7 @@ void ZooLib::Application::OnActivate(GtkApplication *app)
 
     if (m_TestMode)
     {
-        gtk_widget_add_tick_callback(
+        m_ExecuteTestActionCallbackId = gtk_widget_add_tick_callback(
                 m_MainWindow,
                 [](GtkWidget *widget, GdkFrameClock *frameClock, gpointer data) -> gboolean {
                     auto app = static_cast<Application *>(data);

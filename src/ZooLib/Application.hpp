@@ -27,6 +27,9 @@ namespace ZooLib
      */
     class Application
     {
+        guint m_RunObserversCallbackId{};
+        guint m_ExecuteTestActionCallbackId{};
+
     protected:
         /**
          * \brief Command dispatcher for handling application commands.
