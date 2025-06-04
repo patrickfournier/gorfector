@@ -113,12 +113,13 @@ Then you will need to install the following dependencies:
 - `libtiff` 4.5 or later
 - `libpng` 1.6 or later
 - `libjpeg` 2.1 or later
+- `libxdo` 3.20160808.1 or later (to build and run the tests)
 
 On Ubuntu 24.04, you can install these dependencies with the following command:
 (`libjpeg` will be pulled by `libtiff`):
 
 ```bash
-  sudo apt install libglib2.0-dev-bin libgtk-4-dev libadwaita-1-dev libsane-dev libtiff-dev libpng-dev
+  sudo apt install libglib2.0-dev-bin libgtk-4-dev libadwaita-1-dev libsane-dev libtiff-dev libpng-dev libxdo-dev libxdo3
 ```
 
 If you are using a different distribution, you will need to install the equivalent packages for your distribution.

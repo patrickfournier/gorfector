@@ -1,9 +1,19 @@
 # Publishing a new release
 
+## Tools needed
+
+- To build the AppImage, you will need `curl`:
+
+```bash
+  sudo apt install curl
+```
+
 ## Preliminary steps
 
-- Build and test the AppImage on a clean Ubuntu 24.04 system
-- Make sure CI tests pass
+- Build the AppImage on a clean Ubuntu 24.04 system.
+- Test the AppImage on a clean Ubuntu 24.04 system. 
+- Make sure tests pass. Make sure your session runs X11, not Wayland. This can be selected in the
+  login screen, at the password prompt, using the gear icon in the bottom right corner of the screen.
 
 ## Making a major or minor release
 
