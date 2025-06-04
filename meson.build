@@ -1,6 +1,6 @@
 project('gorfector',
         'cpp',
-        version : '0.2.0-devel',
+        version : '0.3.0-devel',
         default_options : [
                 'warning_level=2',
                 'cpp_std=c++23'

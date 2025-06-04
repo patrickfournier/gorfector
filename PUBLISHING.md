@@ -18,7 +18,7 @@
 ## Making a major or minor release
 
 - Create a new branch vX.Y and check it out
-- Update the change log
+- Update the change log (at the very least, change UNRELEASED to the new version)
 - Update the version in meson.build to X.Y.0
 - Commit the changes and push the branch
 - Build the AppImage
@@ -31,11 +31,14 @@
   - Upload the AppImage binary and rename it to `Gorfector-vX_Y_0-x86_64-Ubuntu-24_04.AppImage`
   - Save as draft and review.
   - Publish the release
+- Check out the main branch out
+- Update the version in meson.build to X.Y+1.0-dev
+- Commit and push the changes to the main branch
 
 ## Making a patch release
 
 - Check out and pull the branch to be patched (vX.Y)
-- Update the change log
+- Update the change log (at the very least, change UNRELEASED to the new version)
 - Update the version in meson.build to X.Y.Z
 - Commit the changes and push the branch
 - Build the AppImage
